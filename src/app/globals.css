@@ -1,26 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent: #00ff00;
+  --muted: #555555;
+  --border: #333333;
 }
 
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #000000;
+  --accent: #0066cc;
+  --muted: #666666;
+  --border: #cccccc;
+}
+
+[data-theme="dark"] {
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent: #00ff00;
+  --muted: #555555;
+  --border: #333333;
+}
+
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-tui-background: var(--background);
+  --color-tui-foreground: var(--foreground);
+  --color-tui-accent: var(--accent);
+  --color-tui-muted: var(--muted);
+  --color-tui-border: var(--border);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-mono), "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
+
+/* tui-inspired utility classes */
+.tui-border {
+  border: 1px solid var(--border);
+}
+
+.tui-border-r {
+  border-right: 1px solid var(--border);
+}
+
+.tui-border-b {
+  border-bottom: 1px solid var(--border);
+}
+
+.tui-border-t {
+  border-top: 1px solid var(--border);
+}
+
+.tui-border-l {
+  border-left: 1px solid var(--border);
+}
+
+.tui-input {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-family: inherit;
+  padding: 0.5rem;
+}
+
+.tui-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.tui-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+}
+
+.tui-button:hover {
+  background: var(--border);
+}
+
+.tui-button:active {
+  background: var(--muted);
+}
+
+.tui-accent {
+  color: var(--accent);
+}
+
+.tui-muted {
+  color: var(--muted);
+}
+
+.tui-background {
+  background-color: var(--background);
+}
+
+.tui-foreground {
+  color: var(--foreground);
 }
