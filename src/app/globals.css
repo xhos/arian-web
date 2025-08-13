@@ -75,11 +75,18 @@ body {
   color: var(--foreground);
   font-family: inherit;
   padding: 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.tui-input:hover {
+  border-color: var(--accent);
+  opacity: 0.8;
 }
 
 .tui-input:focus {
   outline: none;
   border-color: var(--accent);
+  opacity: 1;
 }
 
 .tui-button {

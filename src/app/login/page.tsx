@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -28,7 +31,7 @@ export default function LoginPage() {
         <h1 className="text-lg mb-2">arian // authentication</h1>
         <p className="text-sm tui-muted">
           {mode === "login" 
-            ? "sign in to access your financial data" 
+            ? "login to access your financial data" 
             : "create an account to start tracking"
           }
         </p>
@@ -36,56 +39,48 @@ export default function LoginPage() {
 
         {/* mode toggle */}
         <div className="mb-6 flex gap-1">
-          <button
+          <Button
             onClick={() => setMode("login")}
-            className={`text-sm px-3 py-1 transition-colors ${
-              mode === "login" 
-                ? "tui-accent bg-accent/10 border border-accent/30" 
-                : "tui-muted hover:text-foreground"
-            }`}
+            variant={mode === "login" ? "accent" : "ghost"}
+            size="sm"
           >
             login
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setMode("register")}
-            className={`text-sm px-3 py-1 transition-colors ${
-              mode === "register" 
-                ? "tui-accent bg-accent/10 border border-accent/30" 
-                : "tui-muted hover:text-foreground"
-            }`}
+            variant={mode === "register" ? "accent" : "ghost"}
+            size="sm"
           >
             register
-          </button>
+          </Button>
         </div>
 
         {/* form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div>
-            <label htmlFor="email" className="block text-xs tui-muted mb-1 uppercase tracking-wider">
+            <Label htmlFor="email">
               email
-            </label>
-            <input
+            </Label>
+            <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
-              className="w-full tui-input"
               required
               placeholder="user@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs tui-muted mb-1 uppercase tracking-wider">
+            <Label htmlFor="password">
               password
-            </label>
-            <input
+            </Label>
+            <Input
               id="password"
               type="password"
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
-              className="w-full tui-input"
               required
               placeholder="••••••••"
             />
@@ -93,27 +88,27 @@ export default function LoginPage() {
 
           {mode === "register" && (
             <div>
-              <label htmlFor="confirmPassword" className="block text-xs tui-muted mb-1 uppercase tracking-wider">
+              <Label htmlFor="confirmPassword">
                 confirm password
-              </label>
-              <input
+              </Label>
+              <Input
                 id="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                className="w-full tui-input"
                 required
                 placeholder="••••••••"
               />
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
-            className="w-full tui-button py-3 mt-6"
+            className="w-full mt-6"
+            size="lg"
           >
-            {mode === "login" ? "sign in" : "create account"}
-          </button>
+            {mode === "login" ? "login" : "create account"}
+          </Button>
 
         </form>
 
