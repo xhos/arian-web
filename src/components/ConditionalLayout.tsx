@@ -27,7 +27,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
         
         {/* Right half - ASCII Stars animation (hidden on narrow screens) */}
         <div className="hidden lg:block lg:w-1/2 relative tui-border-l overflow-hidden">
-          <AsciiStars />
+          <AsciiStars className="w-full h-full" />
         </div>
 
         {/* Theme toggle - bottom left */}
