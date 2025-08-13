@@ -1,0 +1,16 @@
+version: v2
+
+inputs:
+  - directory: proto
+
+plugins:
+  - remote: buf.build/bufbuild/es:v2.6.3
+    out: src/gen
+    opt:
+      - target=ts
+      - import_extension=.js
+  - remote: buf.build/connectrpc/es:v1.6.1
+    out: src/gen
+    opt:
+      - target=ts
+      - import_extension=.js

@@ -1,4 +1,6 @@
-{
+{pkgs,...}:{
+  packages = [ pkgs.buf ];
+
   languages = {
     typescript.enable = true;
     javascript = {
