@@ -4,6 +4,10 @@ arian-web is a modern web dashboard for the Arian financial transaction manageme
 
 ## 🌱 ecosystem
 
+```definition
+arian (n.) /ˈarjan/ [Welsh] Silver; money; wealth.  
+```
+
 - [ariand](https://github.com/xhos/ariand) - main backend service
 - [arian-web](https://github.com/xhos/arian-web) - frontend web application
 - [arian-mobile](https://github.com/xhos/arian-mobile) - mobile appplication

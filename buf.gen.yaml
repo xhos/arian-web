@@ -4,13 +4,11 @@ inputs:
   - directory: proto
 
 plugins:
-  - remote: buf.build/bufbuild/es:v2.6.3
+  - local: protoc-gen-es
     out: src/gen
     opt:
       - target=ts
-      - import_extension=.js
-  - remote: buf.build/connectrpc/es:v1.6.1
+  - local: protoc-gen-connect-es
     out: src/gen
     opt:
       - target=ts
-      - import_extension=.js
