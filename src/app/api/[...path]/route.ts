@@ -10,7 +10,7 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
     const { token } = await auth.api.getToken({
       headers: await headers(),
     });
-    console.log(`JWT Token: ${token}`);
+
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

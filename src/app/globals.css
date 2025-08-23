@@ -77,6 +77,11 @@ body {
   transition: border-color 0.2s ease;
 }
 
+select.tui-input {
+  height: calc(1.4em + 1rem + 2px);
+  box-sizing: border-box;
+}
+
 .tui-input:hover {
   border-color: var(--accent);
   opacity: 0.8;
