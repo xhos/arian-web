@@ -3,12 +3,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddCollaboratorRequest, AddCollaboratorResponse, CheckCollaboratorRequest, CheckCollaboratorResponse, CheckUserAccountAccessRequest, CheckUserAccountAccessResponse, CreateAccountRequest, CreateAccountResponse, DeleteAccountRequest, DeleteAccountResponse, GetAccountBalanceRequest, GetAccountBalanceResponse, GetAccountRequest, GetAccountResponse, GetAccountsCountRequest, GetAccountsCountResponse, GetAnchorBalanceRequest, GetAnchorBalanceResponse, GetCollaboratorCountRequest, GetCollaboratorCountResponse, LeaveCollaborationRequest, LeaveCollaborationResponse, ListAccountsRequest, ListAccountsResponse, ListCollaboratorsRequest, ListCollaboratorsResponse, ListUserCollaborationsRequest, ListUserCollaborationsResponse, RemoveCollaboratorRequest, RemoveCollaboratorResponse, SetAccountAnchorRequest, SetAccountAnchorResponse, SyncAccountBalancesRequest, SyncAccountBalancesResponse, TransferOwnershipRequest, TransferOwnershipResponse, UpdateAccountRequest, UpdateAccountResponse } from "./account_services_pb.js";
+import { CreateAccountRequest, CreateAccountResponse, DeleteAccountRequest, DeleteAccountResponse, GetAccountBalanceRequest, GetAccountBalanceResponse, GetAccountRequest, GetAccountResponse, GetAccountsCountRequest, GetAccountsCountResponse, GetAnchorBalanceRequest, GetAnchorBalanceResponse, ListAccountsRequest, ListAccountsResponse, SetAccountAnchorRequest, SetAccountAnchorResponse, SyncAccountBalancesRequest, SyncAccountBalancesResponse, UpdateAccountRequest, UpdateAccountResponse } from "./account_services_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * Account management service
- *
  * @generated from service arian.v1.AccountService
  */
 export const AccountService = {
@@ -96,104 +94,12 @@ export const AccountService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc arian.v1.AccountService.CheckUserAccountAccess
-     */
-    checkUserAccountAccess: {
-      name: "CheckUserAccountAccess",
-      I: CheckUserAccountAccessRequest,
-      O: CheckUserAccountAccessResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * @generated from rpc arian.v1.AccountService.SyncAccountBalances
      */
     syncAccountBalances: {
       name: "SyncAccountBalances",
       I: SyncAccountBalancesRequest,
       O: SyncAccountBalancesResponse,
-      kind: MethodKind.Unary,
-    },
-  }
-} as const;
-
-/**
- * Account collaboration service
- *
- * @generated from service arian.v1.AccountCollaborationService
- */
-export const AccountCollaborationService = {
-  typeName: "arian.v1.AccountCollaborationService",
-  methods: {
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.AddCollaborator
-     */
-    addCollaborator: {
-      name: "AddCollaborator",
-      I: AddCollaboratorRequest,
-      O: AddCollaboratorResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.RemoveCollaborator
-     */
-    removeCollaborator: {
-      name: "RemoveCollaborator",
-      I: RemoveCollaboratorRequest,
-      O: RemoveCollaboratorResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.ListCollaborators
-     */
-    listCollaborators: {
-      name: "ListCollaborators",
-      I: ListCollaboratorsRequest,
-      O: ListCollaboratorsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.GetCollaboratorCount
-     */
-    getCollaboratorCount: {
-      name: "GetCollaboratorCount",
-      I: GetCollaboratorCountRequest,
-      O: GetCollaboratorCountResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.CheckCollaborator
-     */
-    checkCollaborator: {
-      name: "CheckCollaborator",
-      I: CheckCollaboratorRequest,
-      O: CheckCollaboratorResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.ListUserCollaborations
-     */
-    listUserCollaborations: {
-      name: "ListUserCollaborations",
-      I: ListUserCollaborationsRequest,
-      O: ListUserCollaborationsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.LeaveCollaboration
-     */
-    leaveCollaboration: {
-      name: "LeaveCollaboration",
-      I: LeaveCollaborationRequest,
-      O: LeaveCollaborationResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc arian.v1.AccountCollaborationService.TransferOwnership
-     */
-    transferOwnership: {
-      name: "TransferOwnership",
-      I: TransferOwnershipRequest,
-      O: TransferOwnershipResponse,
       kind: MethodKind.Unary,
     },
   }

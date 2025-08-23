@@ -1,0 +1,6 @@
+src/gen/
+src/db/schema.ts
+node_modules/
+.next/
+dist/
+build/

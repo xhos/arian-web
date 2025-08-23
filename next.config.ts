@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@/gen': path.resolve(__dirname, 'src/gen'),
-    }
-    return config
-  }
+      "@/gen": path.resolve(__dirname, "src/gen"),
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

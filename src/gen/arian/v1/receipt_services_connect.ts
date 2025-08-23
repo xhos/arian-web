@@ -94,7 +94,7 @@ export const ReceiptService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Receipt items management
+     * receipt items management
      *
      * @generated from rpc arian.v1.ReceiptService.ListReceiptItems
      */
@@ -159,7 +159,7 @@ export const ReceiptService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Utility operations
+     * utility operations
      *
      * @generated from rpc arian.v1.ReceiptService.GetUnlinkedReceipts
      */

@@ -7,8 +7,6 @@ import { CheckUserExistsRequest, CheckUserExistsResponse, CreateUserRequest, Cre
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * User management service
- *
  * @generated from service arian.v1.UserService
  */
 export const UserService = {

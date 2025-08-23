@@ -13,9 +13,9 @@ export default function AsciiStars({
   radius = 100,
   fps = 20,
   className = "",
-  cw = 8,           // px per char column
-  ch = 16,          // px per row
-  seed = 1337,      // deterministic layout
+  cw = 8, // px per char column
+  ch = 16, // px per row
+  seed = 1337, // deterministic layout
 }: {
   density?: number;
   speed?: number;
@@ -28,8 +28,8 @@ export default function AsciiStars({
   ch?: number;
   seed?: number;
 }) {
-  const root = useRef<HTMLDivElement>(null);   // the container we clip to
-  const layer = useRef<HTMLDivElement>(null);  // absolutely-positioned overlay
+  const root = useRef<HTMLDivElement>(null); // the container we clip to
+  const layer = useRef<HTMLDivElement>(null); // absolutely-positioned overlay
   const pre = useRef<HTMLPreElement>(null);
 
   // grid measured from the container (NOT from the <pre>, so no feedback loop)
@@ -72,7 +72,9 @@ export default function AsciiStars({
       // maintain density without nuking the array
       const target = Math.max(80, (cols * rows * density) | 0);
       if (stars.current.length < target) {
-        stars.current.push(...makeStars(target - stars.current.length, { cols, rows }, rng.current));
+        stars.current.push(
+          ...makeStars(target - stars.current.length, { cols, rows }, rng.current)
+        );
       } else if (stars.current.length > target) {
         stars.current.length = target;
       }
@@ -119,7 +121,9 @@ export default function AsciiStars({
 
   // animation
   useEffect(() => {
-    let id = 0, last = 0, acc = 0;
+    let id = 0,
+      last = 0,
+      acc = 0;
     const step = 1000 / Math.max(1, fps);
     const pal = [" ", ".", ",", ":", ";", "+", "*", "x", "%", "#", "@"];
     const spark = ["·", "•", "✶", "✷", "✦"];
@@ -128,7 +132,10 @@ export default function AsciiStars({
       const delta = Math.min(50, t - last);
       last = t;
       acc += delta;
-      if (acc < step) { id = requestAnimationFrame(tick); return; }
+      if (acc < step) {
+        id = requestAnimationFrame(tick);
+        return;
+      }
       acc = 0;
 
       const { cols, rows } = grid;
@@ -142,7 +149,7 @@ export default function AsciiStars({
         st.x += (0.2 + st.z * speed) * (delta * 0.001);
         if (st.x >= cols) st.x -= cols;
 
-        if (twinkle) st.p += (delta * 0.001) * (0.6 + st.s * 0.8);
+        if (twinkle) st.p += delta * 0.001 * (0.6 + st.s * 0.8);
 
         const gx = st.x | 0;
         const gy = st.y | 0;
@@ -151,20 +158,21 @@ export default function AsciiStars({
         let b = twinkle ? 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(st.p)) : 0.7;
 
         if (active) {
-          const dx = gx - mx, dy = gy - my;
+          const dx = gx - mx,
+            dy = gy - my;
           const d2 = dx * dx + dy * dy;
           if (d2 < radius) {
             const k = 1 - d2 / radius;
             const force = k * k; // quadratic falloff for stronger nearby effect
             b = Math.min(1, b + force * 1.2);
-            
+
             // stronger repulsion in both x and y directions
             const pushX = dx > 0 ? 0.8 : -0.8;
             const pushY = dy > 0 ? 0.8 : -0.8;
-            
+
             st.x += pushX * force;
             st.y += pushY * force;
-            
+
             // wrap around edges
             if (st.x < 0) st.x += cols;
             if (st.x >= cols) st.x -= cols;
@@ -174,12 +182,13 @@ export default function AsciiStars({
         }
 
         const idx = clamp((b * (pal.length - 1)) | 0, 0, pal.length - 1);
-        buf[gy][gx] = sparkle && b > 0.9 && st.s > 0.7
-          ? spark[(i + ((st.p * 10) | 0)) % spark.length]
-          : pal[idx];
+        buf[gy][gx] =
+          sparkle && b > 0.9 && st.s > 0.7
+            ? spark[(i + ((st.p * 10) | 0)) % spark.length]
+            : pal[idx];
       }
 
-      if (pre.current) pre.current.textContent = buf.map(r => r.join("")).join("\n");
+      if (pre.current) pre.current.textContent = buf.map((r) => r.join("")).join("\n");
       id = requestAnimationFrame(tick);
     };
 
@@ -190,22 +199,22 @@ export default function AsciiStars({
   return (
     <div
       ref={root}
-      className={`relative ${className}`}        // parent should be sized by your layout
+      className={`relative ${className}`} // parent should be sized by your layout
     >
       <div
         ref={layer}
         className="absolute inset-0 overflow-hidden bg-background text-foreground/70"
-        style={{ contain: "strict", pointerEvents: "none" }}             // ensure content never expands the box
+        style={{ contain: "strict", pointerEvents: "none" }} // ensure content never expands the box
       >
         <pre
           ref={pre}
           className="m-0 h-full w-full font-mono select-none opacity-80"
           style={{
             position: "absolute",
-            inset: 0,               // absolutely fill without affecting layout
+            inset: 0, // absolutely fill without affecting layout
             whiteSpace: "pre",
             lineHeight: `${ch}px`,
-            fontSize: `${Math.round((ch * 0.875))}px`, // rough match to keep cw/ch sane
+            fontSize: `${Math.round(ch * 0.875)}px`, // rough match to keep cw/ch sane
             padding: 16,
             tabSize: 2,
           }}
@@ -232,9 +241,11 @@ function makeStars(n: number, g: { cols: number; rows: number }, rnd: () => numb
 }
 
 function makeRng(seed: number) {
-  let s = (seed >>> 0) || 1;
+  let s = seed >>> 0 || 1;
   return function rng() {
-    s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+    s ^= s << 13;
+    s ^= s >>> 17;
+    s ^= s << 5;
     return ((s >>> 0) % 0x100000000) / 0x100000000;
   };
 }

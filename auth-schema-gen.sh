@@ -1,2 +1,2 @@
-bunx @better-auth/cli generate --output src/db/schema.ts;
-bunx drizzle-kit push --force
+bunx @better-auth/cli@latest --output src/db/schema.ts
+bunx drizzle-kit push --force --config drizzle.config.ts

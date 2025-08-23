@@ -3,70 +3,66 @@ import { notFound } from "next/navigation";
 
 // mock transaction data for demo - in real app this would come from api/database
 const transactions = [
-  { 
-    id: "001", 
-    date: "2024-01-15", 
-    amount: -24.99, 
-    description: "grocery store", 
+  {
+    id: "001",
+    date: "2024-01-15",
+    amount: -24.99,
+    description: "grocery store",
     category: "food",
     merchant: "whole foods market",
     location: "123 main st, anytown",
     paymentMethod: "card ending in 4567",
-    status: "completed"
+    status: "completed",
   },
-  { 
-    id: "002", 
-    date: "2024-01-14", 
-    amount: -120.00, 
-    description: "gas station", 
+  {
+    id: "002",
+    date: "2024-01-14",
+    amount: -120.0,
+    description: "gas station",
     category: "transport",
     merchant: "shell station",
     location: "456 highway rd",
     paymentMethod: "card ending in 4567",
-    status: "completed"
+    status: "completed",
   },
-  { 
-    id: "003", 
-    date: "2024-01-14", 
-    amount: 2500.00, 
-    description: "salary", 
+  {
+    id: "003",
+    date: "2024-01-14",
+    amount: 2500.0,
+    description: "salary",
     category: "income",
     merchant: "acme corp",
     location: "direct deposit",
     paymentMethod: "bank transfer",
-    status: "completed"
+    status: "completed",
   },
-  { 
-    id: "004", 
-    date: "2024-01-13", 
-    amount: -45.00, 
-    description: "restaurant", 
+  {
+    id: "004",
+    date: "2024-01-13",
+    amount: -45.0,
+    description: "restaurant",
     category: "food",
     merchant: "local bistro",
     location: "downtown",
     paymentMethod: "card ending in 4567",
-    status: "completed"
+    status: "completed",
   },
-  { 
-    id: "005", 
-    date: "2024-01-12", 
-    amount: -8.50, 
-    description: "coffee", 
+  {
+    id: "005",
+    date: "2024-01-12",
+    amount: -8.5,
+    description: "coffee",
     category: "food",
     merchant: "coffee shop",
     location: "corner cafe",
     paymentMethod: "card ending in 4567",
-    status: "completed"
+    status: "completed",
   },
 ];
 
-export default function TransactionDetailPage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
-}) {
+export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
-  const transaction = transactions.find(t => t.id === id);
+  const transaction = transactions.find((t) => t.id === id);
 
   if (!transaction) {
     notFound();
@@ -75,7 +71,6 @@ export default function TransactionDetailPage({
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-2xl">
-        
         {/* transaction header */}
         <header className="mb-6 tui-border p-4">
           <div className="flex items-center justify-between mb-2">
@@ -89,7 +84,6 @@ export default function TransactionDetailPage({
 
         {/* transaction details */}
         <div className="space-y-6">
-          
           {/* basic info */}
           <section>
             <h2 className="text-sm tui-muted mb-3 uppercase tracking-wider">basic info</h2>
@@ -133,12 +127,12 @@ export default function TransactionDetailPage({
             <h2 className="text-sm tui-muted mb-3 uppercase tracking-wider">actions</h2>
             <div className="flex gap-2">
               <button className="tui-button text-sm">edit transaction</button>
-              <button className="tui-button text-sm text-red-500 border-red-500/50 hover:bg-red-500/10">delete</button>
+              <button className="tui-button text-sm text-red-500 border-red-500/50 hover:bg-red-500/10">
+                delete
+              </button>
             </div>
           </section>
-
         </div>
-
       </div>
     </div>
   );

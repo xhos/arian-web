@@ -24,7 +24,6 @@
   --border: #333333;
 }
 
-
 @theme inline {
   --color-tui-background: var(--background);
   --color-tui-foreground: var(--foreground);
