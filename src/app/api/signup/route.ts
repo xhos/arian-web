@@ -25,12 +25,12 @@ export async function POST(request: NextRequest) {
     // since the user doesn't have a session yet, we use server-to-server auth
     // TODO: this is a bit of an anti-pattern
     const backendResponse = await fetch(
-      `${process.env.ARIAND_URL || "http://localhost:55556"}/arian.v1.UserService/CreateUser`,
+      `${process.env.ARIAND_URL}/arian.v1.UserService/CreateUser`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Internal-Key": process.env.INTERNAL_API_KEY!,
+          "X-Internal-Key": process.env.API_KEY!,
         },
         body: JSON.stringify({
           id: user.id,

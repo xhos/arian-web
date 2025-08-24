@@ -24,7 +24,7 @@ const getAccountTypeName = (accountType: AccountType): string => {
       return "unknown";
   }
 };
-
+//TODO: decimal support for balance on create account
 export default function AccountsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +93,9 @@ export default function AccountsPage() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.message?.includes("duplicate key value violates unique constraint")) {
-          throw new Error("An account with this name already exists. Please choose a different name.");
+          throw new Error(
+            "An account with this name already exists. Please choose a different name."
+          );
         }
         throw new Error(`Failed to create account: ${response.statusText}`);
       }
@@ -140,7 +142,9 @@ export default function AccountsPage() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.message?.includes("duplicate key value violates unique constraint")) {
-          throw new Error("An account with this name already exists. Please choose a different name.");
+          throw new Error(
+            "An account with this name already exists. Please choose a different name."
+          );
         }
         throw new Error(`Failed to update account: ${response.statusText}`);
       }
