@@ -1,68 +1,10 @@
 import React from "react";
 import { notFound } from "next/navigation";
 
-// mock transaction data for demo - in real app this would come from api/database
-const transactions = [
-  {
-    id: "001",
-    date: "2024-01-15",
-    amount: -24.99,
-    description: "grocery store",
-    category: "food",
-    merchant: "whole foods market",
-    location: "123 main st, anytown",
-    paymentMethod: "card ending in 4567",
-    status: "completed",
-  },
-  {
-    id: "002",
-    date: "2024-01-14",
-    amount: -120.0,
-    description: "gas station",
-    category: "transport",
-    merchant: "shell station",
-    location: "456 highway rd",
-    paymentMethod: "card ending in 4567",
-    status: "completed",
-  },
-  {
-    id: "003",
-    date: "2024-01-14",
-    amount: 2500.0,
-    description: "salary",
-    category: "income",
-    merchant: "acme corp",
-    location: "direct deposit",
-    paymentMethod: "bank transfer",
-    status: "completed",
-  },
-  {
-    id: "004",
-    date: "2024-01-13",
-    amount: -45.0,
-    description: "restaurant",
-    category: "food",
-    merchant: "local bistro",
-    location: "downtown",
-    paymentMethod: "card ending in 4567",
-    status: "completed",
-  },
-  {
-    id: "005",
-    date: "2024-01-12",
-    amount: -8.5,
-    description: "coffee",
-    category: "food",
-    merchant: "coffee shop",
-    location: "corner cafe",
-    paymentMethod: "card ending in 4567",
-    status: "completed",
-  },
-];
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
-  const transaction = transactions.find((t) => t.id === id);
+  // TODO: Replace with real API call to get transaction by ID  
+  const transaction = null;
 
   if (!transaction) {
     notFound();

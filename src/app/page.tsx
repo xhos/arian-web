@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import TransactionTable from "./components/TransactionTable";
+import TransactionCards from "./components/TransactionCards";
 import TransactionSummary from "./components/TransactionSummary";
 import TransactionForm from "./components/TransactionForm";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
@@ -12,7 +12,7 @@ export default function TransactionsPage() {
   const [showForm, setShowForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
-  const tableRef = useRef<{ refresh: () => void }>();
+  const cardsRef = useRef<{ refresh: () => void }>();
 
   const handleCreateTransaction = async (formData: {
     accountId: bigint;
@@ -84,9 +84,9 @@ export default function TransactionsPage() {
       }
 
       setShowForm(false);
-      // Refresh the transaction table
-      if (tableRef.current?.refresh) {
-        tableRef.current.refresh();
+      // Refresh the transaction cards
+      if (cardsRef.current?.refresh) {
+        cardsRef.current.refresh();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create transaction");
@@ -120,7 +120,7 @@ export default function TransactionsPage() {
           </div>
         )}
 
-        <TransactionTable ref={tableRef} />
+        <TransactionCards ref={cardsRef} />
       </div>
     </div>
   );

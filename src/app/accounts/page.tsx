@@ -9,7 +9,14 @@ import AccountForm from "./components/AccountForm";
 import AccountList from "./components/AccountList";
 
 const getAccountTypeName = (accountType: AccountType): string => {
-  switch (accountType) {
+  // Handle both string and numeric enum values
+  const normalizedType = typeof accountType === 'string' 
+    ? AccountType[accountType as keyof typeof AccountType] 
+    : accountType;
+
+  switch (normalizedType) {
+    case AccountType.ACCOUNT_UNSPECIFIED:
+      return "unspecified";
     case AccountType.ACCOUNT_CHEQUING:
       return "chequing";
     case AccountType.ACCOUNT_SAVINGS:
@@ -131,7 +138,7 @@ export default function AccountsPage() {
         body: JSON.stringify({
           userId,
           id: accountId.toString(),
-          updateMask: { paths: ["name", "bank", "account_type", "alias"] },
+          updateMask: "name,bank,accountType,alias",
           name: formData.name,
           bank: formData.bank,
           accountType: formData.type,
