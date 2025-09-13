@@ -13,11 +13,12 @@
     "db:push": "drizzle-kit push --force"
   },
   "dependencies": {
-    "@bufbuild/buf": "^1.56.0",
-    "@bufbuild/protobuf": "^2.6.3",
-    "@connectrpc/connect": "^2.0.4",
-    "@connectrpc/connect-node": "^2.0.4",
-    "@connectrpc/connect-web": "^2.0.4",
+    "@bufbuild/protobuf": "^2.8.0",
+    "@connectrpc/connect": "^2.1.0",
+    "@connectrpc/connect-next": "^2.1.0",
+    "@connectrpc/connect-query": "^2.2.0",
+    "@connectrpc/connect-web": "^2.1.0",
+    "@tanstack/react-query": "^5.87.4",
     "@types/uuid": "^10.0.0",
     "better-auth": "^1.3.7",
     "clsx": "^2.1.1",
@@ -32,8 +33,8 @@
   },
   "devDependencies": {
     "@better-auth/cli": "^1.3.7",
-    "@bufbuild/protoc-gen-es": "^2.7.0",
-    "@connectrpc/protoc-gen-connect-es": "^1.6.1",
+    "@bufbuild/buf": "^1.57.0",
+    "@bufbuild/protoc-gen-es": "^2.8.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

@@ -1,14 +1,11 @@
 version: v2
 
-inputs:
-  - directory: proto
-
 plugins:
   - local: protoc-gen-es
     out: src/gen
-    opt:
+    include_imports: true
+    opt: 
       - target=ts
-  - local: protoc-gen-connect-es
-    out: src/gen
-    opt:
-      - target=ts
+
+inputs:
+  - directory: proto

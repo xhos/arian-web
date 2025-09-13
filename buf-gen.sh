@@ -1,1 +1,0 @@
-rm -rf src/gen/; bun buf generate
