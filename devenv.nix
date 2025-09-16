@@ -11,6 +11,8 @@
 
   scripts.buf-gen.exec = "rm -rf src/gen/; bun buf generate";
 
+  scripts.run.exec = "bun run dev -p 3001";
+
   scripts.auth-schema-gen.exec = ''
     bunx @better-auth/cli@latest --output src/db/schema.ts
     bunx drizzle-kit push --force --config drizzle.config.ts

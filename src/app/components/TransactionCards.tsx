@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useRef, forwardRef, useImperativeHandle, useCallback } from "react";
+import { useState, useRef, forwardRef, useImperativeHandle, useCallback, useEffect, useMemo } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { TransactionDirection, CategorizationStatus } from "@/gen/arian/v1/enums_pb";
-import { useTransactions } from "@/hooks/useTransactions";
+import { useTransactionsQuery } from "@/hooks/useTransactionsQuery";
 import { useAccounts } from "@/hooks/useAccounts";
+import { useMultiSelect } from "@/hooks/useMultiSelect";
 import { Collapse } from "@/components/Collapse";
 
 interface TransactionCardsProps {
   accountId?: bigint;
+  onSelectionChange?: (selectedTransactions: Transaction[]) => void;
+  onDeleteTransactions?: (transactionIds: bigint[]) => Promise<void>;
 }
 
 interface DailyTransactionGroup {
@@ -20,12 +23,41 @@ interface DailyTransactionGroup {
   netAmount: number;
 }
 
-const TransactionCards = forwardRef<{ refresh: () => void }, TransactionCardsProps>(
-  ({ accountId }, ref) => {
-    const { transactions, isLoading, isLoadingMore, error, hasMore, refresh, loadMore } = useTransactions(accountId);
+const TransactionCards = forwardRef<{ 
+  refresh: () => void; 
+  clearSelection: () => void;
+  hasSelection: boolean;
+  selectedCount: number;
+}, TransactionCardsProps>(
+  ({ accountId, onSelectionChange, onDeleteTransactions }, ref) => {
+    const { 
+      transactions, 
+      isLoading, 
+      isLoadingMore,
+      error, 
+      hasMore,
+      loadMore,
+      deleteTransactions, 
+      isDeleting,
+      refetch 
+    } = useTransactionsQuery({ accountId });
     const { getAccountDisplayName, getAccountFullName } = useAccounts();
     const [expandedTransaction, setExpandedTransaction] = useState<bigint | null>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
+    
+    const {
+      selectedIds,
+      isSelected,
+      toggleSelection,
+      clearSelection,
+      getSelectedItems,
+      hasSelection,
+      selectedCount,
+      toggleItems,
+    } = useMultiSelect({
+      items: transactions,
+      getId: (transaction) => transaction.id,
+    });
 
     const formatAmount = (amount?: { currencyCode?: string; currency_code?: string; units?: string; nanos?: number }) => {
       if (!amount?.units) return 0;
@@ -160,27 +192,133 @@ const TransactionCards = forwardRef<{ refresh: () => void }, TransactionCardsPro
       return Object.values(groups).sort((a, b) => b.date.localeCompare(a.date));
     }, []);
 
-    const lastGroupElementCallback = useCallback(
-      (node: HTMLDivElement) => {
-        if (isLoadingMore) return;
-        if (observerRef.current) observerRef.current.disconnect();
+    const sentinelRef = useRef<HTMLDivElement>(null);
+    
+    // Set up intersection observer for the dedicated sentinel element
+    useEffect(() => {
+      const sentinel = sentinelRef.current;
+      if (!sentinel || isLoadingMore) return;
 
-        observerRef.current = new IntersectionObserver((entries) => {
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
           if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
             loadMore();
           }
-        });
+        },
+        {
+          // Large root margin to trigger early, especially helpful for fast scrolling
+          rootMargin: '400px 0px 400px 0px',
+          threshold: 0
+        }
+      );
 
-        if (node) observerRef.current.observe(node);
-      },
-      [hasMore, isLoadingMore, loadMore]
-    );
+      observerRef.current.observe(sentinel);
+
+      return () => {
+        if (observerRef.current) {
+          observerRef.current.disconnect();
+        }
+      };
+    }, [hasMore, isLoadingMore, loadMore]);
+
+    // Backup scroll detection for very fast scrolling
+    useEffect(() => {
+      if (!hasMore || isLoadingMore) return;
+
+      const handleScroll = () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        
+        // Trigger when within 800px of bottom
+        if (scrollHeight - scrollTop - clientHeight < 800) {
+          loadMore();
+        }
+      };
+
+      const throttledHandleScroll = throttle(handleScroll, 200);
+      window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+
+      return () => {
+        window.removeEventListener('scroll', throttledHandleScroll);
+      };
+    }, [hasMore, isLoadingMore, loadMore]);
+
+    // Simple throttle function
+    function throttle(func: (...args: any[]) => void, limit: number) {
+      let inThrottle: boolean;
+      return function(this: any, ...args: any[]) {
+        if (!inThrottle) {
+          func.apply(this, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      };
+    }
 
     const toggleTransactionExpansion = useCallback((transactionId: bigint) => {
       setExpandedTransaction(prev => prev === transactionId ? null : transactionId);
     }, []);
 
-    useImperativeHandle(ref, () => ({ refresh }));
+    const handleDayHeaderClick = useCallback((event: React.MouseEvent, dayTransactions: Transaction[]) => {
+      if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+        return; // Only handle with modifier keys
+      }
+      
+      event.preventDefault();
+      
+      // Find global indices for all transactions in this day
+      const firstTransactionId = dayTransactions[0]?.id;
+      if (!firstTransactionId) return;
+      
+      // Find the global index of the first transaction in this day
+      let firstGlobalIndex = 0;
+      for (const transaction of transactions) {
+        if (transaction.id === firstTransactionId) break;
+        firstGlobalIndex++;
+      }
+      
+      if (event.shiftKey) {
+        // Range selection from last selected to end of day
+        toggleSelection(dayTransactions[dayTransactions.length - 1].id, firstGlobalIndex + dayTransactions.length - 1, event);
+      } else {
+        // Ctrl/Cmd - select/deselect entire day as a unit
+        const dayTransactionIds = dayTransactions.map(t => t.id);
+        toggleItems(dayTransactionIds);
+      }
+    }, [transactions, toggleSelection, toggleItems]);
+
+    // Memoize selected transactions to prevent infinite loops
+    const selectedTransactions = useMemo(() => {
+      return transactions.filter(transaction => selectedIds.has(transaction.id.toString()));
+    }, [transactions, selectedIds]);
+
+    // Notify parent when selection changes
+    useEffect(() => {
+      if (onSelectionChange) {
+        onSelectionChange(selectedTransactions);
+      }
+    }, [selectedTransactions, onSelectionChange]);
+
+    useImperativeHandle(ref, () => ({ 
+      refresh: refetch, 
+      clearSelection,
+      hasSelection,
+      selectedCount,
+      deleteTransactions: (transactionIds: bigint[]) => {
+        deleteTransactions(transactionIds);
+      },
+      createTransaction: (formData: any) => {
+        // This will be passed from the query hook
+      },
+      isCreating: false, // Will be updated below
+      isDeleting,
+      createError: null, // Will be updated below  
+      deleteError: null, // Will be updated below
+      isLoading,
+    }));
 
     if (isLoading) {
       return (
@@ -212,15 +350,20 @@ const TransactionCards = forwardRef<{ refresh: () => void }, TransactionCardsPro
     return (
       <div className="space-y-6">
         {groupedTransactions.map((group, groupIndex) => {
-          const isLast = groupIndex === groupedTransactions.length - 1;
-          
           return (
             <div
               key={group.date}
-              ref={isLast ? lastGroupElementCallback : undefined}
               className="space-y-3"
             >
-              <div className="flex items-center justify-between py-2">
+              <div 
+                className={`flex items-center justify-between py-2 px-2 -mx-2 rounded transition-colors select-none ${
+                  hasSelection 
+                    ? 'hover:bg-slate-100 hover:dark:bg-slate-800 cursor-pointer' 
+                    : ''
+                }`}
+                onClick={(event) => handleDayHeaderClick(event, group.transactions)}
+                title={hasSelection ? "Ctrl+click to select all transactions in this day, Shift+click for range selection" : ""}
+              >
                 <div>
                   <h3 className="text-sm font-medium">{group.displayDate}</h3>
                   <div className="text-xs tui-muted">
@@ -240,18 +383,44 @@ const TransactionCards = forwardRef<{ refresh: () => void }, TransactionCardsPro
               </div>
 
               <div className="space-y-2">
-                {group.transactions.map((transaction) => {
+                {group.transactions.map((transaction, localIndex) => {
                   const directionInfo = getDirectionDisplay(transaction.direction);
                   const categoryInfo = getCategorizationStatusDisplay(transaction.categorizationStatus);
                   const amount = formatAmount(transaction.txAmount);
                   const isExpanded = expandedTransaction === transaction.id;
+                  const isTransactionSelected = isSelected(transaction.id);
+                  
+                  // Calculate global index for multi-select
+                  let globalIndex = 0;
+                  for (let i = 0; i < groupIndex; i++) {
+                    globalIndex += groupedTransactions[i].transactions.length;
+                  }
+                  globalIndex += localIndex;
+
+                  const handleTransactionClick = (event: React.MouseEvent) => {
+                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+                      // Multi-select mode
+                      event.preventDefault();
+                      toggleSelection(transaction.id, globalIndex, event);
+                    } else {
+                      // Only expand/collapse, no selection on regular clicks
+                      toggleTransactionExpansion(transaction.id);
+                    }
+                  };
 
                   return (
                     <div key={transaction.id.toString()}>
-                      <div className="tui-border hover:bg-muted/5 transition-colors">
+                      <div className={`tui-border transition-colors relative ${
+                        isTransactionSelected 
+                          ? 'bg-sky-50 border-sky-300 dark:bg-sky-950 dark:border-sky-700' 
+                          : 'hover:bg-muted/5'
+                      }`}>
+                        {isTransactionSelected && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500"></div>
+                        )}
                         <div
-                          className="p-4 cursor-pointer"
-                          onClick={() => toggleTransactionExpansion(transaction.id)}
+                          className="p-4 cursor-pointer relative select-none"
+                          onClick={handleTransactionClick}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1 min-w-0">
@@ -425,6 +594,11 @@ const TransactionCards = forwardRef<{ refresh: () => void }, TransactionCardsPro
             </div>
           );
         })}
+
+        {/* Dedicated sentinel element for intersection observer */}
+        {hasMore && (
+          <div ref={sentinelRef} className="h-4" />
+        )}
 
         {isLoadingMore && (
           <div className="p-4 text-center text-sm tui-muted border-t border-border">

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useUserId } from "@/hooks/useSession";
 import AccountForm from "./components/AccountForm";
 import AccountList from "./components/AccountList";
 
@@ -33,55 +35,23 @@ const getAccountTypeName = (accountType: AccountType): string => {
 };
 //TODO: decimal support for balance on create account
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+  const { accounts } = useAccounts();
+  
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const [isOperationLoading, setIsOperationLoading] = useState(false);
 
-  const loadAccounts = async () => {
-    try {
-      setIsLoading(true);
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-
-      if (!userId) {
-        setError("User not authenticated");
-        return;
-      }
-
-      const response = await fetch("/api/arian.v1.AccountService/ListAccounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to load accounts: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setAccounts(data.accounts || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load accounts");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateAccount = async (formData: {
-    name: string;
-    bank: string;
-    type: AccountType;
-    alias?: string;
-    anchorBalance?: { currencyCode: string; units: string; nanos: number };
-  }) => {
-    try {
-      setIsOperationLoading(true);
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-
+  // Create account mutation
+  const createAccountMutation = useMutation({
+    mutationFn: async (formData: {
+      name: string;
+      bank: string;
+      type: AccountType;
+      alias?: string;
+      anchorBalance?: { currencyCode: string; units: string; nanos: number };
+    }) => {
       if (!userId) throw new Error("User not authenticated");
 
       const response = await fetch("/api/arian.v1.AccountService/CreateAccount", {
@@ -107,29 +77,33 @@ export default function AccountsPage() {
         throw new Error(`Failed to create account: ${response.statusText}`);
       }
 
-      await loadAccounts();
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
       setShowForm(false);
-    } catch (err) {
+      setError("");
+    },
+    onError: (err) => {
       setError(err instanceof Error ? err.message : "Failed to create account");
-    } finally {
-      setIsOperationLoading(false);
-    }
-  };
+    },
+  });
 
-  const handleUpdateAccount = async (
-    accountId: bigint,
-    formData: {
-      name: string;
-      bank: string;
-      type: AccountType;
-      alias?: string;
-    }
-  ) => {
-    try {
-      setIsOperationLoading(true);
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-
+  // Update account mutation
+  const updateAccountMutation = useMutation({
+    mutationFn: async ({
+      accountId,
+      formData,
+    }: {
+      accountId: bigint;
+      formData: {
+        name: string;
+        bank: string;
+        type: AccountType;
+        alias?: string;
+      };
+    }) => {
       if (!userId) throw new Error("User not authenticated");
 
       const response = await fetch("/api/arian.v1.AccountService/UpdateAccount", {
@@ -156,24 +130,23 @@ export default function AccountsPage() {
         throw new Error(`Failed to update account: ${response.statusText}`);
       }
 
-      await loadAccounts();
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
       setEditingAccount(null);
       setShowForm(false);
-    } catch (err) {
+      setError("");
+    },
+    onError: (err) => {
       setError(err instanceof Error ? err.message : "Failed to update account");
-    } finally {
-      setIsOperationLoading(false);
-    }
-  };
+    },
+  });
 
-  const handleDeleteAccount = async (accountId: bigint) => {
-    if (!confirm("Are you sure you want to delete this account?")) return;
-
-    try {
-      setIsOperationLoading(true);
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: async (accountId: bigint) => {
       if (!userId) throw new Error("User not authenticated");
 
       const response = await fetch("/api/arian.v1.AccountService/DeleteAccount", {
@@ -189,17 +162,21 @@ export default function AccountsPage() {
         throw new Error(`Failed to delete account: ${response.statusText}`);
       }
 
-      await loadAccounts();
-    } catch (err) {
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      setError("");
+    },
+    onError: (err) => {
       setError(err instanceof Error ? err.message : "Failed to delete account");
-    } finally {
-      setIsOperationLoading(false);
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    loadAccounts();
-  }, []);
+  const handleDeleteAccount = (accountId: bigint) => {
+    deleteAccountMutation.mutate(accountId);
+  };
 
   const handleEdit = (account: Account) => {
     setEditingAccount(account);
@@ -211,10 +188,15 @@ export default function AccountsPage() {
     setEditingAccount(null);
   };
 
-  if (isLoading) {
+  // Check if any mutation is loading
+  const isOperationLoading = createAccountMutation.isPending || 
+                            updateAccountMutation.isPending || 
+                            deleteAccountMutation.isPending;
+
+  if (!userId) {
     return (
       <div className="min-h-screen p-6">
-        <div className="text-sm tui-muted">loading accounts...</div>
+        <div className="text-sm tui-muted">loading session...</div>
       </div>
     );
   }
@@ -242,8 +224,8 @@ export default function AccountsPage() {
               account={editingAccount}
               onSubmit={
                 editingAccount
-                  ? (formData) => handleUpdateAccount(editingAccount.id, formData)
-                  : handleCreateAccount
+                  ? (formData) => updateAccountMutation.mutate({ accountId: editingAccount.id, formData })
+                  : (formData) => createAccountMutation.mutate(formData)
               }
               onCancel={handleCancelForm}
               isLoading={isOperationLoading}

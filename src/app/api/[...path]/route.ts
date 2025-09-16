@@ -2,6 +2,44 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+// In-memory token cache for JWT validation
+const tokenCache = new Map<string, { valid: boolean; expiresAt: number; userId?: string }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+function getCachedTokenValidation(token: string) {
+  const cached = tokenCache.get(token);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached;
+  }
+  // Clean up expired token
+  if (cached) {
+    tokenCache.delete(token);
+  }
+  return null;
+}
+
+function setCachedTokenValidation(token: string, valid: boolean, userId?: string) {
+  tokenCache.set(token, {
+    valid,
+    expiresAt: Date.now() + CACHE_DURATION,
+    userId,
+  });
+  
+  // Periodically clean up expired tokens (with 10% probability)
+  if (Math.random() < 0.1) {
+    cleanupExpiredTokens();
+  }
+}
+
+function cleanupExpiredTokens() {
+  const now = Date.now();
+  for (const [token, cached] of tokenCache.entries()) {
+    if (cached.expiresAt <= now) {
+      tokenCache.delete(token);
+    }
+  }
+}
+
 async function handler(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const { token } = await auth.api.getToken({
@@ -10,6 +48,33 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
 
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check cache first to avoid repeated validation
+    const cachedValidation = getCachedTokenValidation(token);
+    if (cachedValidation && !cachedValidation.valid) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // If token validation is not cached, validate it and cache the result
+    if (!cachedValidation) {
+      try {
+        // Validate token by attempting to get session
+        const session = await auth.api.getSession({
+          headers: await headers(),
+        });
+        
+        if (!session?.user) {
+          setCachedTokenValidation(token, false);
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        
+        // Cache valid token
+        setCachedTokenValidation(token, true, session.user.id);
+      } catch (validationError) {
+        setCachedTokenValidation(token, false);
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     // build target URL

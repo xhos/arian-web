@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { authClient } from "@/lib/auth-client";
+import { transactionClient } from "@/lib/grpc-client";
+import { create } from "@bufbuild/protobuf";
+import { ListTransactionsRequestSchema } from "@/gen/arian/v1/transaction_services_pb";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import type { Cursor } from "@/gen/arian/v1/common_pb";
 
@@ -29,45 +32,23 @@ export function useTransactions(accountId?: bigint) {
           return;
         }
 
-        const requestBody: {
-          userId: string;
-          limit: number;
-          accountId?: string;
-          cursor?: Cursor;
-        } = {
+        const request = create(ListTransactionsRequestSchema, {
           userId,
           limit: 50,
-        };
-
-        if (accountId) {
-          requestBody.accountId = accountId.toString();
-        }
-
-        if (cursor) {
-          requestBody.cursor = cursor;
-        }
-
-        const response = await fetch("/api/arian.v1.TransactionService/ListTransactions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
+          accountId,
+          cursor: cursor || undefined,
         });
 
-        if (!response.ok) {
-          throw new Error(`Failed to load transactions: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        const newTransactions = data.transactions || [];
+        const response = await transactionClient.listTransactions(request);
 
         if (isLoadingMore) {
-          setTransactions((prev) => [...prev, ...newTransactions]);
+          setTransactions((prev) => [...prev, ...response.transactions]);
         } else {
-          setTransactions(newTransactions);
+          setTransactions(response.transactions);
         }
 
-        setNextCursor(data.nextCursor || null);
-        setHasMore(!!data.nextCursor && newTransactions.length > 0);
+        setNextCursor(response.nextCursor || null);
+        setHasMore(!!response.nextCursor && response.transactions.length > 0);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load transactions");
         if (!isLoadingMore) {

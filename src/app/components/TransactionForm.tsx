@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { authClient } from "@/lib/auth-client";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
-import type { Account } from "@/gen/arian/v1/account_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useUserId } from "@/hooks/useSession";
 
 interface TransactionFormProps {
   onSubmit: (formData: {
@@ -39,6 +40,28 @@ const currencyOptions = [
 ];
 
 export default function TransactionForm({ onSubmit, onCancel, isLoading }: TransactionFormProps) {
+  const userId = useUserId();
+  const { accounts } = useAccounts();
+  
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await fetch("/api/arian.v1.CategoryService/ListCategories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limit: 100 }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.categories || [];
+      }
+      return [];
+    },
+    staleTime: 10 * 60 * 1000, // Categories change rarely
+    gcTime: 30 * 60 * 1000,
+  });
+
   const [formData, setFormData] = useState({
     accountId: "",
     amount: "",
@@ -52,57 +75,8 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
     categoryId: "",
   });
 
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
   const [error, setError] = useState("");
-
-  const loadAccounts = useCallback(async () => {
-    try {
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-      if (!userId) return;
-
-      const response = await fetch("/api/arian.v1.AccountService/ListAccounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAccounts(data.accounts || []);
-      }
-    } catch {
-      // Ignore errors, just show empty accounts
-    }
-  }, []);
-
-  const loadCategories = useCallback(async () => {
-    try {
-      const response = await fetch("/api/arian.v1.CategoryService/ListCategories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ limit: 100 }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.categories || []);
-      }
-    } catch {
-      // Ignore errors, just show empty categories
-    }
-  }, []);
-
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoadingData(true);
-      await Promise.all([loadAccounts(), loadCategories()]);
-      setIsLoadingData(false);
-    };
-    loadData();
-  }, [loadAccounts, loadCategories]);
+  const isLoadingData = !userId || isLoadingCategories;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +99,7 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
         accountId: BigInt(formData.accountId),
         txDate: dateTime,
         txAmount: {
-          currency_code: formData.currency,
+          currencyCode: formData.currency,
           units: Math.floor(parseFloat(formData.amount)).toString(),
           nanos: Math.round((parseFloat(formData.amount) % 1) * 1e9),
         },
@@ -235,7 +209,7 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
               disabled={isLoading}
             >
               <option value="">no category</option>
-              {categories.map((category) => (
+              {categories.map((category: any) => (
                 <option key={category.id.toString()} value={category.id.toString()}>
                   {category.label}
                 </option>

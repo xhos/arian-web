@@ -1,75 +1,25 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { authClient } from "@/lib/auth-client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TransactionSummaryProps {
   accountId?: bigint;
 }
 
 export default function TransactionSummary({ accountId }: TransactionSummaryProps) {
-  const [summary, setSummary] = useState({
-    totalCount: 0,
-    balance: "$0.00",
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  
+  // Get cached data without triggering a new query
+  const transactionData = queryClient.getQueryData(["transactions", accountId?.toString()]);
 
-  const loadSummary = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-
-      if (!userId) return;
-
-      const requestBody: {
-        userId: string;
-        limit: number;
-        accountId?: string;
-      } = {
-        userId,
-        limit: 1, // We just need the total count from the first request
-      };
-
-      if (accountId) {
-        requestBody.accountId = accountId.toString();
-      }
-
-      const response = await fetch("/api/arian.v1.TransactionService/ListTransactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) return;
-
-      const data = await response.json();
-      setSummary({
-        totalCount: data.totalCount || 0,
-        balance: "$0.00", // Could be calculated from account balances
-      });
-    } catch {
-      // Ignore errors, just show default values
-    } finally {
-      setIsLoading(false);
-    }
-  }, [accountId]);
-
-  useEffect(() => {
-    loadSummary();
-  }, [accountId, loadSummary]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center gap-4 text-sm tui-muted">
-        <span>loading summary...</span>
-      </div>
-    );
-  }
+  // Calculate total from cached transaction data
+  const totalCount = (transactionData as any)?.pages 
+    ? (transactionData as any).pages.reduce((total: number, page: any) => total + page.transactions.length, 0)
+    : 0;
 
   return (
     <div className="flex items-center gap-4 text-sm tui-muted">
-      <span>total: {summary.totalCount.toLocaleString()} transactions</span>
+      <span>total: {totalCount.toLocaleString()} transactions loaded</span>
     </div>
   );
 }

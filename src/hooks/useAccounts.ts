@@ -1,39 +1,37 @@
-import { useState, useEffect, useCallback } from "react";
-import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { accountClient } from "@/lib/grpc-client";
+import { create } from "@bufbuild/protobuf";
+import { ListAccountsRequestSchema } from "@/gen/arian/v1/account_services_pb";
+import { useUserId } from "./useSession";
 
 export function useAccounts() {
-  const [accountsMap, setAccountsMap] = useState<Map<string, { name: string; alias?: string }>>(new Map());
+  const userId = useUserId();
 
-  const loadAccounts = useCallback(async () => {
-    try {
-      const session = await authClient.getSession();
-      const userId = session.data?.user?.id;
-      if (!userId) return;
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["accounts", userId],
+    queryFn: async () => {
+      if (!userId) throw new Error("User not authenticated");
 
-      const response = await fetch("/api/arian.v1.AccountService/ListAccounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+      const request = create(ListAccountsRequestSchema, { userId });
+      const response = await accountClient.listAccounts(request);
+      return response.accounts;
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+  });
+
+  const accountsMap = useMemo(() => {
+    const map = new Map<string, { name: string; alias?: string }>();
+    accounts.forEach((account) => {
+      map.set(account.id.toString(), {
+        name: account.name,
+        alias: account.alias
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        const accounts = data.accounts || [];
-        const map = new Map<string, { name: string; alias?: string }>();
-        
-        accounts.forEach((account: { id: { toString: () => string }; name: string; alias?: string }) => {
-          map.set(account.id.toString(), {
-            name: account.name,
-            alias: account.alias
-          });
-        });
-        
-        setAccountsMap(map);
-      }
-    } catch (error) {
-      console.warn('Failed to load accounts for transaction display:', error);
-    }
-  }, []);
+    });
+    return map;
+  }, [accounts]);
 
   const getAccountDisplayName = useCallback((accountId: bigint, fallbackName?: string) => {
     const accountInfo = accountsMap.get(accountId.toString());
@@ -54,11 +52,8 @@ export function useAccounts() {
     return fallbackName || `Account #${accountId}`;
   }, [accountsMap]);
 
-  useEffect(() => {
-    loadAccounts();
-  }, [loadAccounts]);
-
   return {
+    accounts,
     accountsMap,
     getAccountDisplayName,
     getAccountFullName,

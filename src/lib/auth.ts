@@ -10,6 +10,12 @@ export const auth = betterAuth({
     provider: "pg",
     schema: schema,
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache session data for 5 minutes
+    },
+  },
   advanced: {
     database: {
       generateId: () => uuidv4(),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
@@ -19,6 +20,7 @@ export default function AccountList({
   getAccountTypeName,
   isLoading,
 }: AccountListProps) {
+  const [deleteConfirmation, setDeleteConfirmation] = useState<bigint | null>(null);
   const formatBalance = (anchorBalance?: {
     currencyCode?: string;
     units?: string;
@@ -35,6 +37,17 @@ export default function AccountList({
   const formatDate = (timestamp?: { seconds?: string; nanos?: number }) => {
     if (!timestamp?.seconds) return "—";
     return new Date(parseInt(timestamp.seconds) * 1000).toLocaleDateString();
+  };
+
+  const handleDeleteClick = (accountId: bigint) => {
+    if (deleteConfirmation === accountId) {
+      // Second click - actually delete
+      onDelete(accountId);
+      setDeleteConfirmation(null);
+    } else {
+      // First click - show confirmation
+      setDeleteConfirmation(accountId);
+    }
   };
 
   return (
@@ -87,12 +100,12 @@ export default function AccountList({
             </Button>
             <Button
               size="sm"
-              variant="ghost"
-              onClick={() => onDelete(account.id)}
-              className="text-red-500 hover:bg-red-500/10 border-red-500/50"
+              variant={deleteConfirmation === account.id ? "destructive" : "ghost"}
+              onClick={() => handleDeleteClick(account.id)}
+              className={deleteConfirmation === account.id ? "min-h-8" : "text-red-500 hover:bg-red-500/10 border-red-500/50"}
               disabled={isLoading}
             >
-              delete
+              {deleteConfirmation === account.id ? "confirm delete" : "delete"}
             </Button>
           </div>
         </div>
