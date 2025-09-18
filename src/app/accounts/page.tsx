@@ -248,14 +248,6 @@ export default function AccountsPage() {
                             deleteAccountMutation.isPending ||
                             setAnchorBalanceMutation.isPending;
 
-  if (!userId) {
-    return (
-      <div className="min-h-screen p-6">
-        <div className="text-sm tui-muted">loading session...</div>
-      </div>
-    );
-  }
-
   const availableTypes = useMemo(() => {
     const types = new Set(accounts.map(account => getAccountTypeName(account.type)));
     return Array.from(types).sort();
@@ -265,6 +257,14 @@ export default function AccountsPage() {
     const banks = new Set(accounts.map(account => account.bank));
     return Array.from(banks).sort();
   }, [accounts]);
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen p-6">
+        <div className="text-sm tui-muted">loading session...</div>
+      </div>
+    );
+  }
 
   const handleAccountClick = (account: Account) => {
     setSelectedAccount(account);
