@@ -39,6 +39,10 @@ const TransactionCards = forwardRef<{
       loadMore,
       deleteTransactions, 
       isDeleting,
+      createTransaction,
+      isCreating,
+      createError,
+      deleteError,
       refetch 
     } = useTransactionsQuery({ accountId });
     const { getAccountDisplayName, getAccountFullName } = useAccounts();
@@ -311,12 +315,12 @@ const TransactionCards = forwardRef<{
         deleteTransactions(transactionIds);
       },
       createTransaction: (formData: any) => {
-        // This will be passed from the query hook
+        return createTransaction(formData);
       },
-      isCreating: false, // Will be updated below
+      isCreating,
       isDeleting,
-      createError: null, // Will be updated below  
-      deleteError: null, // Will be updated below
+      createError,
+      deleteError,
       isLoading,
     }));
 

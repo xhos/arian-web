@@ -43,7 +43,7 @@ export default function TransactionsPage() {
   }) => {
     try {
       if (cardsRef.current?.createTransaction) {
-        cardsRef.current.createTransaction(formData);
+        await cardsRef.current.createTransaction(formData);
         setShowForm(false);
       }
     } catch (err) {

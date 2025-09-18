@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useUserId } from "@/hooks/useSession";
-import AccountForm from "./components/AccountForm";
-import AccountList from "./components/AccountList";
+import AccountGrid from "./components/AccountGrid";
+import AnchorBalanceForm from "./components/AnchorBalanceForm";
+import FilterChips from "./components/FilterChips";
+import AccountDetailsSidebar from "./components/AccountDetailsSidebar";
+import CreateAccountSidebar from "./components/CreateAccountSidebar";
 
 const getAccountTypeName = (accountType: AccountType): string => {
   // Handle both string and numeric enum values
@@ -40,8 +43,11 @@ export default function AccountsPage() {
   const { accounts } = useAccounts();
   
   const [error, setError] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [showAnchorForm, setShowAnchorForm] = useState(false);
+  const [anchorAccount, setAnchorAccount] = useState<Account | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   // Create account mutation
   const createAccountMutation = useMutation({
@@ -82,7 +88,6 @@ export default function AccountsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      setShowForm(false);
       setError("");
     },
     onError: (err) => {
@@ -135,8 +140,6 @@ export default function AccountsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      setEditingAccount(null);
-      setShowForm(false);
       setError("");
     },
     onError: (err) => {
@@ -174,24 +177,76 @@ export default function AccountsPage() {
     },
   });
 
+  // Set anchor balance mutation
+  const setAnchorBalanceMutation = useMutation({
+    mutationFn: async ({
+      accountId,
+      balance,
+    }: {
+      accountId: bigint;
+      balance: {
+        currencyCode: string;
+        units: string;
+        nanos: number;
+      };
+    }) => {
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await fetch("/api/arian.v1.AccountService/SetAccountAnchor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: parseInt(accountId.toString()),
+          balance: {
+            currency_code: balance.currencyCode,
+            units: balance.units,
+            nanos: balance.nanos,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to set anchor balance: ${errorData.message || response.statusText}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      setShowAnchorForm(false);
+      setAnchorAccount(null);
+      setError("");
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : "Failed to set anchor balance");
+    },
+  });
+
   const handleDeleteAccount = (accountId: bigint) => {
     deleteAccountMutation.mutate(accountId);
   };
 
-  const handleEdit = (account: Account) => {
-    setEditingAccount(account);
-    setShowForm(true);
+
+  const handleSetAnchorBalance = (accountId: bigint, balance: { currencyCode: string; units: string; nanos: number }) => {
+    setAnchorBalanceMutation.mutate({ accountId, balance });
   };
 
-  const handleCancelForm = () => {
-    setShowForm(false);
-    setEditingAccount(null);
+  const handleUpdateAccount = (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string }) => {
+    updateAccountMutation.mutate({ accountId, formData: data });
+  };
+
+
+  const handleCancelAnchorForm = () => {
+    setShowAnchorForm(false);
+    setAnchorAccount(null);
   };
 
   // Check if any mutation is loading
   const isOperationLoading = createAccountMutation.isPending || 
                             updateAccountMutation.isPending || 
-                            deleteAccountMutation.isPending;
+                            deleteAccountMutation.isPending ||
+                            setAnchorBalanceMutation.isPending;
 
   if (!userId) {
     return (
@@ -201,39 +256,66 @@ export default function AccountsPage() {
     );
   }
 
+  const availableTypes = useMemo(() => {
+    const types = new Set(accounts.map(account => getAccountTypeName(account.type)));
+    return Array.from(types).sort();
+  }, [accounts]);
+
+  const availableBanks = useMemo(() => {
+    const banks = new Set(accounts.map(account => account.bank));
+    return Array.from(banks).sort();
+  }, [accounts]);
+
+  const handleAccountClick = (account: Account) => {
+    setSelectedAccount(account);
+  };
+
+  const handleCloseSidebar = () => {
+    setSelectedAccount(null);
+    setIsCreatingAccount(false);
+  };
+
   return (
     <div className="min-h-screen p-6">
-      <div className="max-w-6xl">
+      <div className="max-w-7xl mx-auto">
         <header className="mb-6">
-          <h1 className="text-lg mb-1">arian // accounts</h1>
+          <h1 className="text-2xl font-mono mb-4">accounts</h1>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 text-sm tui-muted">
               <span>total: {accounts.length} accounts</span>
             </div>
-            <Button onClick={() => setShowForm(!showForm)} size="sm" disabled={isOperationLoading}>
-              {showForm ? "cancel" : "add account"}
+            <Button onClick={() => setIsCreatingAccount(true)} size="sm" disabled={isOperationLoading}>
+              add account
             </Button>
           </div>
         </header>
 
         {error && <div className="mb-6 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
 
-        {showForm && (
+
+        {showAnchorForm && anchorAccount && (
           <div className="mb-6">
-            <AccountForm
-              account={editingAccount}
-              onSubmit={
-                editingAccount
-                  ? (formData) => updateAccountMutation.mutate({ accountId: editingAccount.id, formData })
-                  : (formData) => createAccountMutation.mutate(formData)
-              }
-              onCancel={handleCancelForm}
-              isLoading={isOperationLoading}
+            <AnchorBalanceForm
+              accountId={anchorAccount.id}
+              accountName={anchorAccount.name}
+              currentBalance={anchorAccount.anchorBalance}
+              onSubmit={(balance) => setAnchorBalanceMutation.mutateAsync({ accountId: anchorAccount.id, balance })}
+              onCancel={handleCancelAnchorForm}
+              isLoading={setAnchorBalanceMutation.isPending}
             />
           </div>
         )}
 
-        {accounts.length === 0 && !showForm ? (
+        {!showAnchorForm && accounts.length > 0 && (
+          <FilterChips
+            selectedFilter={selectedFilter}
+            onFilterChange={setSelectedFilter}
+            availableTypes={availableTypes}
+            availableBanks={availableBanks}
+          />
+        )}
+
+        {accounts.length === 0 && !isCreatingAccount ? (
           <div className="tui-border p-8 text-center">
             <div className="text-sm tui-muted mb-2">No accounts yet</div>
             <div className="text-xs tui-muted">
@@ -241,15 +323,33 @@ export default function AccountsPage() {
             </div>
           </div>
         ) : (
-          <AccountList
-            accounts={accounts}
-            onEdit={handleEdit}
-            onDelete={handleDeleteAccount}
-            getAccountTypeName={getAccountTypeName}
-            isLoading={isOperationLoading}
-          />
+          !showAnchorForm && (
+            <AccountGrid
+              accounts={accounts}
+              selectedFilter={selectedFilter}
+              getAccountTypeName={getAccountTypeName}
+              onAccountClick={handleAccountClick}
+            />
+          )
         )}
       </div>
+
+      <AccountDetailsSidebar
+        account={selectedAccount}
+        onClose={handleCloseSidebar}
+        onUpdate={handleUpdateAccount}
+        onDelete={handleDeleteAccount}
+        onSetAnchorBalance={handleSetAnchorBalance}
+        getAccountTypeName={getAccountTypeName}
+        isLoading={isOperationLoading}
+      />
+      
+      <CreateAccountSidebar
+        isOpen={isCreatingAccount}
+        onClose={handleCloseSidebar}
+        onCreate={(formData) => createAccountMutation.mutate(formData)}
+        isLoading={isOperationLoading}
+      />
     </div>
   );
 }

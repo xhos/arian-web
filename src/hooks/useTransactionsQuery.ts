@@ -172,7 +172,7 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
     isDeleting: deleteTransactionsMutation.isPending,
     deleteError: deleteTransactionsMutation.error,
     
-    createTransaction: createTransactionMutation.mutate,
+    createTransaction: createTransactionMutation.mutateAsync,
     isCreating: createTransactionMutation.isPending,
     createError: createTransactionMutation.error,
     
