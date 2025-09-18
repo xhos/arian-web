@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Category, CategoryStats, CategoryWithUsage, CategoryWithUserUsage } from "./category_pb";
+import type { Category, CategoryStats, CategoryWithUsage } from "./category_pb";
 import { file_arian_v1_category } from "./category_pb";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
 import type { FieldMask, Timestamp } from "@bufbuild/protobuf/wkt";
@@ -15,56 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file arian/v1/category_services.proto.
  */
 export const file_arian_v1_category_services: GenFile = /*@__PURE__*/
-  fileDesc("CiBhcmlhbi92MS9jYXRlZ29yeV9zZXJ2aWNlcy5wcm90bxIIYXJpYW4udjEikgEKFUxpc3RDYXRlZ29yaWVzUmVxdWVzdBIdCgVsaW1pdBgBIAEoBUIJukgGGgQYZCgBSACIAQESHAoGb2Zmc2V0GAIgASgFQge6SAQaAigASAGIAQESHAoGZmlsdGVyGAMgASgJQge6SARyAhhkSAKIAQFCCAoGX2xpbWl0QgkKB19vZmZzZXRCCQoHX2ZpbHRlciJVChZMaXN0Q2F0ZWdvcmllc1Jlc3BvbnNlEiYKCmNhdGVnb3JpZXMYASADKAsyEi5hcmlhbi52MS5DYXRlZ29yeRITCgt0b3RhbF9jb3VudBgCIAEoAyIpChJHZXRDYXRlZ29yeVJlcXVlc3QSEwoCaWQYASABKANCB7pIBCICIAAiOwoTR2V0Q2F0ZWdvcnlSZXNwb25zZRIkCghjYXRlZ29yeRgBIAEoCzISLmFyaWFuLnYxLkNhdGVnb3J5IqMBChVDcmVhdGVDYXRlZ29yeVJlcXVlc3QSMgoEc2x1ZxgBIAEoCUIkukghch8QARgyMhleW2EtejAtOV0rKFwuW2EtejAtOV0rKSokEhgKBWxhYmVsGAIgASgJQgm6SAZyBBABGGQSPAoFY29sb3IYAyABKAlCLbpIKnIoEAQYBzIiXiMoWzAtOUEtRmEtZl17M318WzAtOUEtRmEtZl17Nn0pJCI+ChZDcmVhdGVDYXRlZ29yeVJlc3BvbnNlEiQKCGNhdGVnb3J5GAEgASgLMhIuYXJpYW4udjEuQ2F0ZWdvcnkilQIKFVVwZGF0ZUNhdGVnb3J5UmVxdWVzdBITCgJpZBgBIAEoA0IHukgEIgIgABIvCgt1cGRhdGVfbWFzaxgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2sSNwoEc2x1ZxgDIAEoCUIkukghch8QARgyMhleW2EtejAtOV0rKFwuW2EtejAtOV0rKSokSACIAQESHQoFbGFiZWwYBCABKAlCCbpIBnIEEAEYZEgBiAEBEkEKBWNvbG9yGAUgASgJQi26SCpyKBAEGAcyIl4jKFswLTlBLUZhLWZdezN9fFswLTlBLUZhLWZdezZ9KSRIAogBAUIHCgVfc2x1Z0IICgZfbGFiZWxCCAoGX2NvbG9yIj4KFlVwZGF0ZUNhdGVnb3J5UmVzcG9uc2USJAoIY2F0ZWdvcnkYASABKAsyEi5hcmlhbi52MS5DYXRlZ29yeSIsChVEZWxldGVDYXRlZ29yeVJlcXVlc3QSEwoCaWQYASABKANCB7pIBCICIAAiLwoWRGVsZXRlQ2F0ZWdvcnlSZXNwb25zZRIVCg1hZmZlY3RlZF9yb3dzGAEgASgDItsBChxHZXRDYXRlZ29yeVVzYWdlU3RhdHNSZXF1ZXN0EhwKC2NhdGVnb3J5X2lkGAEgASgDQge6SAQiAiAAEhkKB3VzZXJfaWQYAiABKAlCCLpIBXIDsAEBEjMKCnN0YXJ0X2RhdGUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESMQoIZW5kX2RhdGUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAGIAQFCDQoLX3N0YXJ0X2RhdGVCCwoJX2VuZF9kYXRlIkUKHUdldENhdGVnb3J5VXNhZ2VTdGF0c1Jlc3BvbnNlEiQKCGNhdGVnb3J5GAEgASgLMhIuYXJpYW4udjEuQ2F0ZWdvcnkikAIKHUdldENhdGVnb3JpZXNXaXRoU3RhdHNSZXF1ZXN0EhkKB3VzZXJfaWQYASABKAlCCLpIBXIDsAEBEjMKCnN0YXJ0X2RhdGUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESMQoIZW5kX2RhdGUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAGIAQESHQoFbGltaXQYBCABKAVCCbpIBhoEGGQoAUgCiAEBEhwKBm9mZnNldBgFIAEoBUIHukgEGgIoAEgDiAEBQg0KC19zdGFydF9kYXRlQgsKCV9lbmRfZGF0ZUIICgZfbGltaXRCCQoHX29mZnNldCJdCh5HZXRDYXRlZ29yaWVzV2l0aFN0YXRzUmVzcG9uc2USJgoKY2F0ZWdvcmllcxgBIAMoCzISLmFyaWFuLnYxLkNhdGVnb3J5EhMKC3RvdGFsX2NvdW50GAIgASgDIoUBChdTZWFyY2hDYXRlZ29yaWVzUmVxdWVzdBIYCgVxdWVyeRgBIAEoCUIJukgGcgQQARhkEh0KBWxpbWl0GAIgASgFQgm6SAYaBBhkKAFIAIgBARIcCgZvZmZzZXQYAyABKAVCB7pIBBoCKABIAYgBAUIICgZfbGltaXRCCQoHX29mZnNldCJXChhTZWFyY2hDYXRlZ29yaWVzUmVzcG9uc2USJgoKY2F0ZWdvcmllcxgBIAMoCzISLmFyaWFuLnYxLkNhdGVnb3J5EhMKC3RvdGFsX2NvdW50GAIgASgDInIKHkxpc3RDYXRlZ29yaWVzV2l0aFVzYWdlUmVxdWVzdBIdCgVsaW1pdBgBIAEoBUIJukgGGgQYZCgBSACIAQESHAoGb2Zmc2V0GAIgASgFQge6SAQaAigASAGIAQFCCAoGX2xpbWl0QgkKB19vZmZzZXQiZwofTGlzdENhdGVnb3JpZXNXaXRoVXNhZ2VSZXNwb25zZRIvCgpjYXRlZ29yaWVzGAEgAygLMhsuYXJpYW4udjEuQ2F0ZWdvcnlXaXRoVXNhZ2USEwoLdG90YWxfY291bnQYAiABKAMiiwEKHExpc3RDYXRlZ29yaWVzRm9yVXNlclJlcXVlc3QSGQoHdXNlcl9pZBgBIAEoCUIIukgFcgOwAQESHQoFbGltaXQYAiABKAVCCbpIBhoEGGQoAUgAiAEBEhwKBm9mZnNldBgDIAEoBUIHukgEGgIoAEgBiAEBQggKBl9saW1pdEIJCgdfb2Zmc2V0ImkKHUxpc3RDYXRlZ29yaWVzRm9yVXNlclJlc3BvbnNlEjMKCmNhdGVnb3JpZXMYASADKAsyHy5hcmlhbi52MS5DYXRlZ29yeVdpdGhVc2VyVXNhZ2USEwoLdG90YWxfY291bnQYAiABKAMiTgoYR2V0Q2F0ZWdvcnlCeVNsdWdSZXF1ZXN0EjIKBHNsdWcYASABKAlCJLpIIXIfEAEYMjIZXlthLXowLTldKyhcLlthLXowLTldKykqJCJBChlHZXRDYXRlZ29yeUJ5U2x1Z1Jlc3BvbnNlEiQKCGNhdGVnb3J5GAEgASgLMhIuYXJpYW4udjEuQ2F0ZWdvcnkiMgobR2V0Q2F0ZWdvcnlXaXRoU3RhdHNSZXF1ZXN0EhMKAmlkGAEgASgDQge6SAQiAiAAImwKHEdldENhdGVnb3J5V2l0aFN0YXRzUmVzcG9uc2USJAoIY2F0ZWdvcnkYASABKAsyEi5hcmlhbi52MS5DYXRlZ29yeRImCgVzdGF0cxgCIAEoCzIXLmFyaWFuLnYxLkNhdGVnb3J5U3RhdHMiXgobQnVsa0NyZWF0ZUNhdGVnb3JpZXNSZXF1ZXN0Ej8KCmNhdGVnb3JpZXMYASADKAsyHy5hcmlhbi52MS5DcmVhdGVDYXRlZ29yeVJlcXVlc3RCCrpIB5IBBAgBEDIiXQocQnVsa0NyZWF0ZUNhdGVnb3JpZXNSZXNwb25zZRImCgpjYXRlZ29yaWVzGAEgAygLMhIuYXJpYW4udjEuQ2F0ZWdvcnkSFQoNYWZmZWN0ZWRfcm93cxgCIAEoAyIfCh1EZWxldGVVbnVzZWRDYXRlZ29yaWVzUmVxdWVzdCI3Ch5EZWxldGVVbnVzZWRDYXRlZ29yaWVzUmVzcG9uc2USFQoNYWZmZWN0ZWRfcm93cxgBIAEoAyIaChhMaXN0Q2F0ZWdvcnlTbHVnc1JlcXVlc3QiKgoZTGlzdENhdGVnb3J5U2x1Z3NSZXNwb25zZRINCgVzbHVncxgBIAMoCSLtAQojR2V0TW9zdFVzZWRDYXRlZ29yaWVzRm9yVXNlclJlcXVlc3QSGQoHdXNlcl9pZBgBIAEoCUIIukgFcgOwAQESMwoKc3RhcnRfZGF0ZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIxCghlbmRfZGF0ZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAYgBARIdCgVsaW1pdBgEIAEoBUIJukgGGgQYZCgBSAKIAQFCDQoLX3N0YXJ0X2RhdGVCCwoJX2VuZF9kYXRlQggKBl9saW1pdCJXCiRHZXRNb3N0VXNlZENhdGVnb3JpZXNGb3JVc2VyUmVzcG9uc2USLwoKY2F0ZWdvcmllcxgBIAMoCzIbLmFyaWFuLnYxLkNhdGVnb3J5V2l0aFVzYWdlIhwKGkdldFVudXNlZENhdGVnb3JpZXNSZXF1ZXN0IkUKG0dldFVudXNlZENhdGVnb3JpZXNSZXNwb25zZRImCgpjYXRlZ29yaWVzGAEgAygLMhIuYXJpYW4udjEuQ2F0ZWdvcnkylw0KD0NhdGVnb3J5U2VydmljZRJTCg5MaXN0Q2F0ZWdvcmllcxIfLmFyaWFuLnYxLkxpc3RDYXRlZ29yaWVzUmVxdWVzdBogLmFyaWFuLnYxLkxpc3RDYXRlZ29yaWVzUmVzcG9uc2USbgoXTGlzdENhdGVnb3JpZXNXaXRoVXNhZ2USKC5hcmlhbi52MS5MaXN0Q2F0ZWdvcmllc1dpdGhVc2FnZVJlcXVlc3QaKS5hcmlhbi52MS5MaXN0Q2F0ZWdvcmllc1dpdGhVc2FnZVJlc3BvbnNlEmgKFUxpc3RDYXRlZ29yaWVzRm9yVXNlchImLmFyaWFuLnYxLkxpc3RDYXRlZ29yaWVzRm9yVXNlclJlcXVlc3QaJy5hcmlhbi52MS5MaXN0Q2F0ZWdvcmllc0ZvclVzZXJSZXNwb25zZRJKCgtHZXRDYXRlZ29yeRIcLmFyaWFuLnYxLkdldENhdGVnb3J5UmVxdWVzdBodLmFyaWFuLnYxLkdldENhdGVnb3J5UmVzcG9uc2USXAoRR2V0Q2F0ZWdvcnlCeVNsdWcSIi5hcmlhbi52MS5HZXRDYXRlZ29yeUJ5U2x1Z1JlcXVlc3QaIy5hcmlhbi52MS5HZXRDYXRlZ29yeUJ5U2x1Z1Jlc3BvbnNlEmUKFEdldENhdGVnb3J5V2l0aFN0YXRzEiUuYXJpYW4udjEuR2V0Q2F0ZWdvcnlXaXRoU3RhdHNSZXF1ZXN0GiYuYXJpYW4udjEuR2V0Q2F0ZWdvcnlXaXRoU3RhdHNSZXNwb25zZRJTCg5DcmVhdGVDYXRlZ29yeRIfLmFyaWFuLnYxLkNyZWF0ZUNhdGVnb3J5UmVxdWVzdBogLmFyaWFuLnYxLkNyZWF0ZUNhdGVnb3J5UmVzcG9uc2USZQoUQnVsa0NyZWF0ZUNhdGVnb3JpZXMSJS5hcmlhbi52MS5CdWxrQ3JlYXRlQ2F0ZWdvcmllc1JlcXVlc3QaJi5hcmlhbi52MS5CdWxrQ3JlYXRlQ2F0ZWdvcmllc1Jlc3BvbnNlElMKDlVwZGF0ZUNhdGVnb3J5Eh8uYXJpYW4udjEuVXBkYXRlQ2F0ZWdvcnlSZXF1ZXN0GiAuYXJpYW4udjEuVXBkYXRlQ2F0ZWdvcnlSZXNwb25zZRJTCg5EZWxldGVDYXRlZ29yeRIfLmFyaWFuLnYxLkRlbGV0ZUNhdGVnb3J5UmVxdWVzdBogLmFyaWFuLnYxLkRlbGV0ZUNhdGVnb3J5UmVzcG9uc2USawoWRGVsZXRlVW51c2VkQ2F0ZWdvcmllcxInLmFyaWFuLnYxLkRlbGV0ZVVudXNlZENhdGVnb3JpZXNSZXF1ZXN0GiguYXJpYW4udjEuRGVsZXRlVW51c2VkQ2F0ZWdvcmllc1Jlc3BvbnNlEmgKFUdldENhdGVnb3J5VXNhZ2VTdGF0cxImLmFyaWFuLnYxLkdldENhdGVnb3J5VXNhZ2VTdGF0c1JlcXVlc3QaJy5hcmlhbi52MS5HZXRDYXRlZ29yeVVzYWdlU3RhdHNSZXNwb25zZRJrChZHZXRDYXRlZ29yaWVzV2l0aFN0YXRzEicuYXJpYW4udjEuR2V0Q2F0ZWdvcmllc1dpdGhTdGF0c1JlcXVlc3QaKC5hcmlhbi52MS5HZXRDYXRlZ29yaWVzV2l0aFN0YXRzUmVzcG9uc2USWQoQU2VhcmNoQ2F0ZWdvcmllcxIhLmFyaWFuLnYxLlNlYXJjaENhdGVnb3JpZXNSZXF1ZXN0GiIuYXJpYW4udjEuU2VhcmNoQ2F0ZWdvcmllc1Jlc3BvbnNlElwKEUxpc3RDYXRlZ29yeVNsdWdzEiIuYXJpYW4udjEuTGlzdENhdGVnb3J5U2x1Z3NSZXF1ZXN0GiMuYXJpYW4udjEuTGlzdENhdGVnb3J5U2x1Z3NSZXNwb25zZRJ9ChxHZXRNb3N0VXNlZENhdGVnb3JpZXNGb3JVc2VyEi0uYXJpYW4udjEuR2V0TW9zdFVzZWRDYXRlZ29yaWVzRm9yVXNlclJlcXVlc3QaLi5hcmlhbi52MS5HZXRNb3N0VXNlZENhdGVnb3JpZXNGb3JVc2VyUmVzcG9uc2USYgoTR2V0VW51c2VkQ2F0ZWdvcmllcxIkLmFyaWFuLnYxLkdldFVudXNlZENhdGVnb3JpZXNSZXF1ZXN0GiUuYXJpYW4udjEuR2V0VW51c2VkQ2F0ZWdvcmllc1Jlc3BvbnNlYgZwcm90bzM", [file_arian_v1_category, file_buf_validate_validate, file_google_protobuf_field_mask, file_google_protobuf_timestamp]);
-
-/**
- * @generated from message arian.v1.ListCategoriesRequest
- */
-export type ListCategoriesRequest = Message<"arian.v1.ListCategoriesRequest"> & {
-  /**
-   * @generated from field: optional int32 limit = 1;
-   */
-  limit?: number;
-
-  /**
-   * @generated from field: optional int32 offset = 2;
-   */
-  offset?: number;
-
-  /**
-   * @generated from field: optional string filter = 3;
-   */
-  filter?: string;
-};
-
-/**
- * Describes the message arian.v1.ListCategoriesRequest.
- * Use `create(ListCategoriesRequestSchema)` to create a new message.
- */
-export const ListCategoriesRequestSchema: GenMessage<ListCategoriesRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 0);
-
-/**
- * @generated from message arian.v1.ListCategoriesResponse
- */
-export type ListCategoriesResponse = Message<"arian.v1.ListCategoriesResponse"> & {
-  /**
-   * @generated from field: repeated arian.v1.Category categories = 1;
-   */
-  categories: Category[];
-
-  /**
-   * @generated from field: int64 total_count = 2;
-   */
-  totalCount: bigint;
-};
-
-/**
- * Describes the message arian.v1.ListCategoriesResponse.
- * Use `create(ListCategoriesResponseSchema)` to create a new message.
- */
-export const ListCategoriesResponseSchema: GenMessage<ListCategoriesResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 1);
+  fileDesc("CiBhcmlhbi92MS9jYXRlZ29yeV9zZXJ2aWNlcy5wcm90bxIIYXJpYW4udjEiKQoSR2V0Q2F0ZWdvcnlSZXF1ZXN0EhMKAmlkGAEgASgDQge6SAQiAiAAIjsKE0dldENhdGVnb3J5UmVzcG9uc2USJAoIY2F0ZWdvcnkYASABKAsyEi5hcmlhbi52MS5DYXRlZ29yeSKjAQoVQ3JlYXRlQ2F0ZWdvcnlSZXF1ZXN0EjIKBHNsdWcYASABKAlCJLpIIXIfEAEYMjIZXlthLXowLTldKyhcLlthLXowLTldKykqJBIYCgVsYWJlbBgCIAEoCUIJukgGcgQQARhkEjwKBWNvbG9yGAMgASgJQi26SCpyKBAEGAcyIl4jKFswLTlBLUZhLWZdezN9fFswLTlBLUZhLWZdezZ9KSQiPgoWQ3JlYXRlQ2F0ZWdvcnlSZXNwb25zZRIkCghjYXRlZ29yeRgBIAEoCzISLmFyaWFuLnYxLkNhdGVnb3J5IpUCChVVcGRhdGVDYXRlZ29yeVJlcXVlc3QSEwoCaWQYASABKANCB7pIBCICIAASLwoLdXBkYXRlX21hc2sYAiABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrEjcKBHNsdWcYAyABKAlCJLpIIXIfEAEYMjIZXlthLXowLTldKyhcLlthLXowLTldKykqJEgAiAEBEh0KBWxhYmVsGAQgASgJQgm6SAZyBBABGGRIAYgBARJBCgVjb2xvchgFIAEoCUItukgqcigQBBgHMiJeIyhbMC05QS1GYS1mXXszfXxbMC05QS1GYS1mXXs2fSkkSAKIAQFCBwoFX3NsdWdCCAoGX2xhYmVsQggKBl9jb2xvciI+ChZVcGRhdGVDYXRlZ29yeVJlc3BvbnNlEiQKCGNhdGVnb3J5GAEgASgLMhIuYXJpYW4udjEuQ2F0ZWdvcnkiLAoVRGVsZXRlQ2F0ZWdvcnlSZXF1ZXN0EhMKAmlkGAEgASgDQge6SAQiAiAAIi8KFkRlbGV0ZUNhdGVnb3J5UmVzcG9uc2USFQoNYWZmZWN0ZWRfcm93cxgBIAEoAyLbAQocR2V0Q2F0ZWdvcnlVc2FnZVN0YXRzUmVxdWVzdBIcCgtjYXRlZ29yeV9pZBgBIAEoA0IHukgEIgIgABIZCgd1c2VyX2lkGAIgASgJQgi6SAVyA7ABARIzCgpzdGFydF9kYXRlGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEjEKCGVuZF9kYXRlGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgBiAEBQg0KC19zdGFydF9kYXRlQgsKCV9lbmRfZGF0ZSJFCh1HZXRDYXRlZ29yeVVzYWdlU3RhdHNSZXNwb25zZRIkCghjYXRlZ29yeRgBIAEoCzISLmFyaWFuLnYxLkNhdGVnb3J5IpACCh1HZXRDYXRlZ29yaWVzV2l0aFN0YXRzUmVxdWVzdBIZCgd1c2VyX2lkGAEgASgJQgi6SAVyA7ABARIzCgpzdGFydF9kYXRlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEjEKCGVuZF9kYXRlGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgBiAEBEh0KBWxpbWl0GAQgASgFQgm6SAYaBBhkKAFIAogBARIcCgZvZmZzZXQYBSABKAVCB7pIBBoCKABIA4gBAUINCgtfc3RhcnRfZGF0ZUILCglfZW5kX2RhdGVCCAoGX2xpbWl0QgkKB19vZmZzZXQiXQoeR2V0Q2F0ZWdvcmllc1dpdGhTdGF0c1Jlc3BvbnNlEiYKCmNhdGVnb3JpZXMYASADKAsyEi5hcmlhbi52MS5DYXRlZ29yeRITCgt0b3RhbF9jb3VudBgCIAEoAyKFAQoXU2VhcmNoQ2F0ZWdvcmllc1JlcXVlc3QSGAoFcXVlcnkYASABKAlCCbpIBnIEEAEYZBIdCgVsaW1pdBgCIAEoBUIJukgGGgQYZCgBSACIAQESHAoGb2Zmc2V0GAMgASgFQge6SAQaAigASAGIAQFCCAoGX2xpbWl0QgkKB19vZmZzZXQiVwoYU2VhcmNoQ2F0ZWdvcmllc1Jlc3BvbnNlEiYKCmNhdGVnb3JpZXMYASADKAsyEi5hcmlhbi52MS5DYXRlZ29yeRITCgt0b3RhbF9jb3VudBgCIAEoAyJyCh5MaXN0Q2F0ZWdvcmllc1dpdGhVc2FnZVJlcXVlc3QSHQoFbGltaXQYASABKAVCCbpIBhoEGGQoAUgAiAEBEhwKBm9mZnNldBgCIAEoBUIHukgEGgIoAEgBiAEBQggKBl9saW1pdEIJCgdfb2Zmc2V0ImcKH0xpc3RDYXRlZ29yaWVzV2l0aFVzYWdlUmVzcG9uc2USLwoKY2F0ZWdvcmllcxgBIAMoCzIbLmFyaWFuLnYxLkNhdGVnb3J5V2l0aFVzYWdlEhMKC3RvdGFsX2NvdW50GAIgASgDIoQBChVMaXN0Q2F0ZWdvcmllc1JlcXVlc3QSGQoHdXNlcl9pZBgBIAEoCUIIukgFcgOwAQESHQoFbGltaXQYAiABKAVCCbpIBhoEGGQoAUgAiAEBEhwKBm9mZnNldBgDIAEoBUIHukgEGgIoAEgBiAEBQggKBl9saW1pdEIJCgdfb2Zmc2V0IlUKFkxpc3RDYXRlZ29yaWVzUmVzcG9uc2USJgoKY2F0ZWdvcmllcxgBIAMoCzISLmFyaWFuLnYxLkNhdGVnb3J5EhMKC3RvdGFsX2NvdW50GAIgASgDIk4KGEdldENhdGVnb3J5QnlTbHVnUmVxdWVzdBIyCgRzbHVnGAEgASgJQiS6SCFyHxABGDIyGV5bYS16MC05XSsoXC5bYS16MC05XSspKiQiQQoZR2V0Q2F0ZWdvcnlCeVNsdWdSZXNwb25zZRIkCghjYXRlZ29yeRgBIAEoCzISLmFyaWFuLnYxLkNhdGVnb3J5IjIKG0dldENhdGVnb3J5V2l0aFN0YXRzUmVxdWVzdBITCgJpZBgBIAEoA0IHukgEIgIgACJsChxHZXRDYXRlZ29yeVdpdGhTdGF0c1Jlc3BvbnNlEiQKCGNhdGVnb3J5GAEgASgLMhIuYXJpYW4udjEuQ2F0ZWdvcnkSJgoFc3RhdHMYAiABKAsyFy5hcmlhbi52MS5DYXRlZ29yeVN0YXRzIl4KG0J1bGtDcmVhdGVDYXRlZ29yaWVzUmVxdWVzdBI/CgpjYXRlZ29yaWVzGAEgAygLMh8uYXJpYW4udjEuQ3JlYXRlQ2F0ZWdvcnlSZXF1ZXN0Qgq6SAeSAQQIARAyIl0KHEJ1bGtDcmVhdGVDYXRlZ29yaWVzUmVzcG9uc2USJgoKY2F0ZWdvcmllcxgBIAMoCzISLmFyaWFuLnYxLkNhdGVnb3J5EhUKDWFmZmVjdGVkX3Jvd3MYAiABKAMiHwodRGVsZXRlVW51c2VkQ2F0ZWdvcmllc1JlcXVlc3QiNwoeRGVsZXRlVW51c2VkQ2F0ZWdvcmllc1Jlc3BvbnNlEhUKDWFmZmVjdGVkX3Jvd3MYASABKAMiGgoYTGlzdENhdGVnb3J5U2x1Z3NSZXF1ZXN0IioKGUxpc3RDYXRlZ29yeVNsdWdzUmVzcG9uc2USDQoFc2x1Z3MYASADKAki5gEKHEdldE1vc3RVc2VkQ2F0ZWdvcmllc1JlcXVlc3QSGQoHdXNlcl9pZBgBIAEoCUIIukgFcgOwAQESMwoKc3RhcnRfZGF0ZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAIgBARIxCghlbmRfZGF0ZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAYgBARIdCgVsaW1pdBgEIAEoBUIJukgGGgQYZCgBSAKIAQFCDQoLX3N0YXJ0X2RhdGVCCwoJX2VuZF9kYXRlQggKBl9saW1pdCJQCh1HZXRNb3N0VXNlZENhdGVnb3JpZXNSZXNwb25zZRIvCgpjYXRlZ29yaWVzGAEgAygLMhsuYXJpYW4udjEuQ2F0ZWdvcnlXaXRoVXNhZ2UiHAoaR2V0VW51c2VkQ2F0ZWdvcmllc1JlcXVlc3QiRQobR2V0VW51c2VkQ2F0ZWdvcmllc1Jlc3BvbnNlEiYKCmNhdGVnb3JpZXMYASADKAsyEi5hcmlhbi52MS5DYXRlZ29yeTKYDAoPQ2F0ZWdvcnlTZXJ2aWNlEm4KF0xpc3RDYXRlZ29yaWVzV2l0aFVzYWdlEiguYXJpYW4udjEuTGlzdENhdGVnb3JpZXNXaXRoVXNhZ2VSZXF1ZXN0GikuYXJpYW4udjEuTGlzdENhdGVnb3JpZXNXaXRoVXNhZ2VSZXNwb25zZRJTCg5MaXN0Q2F0ZWdvcmllcxIfLmFyaWFuLnYxLkxpc3RDYXRlZ29yaWVzUmVxdWVzdBogLmFyaWFuLnYxLkxpc3RDYXRlZ29yaWVzUmVzcG9uc2USSgoLR2V0Q2F0ZWdvcnkSHC5hcmlhbi52MS5HZXRDYXRlZ29yeVJlcXVlc3QaHS5hcmlhbi52MS5HZXRDYXRlZ29yeVJlc3BvbnNlElwKEUdldENhdGVnb3J5QnlTbHVnEiIuYXJpYW4udjEuR2V0Q2F0ZWdvcnlCeVNsdWdSZXF1ZXN0GiMuYXJpYW4udjEuR2V0Q2F0ZWdvcnlCeVNsdWdSZXNwb25zZRJlChRHZXRDYXRlZ29yeVdpdGhTdGF0cxIlLmFyaWFuLnYxLkdldENhdGVnb3J5V2l0aFN0YXRzUmVxdWVzdBomLmFyaWFuLnYxLkdldENhdGVnb3J5V2l0aFN0YXRzUmVzcG9uc2USUwoOQ3JlYXRlQ2F0ZWdvcnkSHy5hcmlhbi52MS5DcmVhdGVDYXRlZ29yeVJlcXVlc3QaIC5hcmlhbi52MS5DcmVhdGVDYXRlZ29yeVJlc3BvbnNlEmUKFEJ1bGtDcmVhdGVDYXRlZ29yaWVzEiUuYXJpYW4udjEuQnVsa0NyZWF0ZUNhdGVnb3JpZXNSZXF1ZXN0GiYuYXJpYW4udjEuQnVsa0NyZWF0ZUNhdGVnb3JpZXNSZXNwb25zZRJTCg5VcGRhdGVDYXRlZ29yeRIfLmFyaWFuLnYxLlVwZGF0ZUNhdGVnb3J5UmVxdWVzdBogLmFyaWFuLnYxLlVwZGF0ZUNhdGVnb3J5UmVzcG9uc2USUwoORGVsZXRlQ2F0ZWdvcnkSHy5hcmlhbi52MS5EZWxldGVDYXRlZ29yeVJlcXVlc3QaIC5hcmlhbi52MS5EZWxldGVDYXRlZ29yeVJlc3BvbnNlEmsKFkRlbGV0ZVVudXNlZENhdGVnb3JpZXMSJy5hcmlhbi52MS5EZWxldGVVbnVzZWRDYXRlZ29yaWVzUmVxdWVzdBooLmFyaWFuLnYxLkRlbGV0ZVVudXNlZENhdGVnb3JpZXNSZXNwb25zZRJoChVHZXRDYXRlZ29yeVVzYWdlU3RhdHMSJi5hcmlhbi52MS5HZXRDYXRlZ29yeVVzYWdlU3RhdHNSZXF1ZXN0GicuYXJpYW4udjEuR2V0Q2F0ZWdvcnlVc2FnZVN0YXRzUmVzcG9uc2USawoWR2V0Q2F0ZWdvcmllc1dpdGhTdGF0cxInLmFyaWFuLnYxLkdldENhdGVnb3JpZXNXaXRoU3RhdHNSZXF1ZXN0GiguYXJpYW4udjEuR2V0Q2F0ZWdvcmllc1dpdGhTdGF0c1Jlc3BvbnNlElkKEFNlYXJjaENhdGVnb3JpZXMSIS5hcmlhbi52MS5TZWFyY2hDYXRlZ29yaWVzUmVxdWVzdBoiLmFyaWFuLnYxLlNlYXJjaENhdGVnb3JpZXNSZXNwb25zZRJcChFMaXN0Q2F0ZWdvcnlTbHVncxIiLmFyaWFuLnYxLkxpc3RDYXRlZ29yeVNsdWdzUmVxdWVzdBojLmFyaWFuLnYxLkxpc3RDYXRlZ29yeVNsdWdzUmVzcG9uc2USaAoVR2V0TW9zdFVzZWRDYXRlZ29yaWVzEiYuYXJpYW4udjEuR2V0TW9zdFVzZWRDYXRlZ29yaWVzUmVxdWVzdBonLmFyaWFuLnYxLkdldE1vc3RVc2VkQ2F0ZWdvcmllc1Jlc3BvbnNlEmIKE0dldFVudXNlZENhdGVnb3JpZXMSJC5hcmlhbi52MS5HZXRVbnVzZWRDYXRlZ29yaWVzUmVxdWVzdBolLmFyaWFuLnYxLkdldFVudXNlZENhdGVnb3JpZXNSZXNwb25zZWIGcHJvdG8z", [file_arian_v1_category, file_buf_validate_validate, file_google_protobuf_field_mask, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message arian.v1.GetCategoryRequest
@@ -81,7 +32,7 @@ export type GetCategoryRequest = Message<"arian.v1.GetCategoryRequest"> & {
  * Use `create(GetCategoryRequestSchema)` to create a new message.
  */
 export const GetCategoryRequestSchema: GenMessage<GetCategoryRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 2);
+  messageDesc(file_arian_v1_category_services, 0);
 
 /**
  * @generated from message arian.v1.GetCategoryResponse
@@ -98,7 +49,7 @@ export type GetCategoryResponse = Message<"arian.v1.GetCategoryResponse"> & {
  * Use `create(GetCategoryResponseSchema)` to create a new message.
  */
 export const GetCategoryResponseSchema: GenMessage<GetCategoryResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 3);
+  messageDesc(file_arian_v1_category_services, 1);
 
 /**
  * @generated from message arian.v1.CreateCategoryRequest
@@ -125,7 +76,7 @@ export type CreateCategoryRequest = Message<"arian.v1.CreateCategoryRequest"> & 
  * Use `create(CreateCategoryRequestSchema)` to create a new message.
  */
 export const CreateCategoryRequestSchema: GenMessage<CreateCategoryRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 4);
+  messageDesc(file_arian_v1_category_services, 2);
 
 /**
  * @generated from message arian.v1.CreateCategoryResponse
@@ -142,7 +93,7 @@ export type CreateCategoryResponse = Message<"arian.v1.CreateCategoryResponse"> 
  * Use `create(CreateCategoryResponseSchema)` to create a new message.
  */
 export const CreateCategoryResponseSchema: GenMessage<CreateCategoryResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 5);
+  messageDesc(file_arian_v1_category_services, 3);
 
 /**
  * @generated from message arian.v1.UpdateCategoryRequest
@@ -179,7 +130,7 @@ export type UpdateCategoryRequest = Message<"arian.v1.UpdateCategoryRequest"> & 
  * Use `create(UpdateCategoryRequestSchema)` to create a new message.
  */
 export const UpdateCategoryRequestSchema: GenMessage<UpdateCategoryRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 6);
+  messageDesc(file_arian_v1_category_services, 4);
 
 /**
  * @generated from message arian.v1.UpdateCategoryResponse
@@ -196,7 +147,7 @@ export type UpdateCategoryResponse = Message<"arian.v1.UpdateCategoryResponse"> 
  * Use `create(UpdateCategoryResponseSchema)` to create a new message.
  */
 export const UpdateCategoryResponseSchema: GenMessage<UpdateCategoryResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 7);
+  messageDesc(file_arian_v1_category_services, 5);
 
 /**
  * @generated from message arian.v1.DeleteCategoryRequest
@@ -213,7 +164,7 @@ export type DeleteCategoryRequest = Message<"arian.v1.DeleteCategoryRequest"> & 
  * Use `create(DeleteCategoryRequestSchema)` to create a new message.
  */
 export const DeleteCategoryRequestSchema: GenMessage<DeleteCategoryRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 8);
+  messageDesc(file_arian_v1_category_services, 6);
 
 /**
  * @generated from message arian.v1.DeleteCategoryResponse
@@ -230,7 +181,7 @@ export type DeleteCategoryResponse = Message<"arian.v1.DeleteCategoryResponse"> 
  * Use `create(DeleteCategoryResponseSchema)` to create a new message.
  */
 export const DeleteCategoryResponseSchema: GenMessage<DeleteCategoryResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 9);
+  messageDesc(file_arian_v1_category_services, 7);
 
 /**
  * @generated from message arian.v1.GetCategoryUsageStatsRequest
@@ -262,7 +213,7 @@ export type GetCategoryUsageStatsRequest = Message<"arian.v1.GetCategoryUsageSta
  * Use `create(GetCategoryUsageStatsRequestSchema)` to create a new message.
  */
 export const GetCategoryUsageStatsRequestSchema: GenMessage<GetCategoryUsageStatsRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 10);
+  messageDesc(file_arian_v1_category_services, 8);
 
 /**
  * @generated from message arian.v1.GetCategoryUsageStatsResponse
@@ -279,7 +230,7 @@ export type GetCategoryUsageStatsResponse = Message<"arian.v1.GetCategoryUsageSt
  * Use `create(GetCategoryUsageStatsResponseSchema)` to create a new message.
  */
 export const GetCategoryUsageStatsResponseSchema: GenMessage<GetCategoryUsageStatsResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 11);
+  messageDesc(file_arian_v1_category_services, 9);
 
 /**
  * @generated from message arian.v1.GetCategoriesWithStatsRequest
@@ -316,7 +267,7 @@ export type GetCategoriesWithStatsRequest = Message<"arian.v1.GetCategoriesWithS
  * Use `create(GetCategoriesWithStatsRequestSchema)` to create a new message.
  */
 export const GetCategoriesWithStatsRequestSchema: GenMessage<GetCategoriesWithStatsRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 12);
+  messageDesc(file_arian_v1_category_services, 10);
 
 /**
  * @generated from message arian.v1.GetCategoriesWithStatsResponse
@@ -338,7 +289,7 @@ export type GetCategoriesWithStatsResponse = Message<"arian.v1.GetCategoriesWith
  * Use `create(GetCategoriesWithStatsResponseSchema)` to create a new message.
  */
 export const GetCategoriesWithStatsResponseSchema: GenMessage<GetCategoriesWithStatsResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 13);
+  messageDesc(file_arian_v1_category_services, 11);
 
 /**
  * @generated from message arian.v1.SearchCategoriesRequest
@@ -365,7 +316,7 @@ export type SearchCategoriesRequest = Message<"arian.v1.SearchCategoriesRequest"
  * Use `create(SearchCategoriesRequestSchema)` to create a new message.
  */
 export const SearchCategoriesRequestSchema: GenMessage<SearchCategoriesRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 14);
+  messageDesc(file_arian_v1_category_services, 12);
 
 /**
  * @generated from message arian.v1.SearchCategoriesResponse
@@ -387,7 +338,7 @@ export type SearchCategoriesResponse = Message<"arian.v1.SearchCategoriesRespons
  * Use `create(SearchCategoriesResponseSchema)` to create a new message.
  */
 export const SearchCategoriesResponseSchema: GenMessage<SearchCategoriesResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 15);
+  messageDesc(file_arian_v1_category_services, 13);
 
 /**
  * @generated from message arian.v1.ListCategoriesWithUsageRequest
@@ -409,7 +360,7 @@ export type ListCategoriesWithUsageRequest = Message<"arian.v1.ListCategoriesWit
  * Use `create(ListCategoriesWithUsageRequestSchema)` to create a new message.
  */
 export const ListCategoriesWithUsageRequestSchema: GenMessage<ListCategoriesWithUsageRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 16);
+  messageDesc(file_arian_v1_category_services, 14);
 
 /**
  * @generated from message arian.v1.ListCategoriesWithUsageResponse
@@ -431,12 +382,12 @@ export type ListCategoriesWithUsageResponse = Message<"arian.v1.ListCategoriesWi
  * Use `create(ListCategoriesWithUsageResponseSchema)` to create a new message.
  */
 export const ListCategoriesWithUsageResponseSchema: GenMessage<ListCategoriesWithUsageResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 17);
+  messageDesc(file_arian_v1_category_services, 15);
 
 /**
- * @generated from message arian.v1.ListCategoriesForUserRequest
+ * @generated from message arian.v1.ListCategoriesRequest
  */
-export type ListCategoriesForUserRequest = Message<"arian.v1.ListCategoriesForUserRequest"> & {
+export type ListCategoriesRequest = Message<"arian.v1.ListCategoriesRequest"> & {
   /**
    * @generated from field: string user_id = 1;
    */
@@ -454,20 +405,20 @@ export type ListCategoriesForUserRequest = Message<"arian.v1.ListCategoriesForUs
 };
 
 /**
- * Describes the message arian.v1.ListCategoriesForUserRequest.
- * Use `create(ListCategoriesForUserRequestSchema)` to create a new message.
+ * Describes the message arian.v1.ListCategoriesRequest.
+ * Use `create(ListCategoriesRequestSchema)` to create a new message.
  */
-export const ListCategoriesForUserRequestSchema: GenMessage<ListCategoriesForUserRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 18);
+export const ListCategoriesRequestSchema: GenMessage<ListCategoriesRequest> = /*@__PURE__*/
+  messageDesc(file_arian_v1_category_services, 16);
 
 /**
- * @generated from message arian.v1.ListCategoriesForUserResponse
+ * @generated from message arian.v1.ListCategoriesResponse
  */
-export type ListCategoriesForUserResponse = Message<"arian.v1.ListCategoriesForUserResponse"> & {
+export type ListCategoriesResponse = Message<"arian.v1.ListCategoriesResponse"> & {
   /**
-   * @generated from field: repeated arian.v1.CategoryWithUserUsage categories = 1;
+   * @generated from field: repeated arian.v1.Category categories = 1;
    */
-  categories: CategoryWithUserUsage[];
+  categories: Category[];
 
   /**
    * @generated from field: int64 total_count = 2;
@@ -476,11 +427,11 @@ export type ListCategoriesForUserResponse = Message<"arian.v1.ListCategoriesForU
 };
 
 /**
- * Describes the message arian.v1.ListCategoriesForUserResponse.
- * Use `create(ListCategoriesForUserResponseSchema)` to create a new message.
+ * Describes the message arian.v1.ListCategoriesResponse.
+ * Use `create(ListCategoriesResponseSchema)` to create a new message.
  */
-export const ListCategoriesForUserResponseSchema: GenMessage<ListCategoriesForUserResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 19);
+export const ListCategoriesResponseSchema: GenMessage<ListCategoriesResponse> = /*@__PURE__*/
+  messageDesc(file_arian_v1_category_services, 17);
 
 /**
  * @generated from message arian.v1.GetCategoryBySlugRequest
@@ -497,7 +448,7 @@ export type GetCategoryBySlugRequest = Message<"arian.v1.GetCategoryBySlugReques
  * Use `create(GetCategoryBySlugRequestSchema)` to create a new message.
  */
 export const GetCategoryBySlugRequestSchema: GenMessage<GetCategoryBySlugRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 20);
+  messageDesc(file_arian_v1_category_services, 18);
 
 /**
  * @generated from message arian.v1.GetCategoryBySlugResponse
@@ -514,7 +465,7 @@ export type GetCategoryBySlugResponse = Message<"arian.v1.GetCategoryBySlugRespo
  * Use `create(GetCategoryBySlugResponseSchema)` to create a new message.
  */
 export const GetCategoryBySlugResponseSchema: GenMessage<GetCategoryBySlugResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 21);
+  messageDesc(file_arian_v1_category_services, 19);
 
 /**
  * @generated from message arian.v1.GetCategoryWithStatsRequest
@@ -531,7 +482,7 @@ export type GetCategoryWithStatsRequest = Message<"arian.v1.GetCategoryWithStats
  * Use `create(GetCategoryWithStatsRequestSchema)` to create a new message.
  */
 export const GetCategoryWithStatsRequestSchema: GenMessage<GetCategoryWithStatsRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 22);
+  messageDesc(file_arian_v1_category_services, 20);
 
 /**
  * @generated from message arian.v1.GetCategoryWithStatsResponse
@@ -553,7 +504,7 @@ export type GetCategoryWithStatsResponse = Message<"arian.v1.GetCategoryWithStat
  * Use `create(GetCategoryWithStatsResponseSchema)` to create a new message.
  */
 export const GetCategoryWithStatsResponseSchema: GenMessage<GetCategoryWithStatsResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 23);
+  messageDesc(file_arian_v1_category_services, 21);
 
 /**
  * @generated from message arian.v1.BulkCreateCategoriesRequest
@@ -570,7 +521,7 @@ export type BulkCreateCategoriesRequest = Message<"arian.v1.BulkCreateCategories
  * Use `create(BulkCreateCategoriesRequestSchema)` to create a new message.
  */
 export const BulkCreateCategoriesRequestSchema: GenMessage<BulkCreateCategoriesRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 24);
+  messageDesc(file_arian_v1_category_services, 22);
 
 /**
  * @generated from message arian.v1.BulkCreateCategoriesResponse
@@ -592,7 +543,7 @@ export type BulkCreateCategoriesResponse = Message<"arian.v1.BulkCreateCategorie
  * Use `create(BulkCreateCategoriesResponseSchema)` to create a new message.
  */
 export const BulkCreateCategoriesResponseSchema: GenMessage<BulkCreateCategoriesResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 25);
+  messageDesc(file_arian_v1_category_services, 23);
 
 /**
  * @generated from message arian.v1.DeleteUnusedCategoriesRequest
@@ -605,7 +556,7 @@ export type DeleteUnusedCategoriesRequest = Message<"arian.v1.DeleteUnusedCatego
  * Use `create(DeleteUnusedCategoriesRequestSchema)` to create a new message.
  */
 export const DeleteUnusedCategoriesRequestSchema: GenMessage<DeleteUnusedCategoriesRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 26);
+  messageDesc(file_arian_v1_category_services, 24);
 
 /**
  * @generated from message arian.v1.DeleteUnusedCategoriesResponse
@@ -622,7 +573,7 @@ export type DeleteUnusedCategoriesResponse = Message<"arian.v1.DeleteUnusedCateg
  * Use `create(DeleteUnusedCategoriesResponseSchema)` to create a new message.
  */
 export const DeleteUnusedCategoriesResponseSchema: GenMessage<DeleteUnusedCategoriesResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 27);
+  messageDesc(file_arian_v1_category_services, 25);
 
 /**
  * @generated from message arian.v1.ListCategorySlugsRequest
@@ -635,7 +586,7 @@ export type ListCategorySlugsRequest = Message<"arian.v1.ListCategorySlugsReques
  * Use `create(ListCategorySlugsRequestSchema)` to create a new message.
  */
 export const ListCategorySlugsRequestSchema: GenMessage<ListCategorySlugsRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 28);
+  messageDesc(file_arian_v1_category_services, 26);
 
 /**
  * @generated from message arian.v1.ListCategorySlugsResponse
@@ -652,12 +603,12 @@ export type ListCategorySlugsResponse = Message<"arian.v1.ListCategorySlugsRespo
  * Use `create(ListCategorySlugsResponseSchema)` to create a new message.
  */
 export const ListCategorySlugsResponseSchema: GenMessage<ListCategorySlugsResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 29);
+  messageDesc(file_arian_v1_category_services, 27);
 
 /**
- * @generated from message arian.v1.GetMostUsedCategoriesForUserRequest
+ * @generated from message arian.v1.GetMostUsedCategoriesRequest
  */
-export type GetMostUsedCategoriesForUserRequest = Message<"arian.v1.GetMostUsedCategoriesForUserRequest"> & {
+export type GetMostUsedCategoriesRequest = Message<"arian.v1.GetMostUsedCategoriesRequest"> & {
   /**
    * @generated from field: string user_id = 1;
    */
@@ -680,16 +631,16 @@ export type GetMostUsedCategoriesForUserRequest = Message<"arian.v1.GetMostUsedC
 };
 
 /**
- * Describes the message arian.v1.GetMostUsedCategoriesForUserRequest.
- * Use `create(GetMostUsedCategoriesForUserRequestSchema)` to create a new message.
+ * Describes the message arian.v1.GetMostUsedCategoriesRequest.
+ * Use `create(GetMostUsedCategoriesRequestSchema)` to create a new message.
  */
-export const GetMostUsedCategoriesForUserRequestSchema: GenMessage<GetMostUsedCategoriesForUserRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 30);
+export const GetMostUsedCategoriesRequestSchema: GenMessage<GetMostUsedCategoriesRequest> = /*@__PURE__*/
+  messageDesc(file_arian_v1_category_services, 28);
 
 /**
- * @generated from message arian.v1.GetMostUsedCategoriesForUserResponse
+ * @generated from message arian.v1.GetMostUsedCategoriesResponse
  */
-export type GetMostUsedCategoriesForUserResponse = Message<"arian.v1.GetMostUsedCategoriesForUserResponse"> & {
+export type GetMostUsedCategoriesResponse = Message<"arian.v1.GetMostUsedCategoriesResponse"> & {
   /**
    * @generated from field: repeated arian.v1.CategoryWithUsage categories = 1;
    */
@@ -697,11 +648,11 @@ export type GetMostUsedCategoriesForUserResponse = Message<"arian.v1.GetMostUsed
 };
 
 /**
- * Describes the message arian.v1.GetMostUsedCategoriesForUserResponse.
- * Use `create(GetMostUsedCategoriesForUserResponseSchema)` to create a new message.
+ * Describes the message arian.v1.GetMostUsedCategoriesResponse.
+ * Use `create(GetMostUsedCategoriesResponseSchema)` to create a new message.
  */
-export const GetMostUsedCategoriesForUserResponseSchema: GenMessage<GetMostUsedCategoriesForUserResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 31);
+export const GetMostUsedCategoriesResponseSchema: GenMessage<GetMostUsedCategoriesResponse> = /*@__PURE__*/
+  messageDesc(file_arian_v1_category_services, 29);
 
 /**
  * @generated from message arian.v1.GetUnusedCategoriesRequest
@@ -714,7 +665,7 @@ export type GetUnusedCategoriesRequest = Message<"arian.v1.GetUnusedCategoriesRe
  * Use `create(GetUnusedCategoriesRequestSchema)` to create a new message.
  */
 export const GetUnusedCategoriesRequestSchema: GenMessage<GetUnusedCategoriesRequest> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 32);
+  messageDesc(file_arian_v1_category_services, 30);
 
 /**
  * @generated from message arian.v1.GetUnusedCategoriesResponse
@@ -731,20 +682,12 @@ export type GetUnusedCategoriesResponse = Message<"arian.v1.GetUnusedCategoriesR
  * Use `create(GetUnusedCategoriesResponseSchema)` to create a new message.
  */
 export const GetUnusedCategoriesResponseSchema: GenMessage<GetUnusedCategoriesResponse> = /*@__PURE__*/
-  messageDesc(file_arian_v1_category_services, 33);
+  messageDesc(file_arian_v1_category_services, 31);
 
 /**
  * @generated from service arian.v1.CategoryService
  */
 export const CategoryService: GenService<{
-  /**
-   * @generated from rpc arian.v1.CategoryService.ListCategories
-   */
-  listCategories: {
-    methodKind: "unary";
-    input: typeof ListCategoriesRequestSchema;
-    output: typeof ListCategoriesResponseSchema;
-  },
   /**
    * @generated from rpc arian.v1.CategoryService.ListCategoriesWithUsage
    */
@@ -754,12 +697,12 @@ export const CategoryService: GenService<{
     output: typeof ListCategoriesWithUsageResponseSchema;
   },
   /**
-   * @generated from rpc arian.v1.CategoryService.ListCategoriesForUser
+   * @generated from rpc arian.v1.CategoryService.ListCategories
    */
-  listCategoriesForUser: {
+  listCategories: {
     methodKind: "unary";
-    input: typeof ListCategoriesForUserRequestSchema;
-    output: typeof ListCategoriesForUserResponseSchema;
+    input: typeof ListCategoriesRequestSchema;
+    output: typeof ListCategoriesResponseSchema;
   },
   /**
    * @generated from rpc arian.v1.CategoryService.GetCategory
@@ -858,12 +801,12 @@ export const CategoryService: GenService<{
     output: typeof ListCategorySlugsResponseSchema;
   },
   /**
-   * @generated from rpc arian.v1.CategoryService.GetMostUsedCategoriesForUser
+   * @generated from rpc arian.v1.CategoryService.GetMostUsedCategories
    */
-  getMostUsedCategoriesForUser: {
+  getMostUsedCategories: {
     methodKind: "unary";
-    input: typeof GetMostUsedCategoriesForUserRequestSchema;
-    output: typeof GetMostUsedCategoriesForUserResponseSchema;
+    input: typeof GetMostUsedCategoriesRequestSchema;
+    output: typeof GetMostUsedCategoriesResponseSchema;
   },
   /**
    * @generated from rpc arian.v1.CategoryService.GetUnusedCategories

@@ -63,9 +63,10 @@ const TransactionCards = forwardRef<{
       getId: (transaction) => transaction.id,
     });
 
-    const formatAmount = (amount?: { currencyCode?: string; currency_code?: string; units?: string; nanos?: number }) => {
+    const formatAmount = (amount?: { currencyCode?: string; currency_code?: string; units?: string | bigint; nanos?: number }) => {
       if (!amount?.units) return 0;
-      return parseFloat(amount.units) + (amount.nanos || 0) / 1e9;
+      const units = typeof amount.units === 'bigint' ? Number(amount.units) : parseFloat(amount.units);
+      return units + (amount.nanos || 0) / 1e9;
     };
 
     const formatCurrency = (amount: number, currencyCode = "USD") => {
@@ -85,7 +86,7 @@ const TransactionCards = forwardRef<{
       }
     };
 
-    const formatDate = (timestamp?: { seconds?: string; nanos?: number } | string) => {
+    const formatDate = (timestamp?: { seconds?: string | bigint; nanos?: number } | string) => {
       let date: Date;
       
       if (!timestamp) return { date: "", displayDate: "" };
@@ -93,7 +94,8 @@ const TransactionCards = forwardRef<{
       if (typeof timestamp === 'string') {
         date = new Date(timestamp);
       } else if (timestamp.seconds) {
-        date = new Date(parseInt(timestamp.seconds) * 1000);
+        const seconds = typeof timestamp.seconds === 'bigint' ? Number(timestamp.seconds) : parseInt(timestamp.seconds);
+        date = new Date(seconds * 1000);
       } else {
         return { date: "", displayDate: "" };
       }
@@ -333,7 +335,7 @@ const TransactionCards = forwardRef<{
     }
 
     if (error) {
-      return <div className="p-4 text-sm font-mono text-red-600 tui-border">{error}</div>;
+      return <div className="p-4 text-sm font-mono text-red-600 tui-border">{String(error)}</div>;
     }
 
     const groupedTransactions = groupTransactionsByDay(transactions);
@@ -376,12 +378,12 @@ const TransactionCards = forwardRef<{
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-mono">
-                    <span className="text-green-500">+{formatCurrency(group.totalIn)}</span>
+                    <span className="text-green-500">+{formatCurrency(group.totalIn, group.transactions[0]?.txAmount?.currencyCode)}</span>
                     {" / "}
-                    <span className="text-red-500">-{formatCurrency(group.totalOut)}</span>
+                    <span className="text-red-500">-{formatCurrency(group.totalOut, group.transactions[0]?.txAmount?.currencyCode)}</span>
                   </div>
                   <div className={`text-xs font-mono ${group.netAmount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    net: {formatCurrency(group.netAmount)}
+                    net: {formatCurrency(group.netAmount, group.transactions[0]?.txAmount?.currencyCode)}
                   </div>
                 </div>
               </div>
@@ -439,7 +441,7 @@ const TransactionCards = forwardRef<{
                             </div>
                             <div className="text-right ml-4">
                               <div className={`text-lg font-mono ${directionInfo.className}`}>
-                                {directionInfo.symbol}{formatCurrency(amount).replace("-", "")}
+                                {directionInfo.symbol}{formatCurrency(amount, transaction.txAmount?.currencyCode).replace("-", "")}
                               </div>
                             </div>
                           </div>
@@ -476,7 +478,8 @@ const TransactionCards = forwardRef<{
                                 if (typeof transaction.txDate === 'string') {
                                   date = new Date(transaction.txDate);
                                 } else if (transaction.txDate?.seconds) {
-                                  date = new Date(parseInt(transaction.txDate.seconds) * 1000);
+                                  const seconds = typeof transaction.txDate.seconds === 'bigint' ? Number(transaction.txDate.seconds) : parseInt(String(transaction.txDate.seconds));
+                                  date = new Date(seconds * 1000);
                                 } else {
                                   return "—";
                                 }
@@ -511,10 +514,10 @@ const TransactionCards = forwardRef<{
                                     <span className="ml-2">{transaction.merchant}</span>
                                   </div>
                                 )}
-                                {(transaction.category?.name || transaction.category?.label) && (
+                                {transaction.category?.label && (
                                   <div>
                                     <span className="tui-muted">Category:</span>
-                                    <span className="ml-2">{transaction.category.name || transaction.category.label}</span>
+                                    <span className="ml-2">{transaction.category.label}</span>
                                   </div>
                                 )}
                                 {(transaction.categorizationStatus === CategorizationStatus.CATEGORIZATION_MANUAL ||
@@ -539,7 +542,7 @@ const TransactionCards = forwardRef<{
                                 {transaction.balanceAfter && (
                                   <div>
                                     <span className="tui-muted">Balance After:</span>
-                                    <span className="ml-2 font-mono">{formatCurrency(formatAmount(transaction.balanceAfter))}</span>
+                                    <span className="ml-2 font-mono">{formatCurrency(formatAmount(transaction.balanceAfter), transaction.balanceAfter?.currencyCode)}</span>
                                   </div>
                                 )}
                                 {transaction.receiptId && (
@@ -551,7 +554,7 @@ const TransactionCards = forwardRef<{
                                 {transaction.foreignAmount && (
                                   <div>
                                     <span className="tui-muted">Foreign Amount:</span>
-                                    <span className="ml-2 font-mono">{formatCurrency(formatAmount(transaction.foreignAmount))}</span>
+                                    <span className="ml-2 font-mono">{formatCurrency(formatAmount(transaction.foreignAmount), transaction.foreignAmount?.currencyCode)}</span>
                                   </div>
                                 )}
                                 {transaction.exchangeRate && (
@@ -581,10 +584,10 @@ const TransactionCards = forwardRef<{
                             <div className="mt-4 text-xs tui-muted">
                               <div className="flex justify-between">
                                 {transaction.createdAt?.seconds && (
-                                  <span>Created: {new Date(parseInt(transaction.createdAt.seconds) * 1000).toLocaleString()}</span>
+                                  <span>Created: {new Date(Number(transaction.createdAt.seconds) * 1000).toLocaleString()}</span>
                                 )}
                                 {transaction.updatedAt?.seconds && (
-                                  <span>Updated: {new Date(parseInt(transaction.updatedAt.seconds) * 1000).toLocaleString()}</span>
+                                  <span>Updated: {new Date(Number(transaction.updatedAt.seconds) * 1000).toLocaleString()}</span>
                                 )}
                               </div>
                             </div>
