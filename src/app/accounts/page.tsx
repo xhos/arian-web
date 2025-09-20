@@ -10,7 +10,7 @@ import { useUserId } from "@/hooks/useSession";
 import AccountGrid from "./components/AccountGrid";
 import AnchorBalanceForm from "./components/AnchorBalanceForm";
 import FilterChips from "./components/FilterChips";
-import AccountDetailsSidebar from "./components/AccountDetailsSidebar";
+import EditAccountSidebar from "./components/EditAccountSidebar";
 import CreateAccountSidebar from "./components/CreateAccountSidebar";
 
 const getAccountTypeName = (accountType: AccountType): string => {
@@ -57,6 +57,8 @@ export default function AccountsPage() {
       type: AccountType;
       alias?: string;
       anchorBalance?: { currencyCode: string; units: string; nanos: number };
+      mainCurrency?: string;
+      colors?: string[];
     }) => {
       if (!userId) throw new Error("User not authenticated");
 
@@ -70,6 +72,8 @@ export default function AccountsPage() {
           type: formData.type,
           alias: formData.alias,
           anchorBalance: formData.anchorBalance,
+          mainCurrency: formData.mainCurrency,
+          colors: formData.colors,
         }),
       });
 
@@ -88,6 +92,7 @@ export default function AccountsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
       setError("");
     },
     onError: (err) => {
@@ -107,6 +112,8 @@ export default function AccountsPage() {
         bank: string;
         type: AccountType;
         alias?: string;
+        mainCurrency?: string;
+        colors?: string[];
       };
     }) => {
       if (!userId) throw new Error("User not authenticated");
@@ -117,11 +124,13 @@ export default function AccountsPage() {
         body: JSON.stringify({
           userId,
           id: accountId.toString(),
-          updateMask: "name,bank,accountType,alias",
+          updateMask: "name,bank,accountType,alias,mainCurrency,colors",
           name: formData.name,
           bank: formData.bank,
           accountType: formData.type,
           alias: formData.alias,
+          mainCurrency: formData.mainCurrency,
+          colors: formData.colors,
         }),
       });
 
@@ -140,6 +149,7 @@ export default function AccountsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
       setError("");
     },
     onError: (err) => {
@@ -170,6 +180,7 @@ export default function AccountsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
       setError("");
     },
     onError: (err) => {
@@ -214,6 +225,7 @@ export default function AccountsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
       setShowAnchorForm(false);
       setAnchorAccount(null);
       setError("");
@@ -232,7 +244,7 @@ export default function AccountsPage() {
     setAnchorBalanceMutation.mutate({ accountId, balance });
   };
 
-  const handleUpdateAccount = (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string }) => {
+  const handleUpdateAccount = (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string; mainCurrency?: string; colors?: string[] }) => {
     updateAccountMutation.mutate({ accountId, formData: data });
   };
 
@@ -334,7 +346,7 @@ export default function AccountsPage() {
         )}
       </div>
 
-      <AccountDetailsSidebar
+      <EditAccountSidebar
         account={selectedAccount}
         onClose={handleCloseSidebar}
         onUpdate={handleUpdateAccount}

@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file arian/v1/account.proto.
  */
 export const file_arian_v1_account: GenFile = /*@__PURE__*/
-  fileDesc("ChZhcmlhbi92MS9hY2NvdW50LnByb3RvEghhcmlhbi52MSLqAgoHQWNjb3VudBIKCgJpZBgBIAEoAxIQCghvd25lcl9pZBgCIAEoCRIMCgRuYW1lGAMgASgJEgwKBGJhbmsYBCABKAkSIwoEdHlwZRgFIAEoDjIVLmFyaWFuLnYxLkFjY291bnRUeXBlEioKDmFuY2hvcl9iYWxhbmNlGAYgASgLMhIuZ29vZ2xlLnR5cGUuTW9uZXkSLwoLYW5jaG9yX2RhdGUYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmNyZWF0ZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKBWFsaWFzGAogASgJSACIAQESFQoNbWFpbl9jdXJyZW5jeRgLIAEoCRIOCgZjb2xvcnMYDCADKAlCCAoGX2FsaWFzIpYBCg5BY2NvdW50QmFsYW5jZRIKCgJpZBgBIAEoAxIMCgRuYW1lGAIgASgJEisKDGFjY291bnRfdHlwZRgDIAEoDjIVLmFyaWFuLnYxLkFjY291bnRUeXBlEisKD2N1cnJlbnRfYmFsYW5jZRgEIAEoCzISLmdvb2dsZS50eXBlLk1vbmV5EhAKCGN1cnJlbmN5GAUgASgJYgZwcm90bzM", [file_arian_v1_enums, file_google_protobuf_timestamp, file_google_type_money]);
+  fileDesc("ChZhcmlhbi92MS9hY2NvdW50LnByb3RvEghhcmlhbi52MSKPAwoHQWNjb3VudBIKCgJpZBgBIAEoAxIQCghvd25lcl9pZBgCIAEoCRIMCgRuYW1lGAMgASgJEgwKBGJhbmsYBCABKAkSIwoEdHlwZRgFIAEoDjIVLmFyaWFuLnYxLkFjY291bnRUeXBlEioKDmFuY2hvcl9iYWxhbmNlGAYgASgLMhIuZ29vZ2xlLnR5cGUuTW9uZXkSLwoLYW5jaG9yX2RhdGUYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmNyZWF0ZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKBWFsaWFzGAogASgJSACIAQESFQoNbWFpbl9jdXJyZW5jeRgLIAEoCRIOCgZjb2xvcnMYDCADKAkSIwoHYmFsYW5jZRgNIAEoCzISLmdvb2dsZS50eXBlLk1vbmV5QggKBl9hbGlhcyKWAQoOQWNjb3VudEJhbGFuY2USCgoCaWQYASABKAMSDAoEbmFtZRgCIAEoCRIrCgxhY2NvdW50X3R5cGUYAyABKA4yFS5hcmlhbi52MS5BY2NvdW50VHlwZRIrCg9jdXJyZW50X2JhbGFuY2UYBCABKAsyEi5nb29nbGUudHlwZS5Nb25leRIQCghjdXJyZW5jeRgFIAEoCWIGcHJvdG8z", [file_arian_v1_enums, file_google_protobuf_timestamp, file_google_type_money]);
 
 /**
  * @generated from message arian.v1.Account
@@ -81,6 +81,11 @@ export type Account = Message<"arian.v1.Account"> & {
    * @generated from field: repeated string colors = 12;
    */
   colors: string[];
+
+  /**
+   * @generated from field: google.type.Money balance = 13;
+   */
+  balance?: Money;
 };
 
 /**
