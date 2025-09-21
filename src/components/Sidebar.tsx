@@ -18,7 +18,7 @@ interface NavItem {
 const navigationItems: NavItem[] = [
   { type: "file", name: "transactions", href: "/" },
   { type: "file", name: "accounts", href: "/accounts" },
-  { type: "file", name: "categories", href: "#", disabled: true },
+  { type: "file", name: "categories", href: "/categories" },
 ];
 
 interface NavItemProps {
