@@ -12,7 +12,10 @@ interface UseTransactionsQueryOptions {
   enabled?: boolean;
 }
 
-export function useTransactionsQuery({ accountId, enabled = true }: UseTransactionsQueryOptions = {}) {
+export function useTransactionsQuery({
+  accountId,
+  enabled = true,
+}: UseTransactionsQueryOptions = {}) {
   const queryClient = useQueryClient();
   const userId = useUserId();
 
@@ -47,7 +50,7 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
 
   // Flatten all pages into single transactions array
   const allTransactions = useMemo(() => {
-    return transactionsQuery.data?.pages.flatMap(page => page.transactions) ?? [];
+    return transactionsQuery.data?.pages.flatMap((page) => page.transactions) ?? [];
   }, [transactionsQuery.data]);
 
   const hasNextPage = transactionsQuery.hasNextPage;
@@ -65,13 +68,15 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
-          transaction_ids: transactionIds.map(id => parseInt(id.toString())),
+          transaction_ids: transactionIds.map((id) => parseInt(id.toString())),
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to delete transactions: ${response.statusText}`);
+        throw new Error(
+          errorData.message || `Failed to delete transactions: ${response.statusText}`
+        );
       }
 
       return response.json();
@@ -84,21 +89,24 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
       const previousData = queryClient.getQueryData(["transactions", accountId?.toString()]);
 
       // Optimistically update the cache for infinite query
-      queryClient.setQueryData(["transactions", accountId?.toString()], (old: any) => {
-        if (!old?.pages) return old;
-        
-        const idsToDelete = new Set(transactionIds.map(id => id.toString()));
-        
-        return {
-          ...old,
-          pages: old.pages.map((page: any) => ({
-            ...page,
-            transactions: page.transactions.filter((t: Transaction) => 
-              !idsToDelete.has(t.id.toString())
-            ),
-          })),
-        };
-      });
+      queryClient.setQueryData(
+        ["transactions", accountId?.toString()],
+        (old: { pages?: Array<{ transactions: Transaction[] }> }) => {
+          if (!old?.pages) return old;
+
+          const idsToDelete = new Set(transactionIds.map((id) => id.toString()));
+
+          return {
+            ...old,
+            pages: old.pages.map((page: { transactions: Transaction[] }) => ({
+              ...page,
+              transactions: page.transactions.filter(
+                (t: Transaction) => !idsToDelete.has(t.id.toString())
+              ),
+            })),
+          };
+        }
+      );
 
       // Return context with snapshot
       return { previousData };
@@ -118,7 +126,16 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
 
   // Create transaction mutation
   const createTransactionMutation = useMutation({
-    mutationFn: async (formData: any) => {
+    mutationFn: async (formData: {
+      accountId: bigint;
+      txDate: Date;
+      txAmount: { currencyCode: string; units: string; nanos: number };
+      direction: number;
+      description?: string;
+      merchant?: string;
+      userNotes?: string;
+      categoryId?: bigint;
+    }) => {
       if (!userId) {
         throw new Error("User not authenticated");
       }
@@ -143,7 +160,9 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to create transaction: ${response.statusText}`);
+        throw new Error(
+          errorData.message || `Failed to create transaction: ${response.statusText}`
+        );
       }
 
       return response.json();
@@ -163,21 +182,22 @@ export function useTransactionsQuery({ accountId, enabled = true }: UseTransacti
     error: transactionsQuery.error,
     hasMore: hasNextPage,
     isLoadingMore: isFetchingNextPage,
-    
+
     // Pagination
     loadMore: transactionsQuery.fetchNextPage,
-    
+
     // Mutations
     deleteTransactions: deleteTransactionsMutation.mutate,
     isDeleting: deleteTransactionsMutation.isPending,
     deleteError: deleteTransactionsMutation.error,
-    
+
     createTransaction: createTransactionMutation.mutateAsync,
     isCreating: createTransactionMutation.isPending,
     createError: createTransactionMutation.error,
-    
+
     // Manual controls
     refetch: transactionsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: ["transactions", accountId?.toString()] }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: ["transactions", accountId?.toString()] }),
   };
 }

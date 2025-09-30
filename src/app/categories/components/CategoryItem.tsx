@@ -9,7 +9,6 @@ import {
   type PendingChange,
   getDisplayName,
   calculateDropResult,
-  findInsertionIndex,
   categoryDisplayStyles,
 } from "../utils/categoryUtils";
 import { CategoryDisplay } from "./CategoryDisplay";
@@ -39,45 +38,57 @@ interface CategoryItemProps {
   isOverlay?: boolean;
 }
 
-export function CategoryItem({ node, pendingChanges, dragState, categories, onDelete, isOverlay = false }: CategoryItemProps) {
+export function CategoryItem({
+  node,
+  pendingChanges,
+  dragState,
+  categories,
+  onDelete,
+  isOverlay = false,
+}: CategoryItemProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const dragId = node.category.id.toString();
-  const hasChanges = pendingChanges.some(change => change.categoryId === node.category.id);
+  const hasChanges = pendingChanges.some((change) => change.categoryId === node.category.id);
   const isDragging = dragState.activeId === dragId;
   const isDropTarget = dragState.overId === dragId;
 
   // Check if this category or any ancestor is being dragged
-  const draggedCategory = dragState.activeId ? categories.find(c => c.id.toString() === dragState.activeId) : null;
-  const isChildOfDragged = draggedCategory && node.category.slug.startsWith(draggedCategory.slug + '.');
+  const draggedCategory = dragState.activeId
+    ? categories.find((c) => c.id.toString() === dragState.activeId)
+    : null;
+  const isChildOfDragged =
+    draggedCategory && node.category.slug.startsWith(draggedCategory.slug + ".");
   const shouldHide = isDragging || isChildOfDragged;
 
   // Draggable setup
   const draggable = useDraggable({
     id: dragId,
-    data: { category: node.category, type: 'category' }
+    data: { category: node.category, type: "category" },
   });
 
   // Droppable setup
   const droppable = useDroppable({
     id: dragId,
     data: { category: node.category },
-    disabled: false
+    disabled: false,
   });
 
-  const style = draggable.transform ? {
-    transform: CSS.Transform.toString(draggable.transform),
-  } : undefined;
+  const style = draggable.transform
+    ? {
+        transform: CSS.Transform.toString(draggable.transform),
+      }
+    : undefined;
 
   // Show nesting preview when this item is a drop target
   const showNestingPreview = isDropTarget && dragState.activeId && dragState.activeId !== dragId;
 
   // Calculate the actual resulting nesting level and slug using shared logic
   const previewInfo = (() => {
-    if (!showNestingPreview || !dragState.activeId) return { actualLevel: 0, newSlug: '' };
+    if (!showNestingPreview || !dragState.activeId) return { actualLevel: 0, newSlug: "" };
 
-    const draggedCategory = categories.find(c => c.id.toString() === dragState.activeId);
-    if (!draggedCategory) return { actualLevel: 0, newSlug: '' };
+    const draggedCategory = categories.find((c) => c.id.toString() === dragState.activeId);
+    if (!draggedCategory) return { actualLevel: 0, newSlug: "" };
 
     return calculateDropResult(draggedCategory, node.category, dragState.nestingLevel);
   })();
@@ -91,14 +102,12 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
           droppable.setNodeRef(element);
         }}
         style={style}
-        className={`relative transition-all ${
-          shouldHide ? 'opacity-0' : ''
-        }`}
+        className={`relative transition-all ${shouldHide ? "opacity-0" : ""}`}
       >
         <div
           className={`group flex items-center gap-3 p-3 tui-border rounded-md transition-all cursor-pointer ${
-            hasChanges ? 'border-yellow-400 bg-yellow-500/10' : 'tui-background hover:opacity-80'
-          } ${isOverlay ? 'shadow-2xl' : ''}`}
+            hasChanges ? "border-yellow-400 bg-yellow-500/10" : "tui-background hover:opacity-80"
+          } ${isOverlay ? "shadow-2xl" : ""}`}
           style={{ marginLeft: `${node.level * 24}px` }}
           onClick={() => node.children.length > 0 && setIsCollapsed(!isCollapsed)}
         >
@@ -117,9 +126,7 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
 
             <div className={categoryDisplayStyles.iconContainer}>
               {node.children.length > 0 && (
-                <div className={categoryDisplayStyles.collapseIcon}>
-                  {isCollapsed ? '▶' : '▼'}
-                </div>
+                <div className={categoryDisplayStyles.collapseIcon}>{isCollapsed ? "▶" : "▼"}</div>
               )}
               <div
                 className={categoryDisplayStyles.colorDot}
@@ -131,9 +138,7 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
               {getDisplayName(node.category.slug)}
             </span>
 
-            <span className={categoryDisplayStyles.categorySlug}>
-              {node.category.slug}
-            </span>
+            <span className={categoryDisplayStyles.categorySlug}>{node.category.slug}</span>
           </div>
 
           {/* Delete button */}
@@ -158,20 +163,20 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
           {(() => {
             // Create a list with existing children and the preview item for proper sorting
             // Filter out the dragged category to avoid showing both original (invisible) and preview
-            const children: ChildItem[] = node.children.filter(child =>
-              child.category.id.toString() !== dragState.activeId
+            const children: ChildItem[] = node.children.filter(
+              (child) => child.category.id.toString() !== dragState.activeId
             );
 
             // Add preview item if it should be shown as a child
             const shouldShowPreview = showNestingPreview && previewInfo.actualLevel > node.level;
             if (shouldShowPreview && dragState.activeId) {
-              const draggedDisplayName = previewInfo.newSlug.split('.').pop() || '';
+              const draggedDisplayName = previewInfo.newSlug.split(".").pop() || "";
               const previewItem: PreviewItem = {
                 isPreview: true,
                 displayName: draggedDisplayName,
-                category: categories.find(c => c.id.toString() === dragState.activeId),
+                category: categories.find((c) => c.id.toString() === dragState.activeId),
                 newSlug: previewInfo.newSlug,
-                actualLevel: previewInfo.actualLevel
+                actualLevel: previewInfo.actualLevel,
               };
 
               // Find the correct position to insert the preview based on alphabetical order
@@ -190,7 +195,7 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
 
             return children.map((child) => {
               // Render preview item
-              if ('isPreview' in child && child.isPreview) {
+              if ("isPreview" in child && child.isPreview) {
                 return (
                   <div
                     key="preview"
@@ -198,7 +203,7 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
                     style={{ marginLeft: `${child.actualLevel * 24}px` }}
                   >
                     <CategoryDisplay
-                      category={child.category || { color: '#666' } as Category}
+                      category={child.category || ({ color: "#666" } as Category)}
                       displayName={child.displayName}
                       slug={child.newSlug}
                       isPreview
@@ -226,7 +231,6 @@ export function CategoryItem({ node, pendingChanges, dragState, categories, onDe
           })()}
         </div>
       )}
-
     </div>
   );
 }

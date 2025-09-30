@@ -17,13 +17,22 @@ export default function TransactionsPage() {
   const handleSelectionChange = useCallback((transactions: Transaction[]) => {
     setSelectedTransactions(transactions);
   }, []);
-  const cardsRef = useRef<{ 
-    refresh: () => void; 
+  const cardsRef = useRef<{
+    refresh: () => void;
     clearSelection: () => void;
     hasSelection: boolean;
     selectedCount: number;
     deleteTransactions: (transactionIds: bigint[]) => void;
-    createTransaction: (formData: any) => void;
+    createTransaction: (formData: {
+      accountId: bigint;
+      txDate: Date;
+      txAmount: { currencyCode: string; units: string; nanos: number };
+      direction: TransactionDirection;
+      description?: string;
+      merchant?: string;
+      userNotes?: string;
+      categoryId?: bigint;
+    }) => void;
     isCreating: boolean;
     isDeleting: boolean;
     createError: Error | null;
@@ -58,8 +67,8 @@ export default function TransactionsPage() {
   };
 
   const handleDeleteSelected = async () => {
-    const transactionIds = selectedTransactions.map(t => t.id);
-    
+    const transactionIds = selectedTransactions.map((t) => t.id);
+
     try {
       if (cardsRef.current?.deleteTransactions) {
         cardsRef.current.deleteTransactions(transactionIds);
@@ -86,7 +95,7 @@ export default function TransactionsPage() {
               {selectedTransactions.length > 0 && (
                 <div className="flex items-center gap-2 text-sm tui-muted">
                   <span>{selectedTransactions.length} selected</span>
-                  <button 
+                  <button
                     onClick={handleClearSelection}
                     className="text-xs underline hover:no-underline"
                   >
@@ -96,16 +105,20 @@ export default function TransactionsPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                onClick={() => cardsRef.current?.refresh()} 
-                size="sm" 
+              <Button
+                onClick={() => cardsRef.current?.refresh()}
+                size="sm"
                 variant="outline"
                 disabled={cardsRef.current?.isLoading}
                 className="text-xs"
               >
                 {cardsRef.current?.isLoading ? "↻" : "⟲"} refresh
               </Button>
-              <Button onClick={() => setShowForm(!showForm)} size="sm" disabled={cardsRef.current?.isCreating || false}>
+              <Button
+                onClick={() => setShowForm(!showForm)}
+                size="sm"
+                disabled={cardsRef.current?.isCreating || false}
+              >
                 {showForm ? "cancel" : "add transaction"}
               </Button>
             </div>
@@ -131,15 +144,12 @@ export default function TransactionsPage() {
 
         <div className="flex gap-6">
           <div className="flex-1 min-w-0">
-            <TransactionCards 
-              ref={cardsRef} 
-              onSelectionChange={handleSelectionChange}
-            />
+            <TransactionCards ref={cardsRef} onSelectionChange={handleSelectionChange} />
           </div>
-          
+
           <div className="flex-shrink-0 sticky top-6 h-fit">
             {selectedTransactions.length > 0 ? (
-              <TransactionAnalytics 
+              <TransactionAnalytics
                 transactions={selectedTransactions}
                 onClose={handleClearSelection}
                 onDeleteSelected={handleDeleteSelected}

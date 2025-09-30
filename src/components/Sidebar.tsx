@@ -19,6 +19,7 @@ const navigationItems: NavItem[] = [
   { type: "file", name: "transactions", href: "/" },
   { type: "file", name: "accounts", href: "/accounts" },
   { type: "file", name: "categories", href: "/categories" },
+  { type: "file", name: "rules", href: "/rules" },
 ];
 
 interface NavItemProps {
@@ -27,7 +28,12 @@ interface NavItemProps {
   currentPath: string;
 }
 
-function NavItem({ item, level, currentPath, isCollapsed }: NavItemProps & { isCollapsed: boolean }) {
+function NavItem({
+  item,
+  level,
+  currentPath,
+  isCollapsed,
+}: NavItemProps & { isCollapsed: boolean }) {
   const isActive = item.href === currentPath;
 
   const indent = "  ".repeat(level);
@@ -40,15 +46,16 @@ function NavItem({ item, level, currentPath, isCollapsed }: NavItemProps & { isC
           <span>+</span>
           {!isCollapsed && <span>{item.name}</span>}
         </div>
-        {!isCollapsed && item.children?.map((child, index) => (
-          <NavItem
-            key={`${child.name}-${index}`}
-            item={child}
-            level={level + 1}
-            currentPath={currentPath}
-            isCollapsed={isCollapsed}
-          />
-        ))}
+        {!isCollapsed &&
+          item.children?.map((child, index) => (
+            <NavItem
+              key={`${child.name}-${index}`}
+              item={child}
+              level={level + 1}
+              currentPath={currentPath}
+              isCollapsed={isCollapsed}
+            />
+          ))}
       </div>
     );
   }
@@ -92,7 +99,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} h-screen tui-border-r bg-tui-background sticky top-0 flex flex-col transition-all duration-300 ease-in-out`}>
+    <aside
+      className={`${isCollapsed ? "w-16" : "w-64"} h-screen tui-border-r bg-tui-background sticky top-0 flex flex-col transition-all duration-300 ease-in-out`}
+    >
       <div className="p-4 tui-border-b">
         <div className="flex items-center justify-between gap-2">
           {!isCollapsed && <span className="text-sm font-mono">arian</span>}
@@ -103,20 +112,18 @@ export default function Sidebar() {
             className="p-1 hover:bg-tui-border"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <span className="text-xs font-mono">
-              {isCollapsed ? "→" : "←"}
-            </span>
+            <span className="text-xs font-mono">{isCollapsed ? "→" : "←"}</span>
           </Button>
         </div>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
         {navigationItems.map((item, index) => (
-          <NavItem 
-            key={`${item.name}-${index}`} 
-            item={item} 
-            level={0} 
-            currentPath={pathname} 
+          <NavItem
+            key={`${item.name}-${index}`}
+            item={item}
+            level={0}
+            currentPath={pathname}
             isCollapsed={isCollapsed}
           />
         ))}

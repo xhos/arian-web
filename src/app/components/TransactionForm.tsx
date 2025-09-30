@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
-import type { Category } from "@/gen/arian/v1/category_pb";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useUserId } from "@/hooks/useSession";
 
@@ -42,7 +41,7 @@ const currencyOptions = [
 export default function TransactionForm({ onSubmit, onCancel, isLoading }: TransactionFormProps) {
   const userId = useUserId();
   const { accounts } = useAccounts();
-  
+
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -116,14 +115,14 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
 
   if (isLoadingData) {
     return (
-      <div className="tui-border p-4">
+      <div className="tui-border rounded-lg p-4">
         <div className="text-sm tui-muted">loading form data...</div>
       </div>
     );
   }
 
   return (
-    <div className="tui-border p-4">
+    <div className="tui-border rounded-lg p-4">
       <h2 className="text-sm tui-muted mb-4 uppercase tracking-wider">add new transaction</h2>
 
       {error && <div className="mb-4 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
@@ -209,7 +208,7 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
               disabled={isLoading}
             >
               <option value="">no category</option>
-              {categories.map((category: any) => (
+              {categories.map((category: { id: bigint; label: string }) => (
                 <option key={category.id.toString()} value={category.id.toString()}>
                   {category.label}
                 </option>

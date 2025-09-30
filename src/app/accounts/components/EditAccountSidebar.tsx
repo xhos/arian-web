@@ -10,9 +10,22 @@ import { AccountType } from "@/gen/arian/v1/enums_pb";
 interface EditAccountSidebarProps {
   account: Account | null;
   onClose: () => void;
-  onUpdate: (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string; mainCurrency?: string; colors?: string[] }) => void;
+  onUpdate: (
+    accountId: bigint,
+    data: {
+      name: string;
+      bank: string;
+      type: AccountType;
+      alias?: string;
+      mainCurrency?: string;
+      colors?: string[];
+    }
+  ) => void;
   onDelete: (accountId: bigint) => void;
-  onSetAnchorBalance: (accountId: bigint, balance: { currencyCode: string; units: string; nanos: number }) => void;
+  onSetAnchorBalance: (
+    accountId: bigint,
+    balance: { currencyCode: string; units: string; nanos: number }
+  ) => void;
   getAccountTypeName: (type: AccountType) => string;
   isLoading: boolean;
 }
@@ -23,18 +36,17 @@ export default function EditAccountSidebar({
   onUpdate,
   onDelete,
   onSetAnchorBalance,
-  getAccountTypeName,
   isLoading,
 }: EditAccountSidebarProps) {
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: '',
-    bank: '',
+    name: "",
+    bank: "",
     type: AccountType.ACCOUNT_UNSPECIFIED,
-    alias: '',
-    mainCurrency: '',
-    anchorBalance: '',
-    colors: ['#1f2937', '#3b82f6', '#10b981']
+    alias: "",
+    mainCurrency: "",
+    anchorBalance: "",
+    colors: ["#1f2937", "#3b82f6", "#10b981"],
   });
 
   useEffect(() => {
@@ -44,12 +56,15 @@ export default function EditAccountSidebar({
       name: account.name,
       bank: account.bank,
       type: account.type,
-      alias: account.alias || '',
-      mainCurrency: account.mainCurrency || 'USD',
-      anchorBalance: account.anchorBalance 
-        ? (parseFloat(account.anchorBalance.units?.toString() || '0') + (account.anchorBalance.nanos || 0) / 1e9).toString()
-        : '',
-      colors: account.colors.length === 3 ? account.colors : ['#1f2937', '#3b82f6', '#10b981']
+      alias: account.alias || "",
+      mainCurrency: account.mainCurrency || "USD",
+      anchorBalance: account.anchorBalance
+        ? (
+            parseFloat(account.anchorBalance.units?.toString() || "0") +
+            (account.anchorBalance.nanos || 0) / 1e9
+          ).toString()
+        : "",
+      colors: account.colors.length === 3 ? account.colors : ["#1f2937", "#3b82f6", "#10b981"],
     });
 
     // Reset delete confirmation when account changes
@@ -65,7 +80,7 @@ export default function EditAccountSidebar({
 
   const handleDeleteClick = () => {
     if (!account) return;
-    
+
     if (deleteConfirmation) {
       onDelete(account.id);
       setDeleteConfirmation(false);
@@ -77,45 +92,55 @@ export default function EditAccountSidebar({
 
   const handleSave = () => {
     if (!account) return;
-    
+
     const updateData = {
       name: editForm.name,
       bank: editForm.bank,
       type: editForm.type,
       alias: editForm.alias,
       mainCurrency: editForm.mainCurrency,
-      colors: editForm.colors
+      colors: editForm.colors,
     };
 
     onUpdate(account.id, updateData);
 
     // Update anchor balance if it changed
-    if (editForm.anchorBalance && editForm.anchorBalance !== (account.anchorBalance 
-      ? (parseFloat(account.anchorBalance.units?.toString() || '0') + (account.anchorBalance.nanos || 0) / 1e9).toString()
-      : '')) {
+    if (
+      editForm.anchorBalance &&
+      editForm.anchorBalance !==
+        (account.anchorBalance
+          ? (
+              parseFloat(account.anchorBalance.units?.toString() || "0") +
+              (account.anchorBalance.nanos || 0) / 1e9
+            ).toString()
+          : "")
+    ) {
       const anchorBalance = {
         currencyCode: editForm.mainCurrency,
         units: parseFloat(editForm.anchorBalance).toString(),
-        nanos: Math.round((parseFloat(editForm.anchorBalance) % 1) * 1e9)
+        nanos: Math.round((parseFloat(editForm.anchorBalance) % 1) * 1e9),
       };
-      
+
       onSetAnchorBalance(account.id, anchorBalance);
     }
   };
 
   const handleCancel = () => {
     if (!account) return;
-    
+
     setEditForm({
       name: account.name,
       bank: account.bank,
       type: account.type,
-      alias: account.alias || '',
-      mainCurrency: account.mainCurrency || 'USD',
-      anchorBalance: account.anchorBalance 
-        ? (parseFloat(account.anchorBalance.units?.toString() || '0') + (account.anchorBalance.nanos || 0) / 1e9).toString()
-        : '',
-      colors: account.colors.length === 3 ? account.colors : ['#1f2937', '#3b82f6', '#10b981']
+      alias: account.alias || "",
+      mainCurrency: account.mainCurrency || "USD",
+      anchorBalance: account.anchorBalance
+        ? (
+            parseFloat(account.anchorBalance.units?.toString() || "0") +
+            (account.anchorBalance.nanos || 0) / 1e9
+          ).toString()
+        : "",
+      colors: account.colors.length === 3 ? account.colors : ["#1f2937", "#3b82f6", "#10b981"],
     });
     onClose();
   };
@@ -125,11 +150,8 @@ export default function EditAccountSidebar({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/20 z-40"
-        onClick={handleCancel}
-      />
-      
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={handleCancel} />
+
       {/* Sidebar */}
       <div className="fixed right-0 top-0 h-full w-96 bg-tui-background tui-border-l z-50 overflow-y-auto">
         <div className="p-6">
@@ -152,7 +174,7 @@ export default function EditAccountSidebar({
               <label className="text-xs text-tui-muted block mb-1">id</label>
               <div className="text-sm font-mono text-tui-muted">{account.id.toString()}</div>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">name</label>
               <Input
@@ -162,7 +184,7 @@ export default function EditAccountSidebar({
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">alias</label>
               <Input
@@ -172,7 +194,7 @@ export default function EditAccountSidebar({
                 className="text-sm h-8"
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">bank</label>
               <Input
@@ -182,12 +204,14 @@ export default function EditAccountSidebar({
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">type</label>
-              <Select 
+              <Select
                 value={editForm.type.toString()}
-                onChange={(e) => setEditForm({ ...editForm, type: parseInt(e.target.value) as AccountType })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, type: parseInt(e.target.value) as AccountType })
+                }
                 className="text-sm"
               >
                 <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
@@ -197,7 +221,7 @@ export default function EditAccountSidebar({
                 <option value={AccountType.ACCOUNT_OTHER}>Other</option>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">currency</label>
               <Select
@@ -212,7 +236,7 @@ export default function EditAccountSidebar({
                 <option value="JPY">JPY</option>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">colors</label>
               <div className="space-y-2">
@@ -229,7 +253,7 @@ export default function EditAccountSidebar({
                       className="w-8 h-8 rounded border cursor-pointer"
                     />
                     <span className="text-xs text-tui-muted">
-                      {index === 0 ? 'Primary' : index === 1 ? 'Secondary' : 'Tertiary'}
+                      {index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary"}
                     </span>
                   </div>
                 ))}
@@ -248,7 +272,10 @@ export default function EditAccountSidebar({
               />
               {account.anchorDate && (
                 <div className="text-xs text-tui-muted mt-1">
-                  last set on {new Date(parseInt(account.anchorDate.seconds?.toString() || '0') * 1000).toLocaleDateString()}
+                  last set on{" "}
+                  {new Date(
+                    parseInt(account.anchorDate.seconds?.toString() || "0") * 1000
+                  ).toLocaleDateString()}
                 </div>
               )}
             </div>
@@ -262,14 +289,14 @@ export default function EditAccountSidebar({
               >
                 save
               </Button>
-              
+
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={handleDeleteClick}
                 disabled={isLoading}
                 className={`w-full h-8 text-red-500 hover:bg-red-500/10 ${
-                  deleteConfirmation ? 'bg-red-500 text-white hover:bg-red-600' : ''
+                  deleteConfirmation ? "bg-red-500 text-white hover:bg-red-600" : ""
                 }`}
               >
                 {deleteConfirmation ? "confirm delete" : "delete"}

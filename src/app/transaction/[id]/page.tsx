@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  // TODO: Replace with real API call to get transaction by ID  
+  // TODO: Replace with real API call to get transaction by ID
   const transaction = null;
 
   if (!transaction) {

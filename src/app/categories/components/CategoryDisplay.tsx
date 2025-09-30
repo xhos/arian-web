@@ -20,15 +20,15 @@ export function CategoryDisplay({
   isPreview = false,
   className = "",
   style,
-  children
+  children,
 }: CategoryDisplayProps) {
   const name = displayName || getDisplayName(category.slug);
   const slugText = slug || category.slug;
 
   const baseClasses = `flex items-center gap-3 p-3 rounded-md ${
     isPreview
-      ? 'border-2 border-dashed border-blue-500/50 bg-blue-500/10'
-      : 'tui-border tui-background'
+      ? "border-2 border-dashed border-blue-500/50 bg-blue-500/10"
+      : "tui-border tui-background"
   }`;
 
   return (

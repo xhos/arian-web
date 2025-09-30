@@ -25,7 +25,7 @@ export function CategoryForm({ onCreateCategory }: CategoryFormProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSubmit();
     }
   };

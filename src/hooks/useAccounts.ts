@@ -27,30 +27,36 @@ export function useAccounts() {
     accounts.forEach((account) => {
       map.set(account.id.toString(), {
         name: account.name,
-        alias: account.alias
+        alias: account.alias,
       });
     });
     return map;
   }, [accounts]);
 
-  const getAccountDisplayName = useCallback((accountId: bigint, fallbackName?: string) => {
-    const accountInfo = accountsMap.get(accountId.toString());
-    if (accountInfo) {
-      return accountInfo.alias || accountInfo.name;
-    }
-    return fallbackName || `Account #${accountId}`;
-  }, [accountsMap]);
+  const getAccountDisplayName = useCallback(
+    (accountId: bigint, fallbackName?: string) => {
+      const accountInfo = accountsMap.get(accountId.toString());
+      if (accountInfo) {
+        return accountInfo.alias || accountInfo.name;
+      }
+      return fallbackName || `Account #${accountId}`;
+    },
+    [accountsMap]
+  );
 
-  const getAccountFullName = useCallback((accountId: bigint, fallbackName?: string) => {
-    const accountInfo = accountsMap.get(accountId.toString());
-    if (accountInfo) {
-      const parts = [];
-      if (accountInfo.name) parts.push(accountInfo.name);
-      if (accountInfo.alias) parts.push(`(${accountInfo.alias})`);
-      return parts.join(' ') || `Account #${accountId}`;
-    }
-    return fallbackName || `Account #${accountId}`;
-  }, [accountsMap]);
+  const getAccountFullName = useCallback(
+    (accountId: bigint, fallbackName?: string) => {
+      const accountInfo = accountsMap.get(accountId.toString());
+      if (accountInfo) {
+        const parts = [];
+        if (accountInfo.name) parts.push(accountInfo.name);
+        if (accountInfo.alias) parts.push(`(${accountInfo.alias})`);
+        return parts.join(" ") || `Account #${accountId}`;
+      }
+      return fallbackName || `Account #${accountId}`;
+    },
+    [accountsMap]
+  );
 
   return {
     accounts,

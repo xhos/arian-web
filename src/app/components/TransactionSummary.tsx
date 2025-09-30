@@ -8,13 +8,16 @@ interface TransactionSummaryProps {
 
 export default function TransactionSummary({ accountId }: TransactionSummaryProps) {
   const queryClient = useQueryClient();
-  
+
   // Get cached data without triggering a new query
   const transactionData = queryClient.getQueryData(["transactions", accountId?.toString()]);
 
   // Calculate total from cached transaction data
-  const totalCount = (transactionData as any)?.pages 
-    ? (transactionData as any).pages.reduce((total: number, page: any) => total + page.transactions.length, 0)
+  const totalCount = (transactionData as { pages?: Array<{ transactions: unknown[] }> })?.pages
+    ? (transactionData as { pages: Array<{ transactions: unknown[] }> }).pages.reduce(
+        (total: number, page: { transactions: unknown[] }) => total + page.transactions.length,
+        0
+      )
     : 0;
 
   return (

@@ -1,7 +1,7 @@
-import localFont from 'next/font/local'
+import localFont from "next/font/local";
 
 export const wagonBold = localFont({
-  src: './Wagon-Bold.otf',
-  variable: '--font-wagon-bold',
-  display: 'swap',
-})
+  src: "./Wagon-Bold.otf",
+  variable: "--font-wagon-bold",
+  display: "swap",
+});

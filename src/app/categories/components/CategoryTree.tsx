@@ -13,7 +13,6 @@ import {
   closestCorners,
   pointerWithin,
   rectIntersection,
-  getFirstCollision,
 } from "@dnd-kit/core";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import { CategoryItem } from "./CategoryItem";
@@ -45,7 +44,13 @@ interface DragState {
 const NESTING_THRESHOLD = 20;
 const INITIAL_DRAG_STATE: DragState = { activeId: null, overId: null, nestingLevel: 0 };
 
-export function CategoryTree({ categoryTree, categories, pendingChanges, onCategoryMove, onDelete }: CategoryTreeProps) {
+export function CategoryTree({
+  categoryTree,
+  categories,
+  pendingChanges,
+  onCategoryMove,
+  onDelete,
+}: CategoryTreeProps) {
   const [dragState, setDragState] = useState<DragState>(INITIAL_DRAG_STATE);
 
   const sensors = useSensors(
@@ -55,7 +60,7 @@ export function CategoryTree({ categoryTree, categories, pendingChanges, onCateg
   );
 
   // Custom collision detection for better hierarchical drag and drop
-  const customCollisionDetection = (args: any) => {
+  const customCollisionDetection = (args: Parameters<typeof pointerWithin>[0]) => {
     // First try pointer within - most precise
     const pointerCollisions = pointerWithin(args);
     if (pointerCollisions.length > 0) {
@@ -73,27 +78,27 @@ export function CategoryTree({ categoryTree, categories, pendingChanges, onCateg
   };
 
   const resetDragState = () => setDragState(INITIAL_DRAG_STATE);
-  const findCategory = (id: string) => categories.find(c => c.id.toString() === id);
+  const findCategory = (id: string) => categories.find((c) => c.id.toString() === id);
 
   const handleDragStart = (event: DragStartEvent) => {
-    setDragState(prev => ({ ...prev, activeId: event.active.id as string }));
+    setDragState((prev) => ({ ...prev, activeId: event.active.id as string }));
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { over, delta } = event;
 
     if (!over) {
-      setDragState(prev => ({ ...prev, overId: null }));
+      setDragState((prev) => ({ ...prev, overId: null }));
       return;
     }
 
     const targetId = over.id as string;
     const nestingChange = Math.floor(delta.x / NESTING_THRESHOLD);
     const targetCategory = findCategory(targetId);
-    const targetLevel = (targetCategory?.slug.split('.').length ?? 1) - 1;
+    const targetLevel = (targetCategory?.slug.split(".").length ?? 1) - 1;
     const newNestingLevel = Math.max(0, targetLevel + nestingChange);
 
-    setDragState(prev => ({ ...prev, overId: targetId, nestingLevel: newNestingLevel }));
+    setDragState((prev) => ({ ...prev, overId: targetId, nestingLevel: newNestingLevel }));
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -110,13 +115,15 @@ export function CategoryTree({ categoryTree, categories, pendingChanges, onCateg
       return;
     }
 
-    const newSlug = dragState.nestingLevel === 0
-      ? getDisplayName(draggedCategory.slug)
-      : (() => {
-          const targetCategory = findCategory(over.id as string);
-          if (!targetCategory || draggedCategory.id === targetCategory.id) return null;
-          return calculateDropResult(draggedCategory, targetCategory, dragState.nestingLevel).newSlug;
-        })();
+    const newSlug =
+      dragState.nestingLevel === 0
+        ? getDisplayName(draggedCategory.slug)
+        : (() => {
+            const targetCategory = findCategory(over.id as string);
+            if (!targetCategory || draggedCategory.id === targetCategory.id) return null;
+            return calculateDropResult(draggedCategory, targetCategory, dragState.nestingLevel)
+              .newSlug;
+          })();
 
     if (!newSlug || newSlug === draggedCategory.slug) {
       resetDragState();
@@ -166,7 +173,7 @@ function CategoryTreeItems({
   dragState,
   categories,
   pendingChanges,
-  onDelete
+  onDelete,
 }: {
   categoryTree: CategoryNode[];
   dragState: DragState;
@@ -177,19 +184,26 @@ function CategoryTreeItems({
   const showRootPreview = dragState.nestingLevel === 0 && dragState.activeId;
 
   if (showRootPreview) {
-    const draggedCategory = categories.find(c => c.id.toString() === dragState.activeId);
+    const draggedCategory = categories.find((c) => c.id.toString() === dragState.activeId);
     if (draggedCategory) {
-      const filteredTree = categoryTree.filter(node => node.category.id.toString() !== dragState.activeId);
+      const filteredTree = categoryTree.filter(
+        (node) => node.category.id.toString() !== dragState.activeId
+      );
       const draggedDisplayName = getDisplayName(draggedCategory.slug);
-      const insertIndex = findInsertionIndex(filteredTree, draggedDisplayName, node => getDisplayName(node.category.slug));
+      const insertIndex = findInsertionIndex(filteredTree, draggedDisplayName, (node) =>
+        getDisplayName(node.category.slug)
+      );
 
       const itemsWithPreview = [...filteredTree];
-      itemsWithPreview.splice(insertIndex, 0, { isPreview: true, category: draggedCategory } as any);
+      itemsWithPreview.splice(insertIndex, 0, {
+        isPreview: true,
+        category: draggedCategory,
+      } as TreeItem & { isPreview: boolean });
 
       return (
         <>
-          {itemsWithPreview.map((item, index) => {
-            if ((item as any).isPreview) {
+          {itemsWithPreview.map((item) => {
+            if ((item as TreeItem & { isPreview?: boolean }).isPreview) {
               return (
                 <div key="root-preview" className="opacity-70 mb-2">
                   <CategoryDisplay
@@ -223,15 +237,15 @@ function CategoryTreeItems({
 
   // Filter out dragged items and their children even during normal rendering
   const filteredTree = dragState.activeId
-    ? categoryTree.filter(node => {
-        const draggedCategory = categories.find(c => c.id.toString() === dragState.activeId);
+    ? categoryTree.filter((node) => {
+        const draggedCategory = categories.find((c) => c.id.toString() === dragState.activeId);
         if (!draggedCategory) return true;
 
         // Exclude the dragged item itself
         if (node.category.id.toString() === dragState.activeId) return false;
 
         // Exclude children of the dragged item
-        return !node.category.slug.startsWith(draggedCategory.slug + '.');
+        return !node.category.slug.startsWith(draggedCategory.slug + ".");
       })
     : categoryTree;
 
@@ -252,8 +266,14 @@ function CategoryTreeItems({
 }
 
 // Drag overlay component - shows entire tree being dragged
-function DraggedItemOverlay({ draggedCategoryId, categories }: { draggedCategoryId: string; categories: Category[] }) {
-  const category = categories.find(c => c.id.toString() === draggedCategoryId);
+function DraggedItemOverlay({
+  draggedCategoryId,
+  categories,
+}: {
+  draggedCategoryId: string;
+  categories: Category[];
+}) {
+  const category = categories.find((c) => c.id.toString() === draggedCategoryId);
   if (!category) return null;
 
   const draggedTree = getCategoryTree(category, categories);
@@ -269,10 +289,7 @@ function DraggedItemOverlay({ draggedCategoryId, categories }: { draggedCategory
 function DraggedTreeNode({ node }: { node: CategoryNode }) {
   return (
     <div>
-      <CategoryDisplay
-        category={node.category}
-        className="shadow-xl opacity-90"
-      />
+      <CategoryDisplay category={node.category} className="shadow-xl opacity-90" />
       {node.children.length > 0 && (
         <div className="ml-6 mt-2 space-y-2">
           {node.children.map((child) => (

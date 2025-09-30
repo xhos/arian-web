@@ -14,11 +14,7 @@ interface AnchorBalanceFormProps {
     units?: string | bigint;
     nanos?: number;
   };
-  onSubmit: (balance: {
-    currencyCode: string;
-    units: string;
-    nanos: number;
-  }) => Promise<void>;
+  onSubmit: (balance: { currencyCode: string; units: string; nanos: number }) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
 }
@@ -32,7 +28,6 @@ const currencyOptions = [
 ];
 
 export default function AnchorBalanceForm({
-  accountId,
   accountName,
   currentBalance,
   onSubmit,
@@ -66,7 +61,7 @@ export default function AnchorBalanceForm({
   };
 
   return (
-    <div className="tui-border p-4">
+    <div className="tui-border rounded-lg p-4">
       <h2 className="text-sm tui-muted mb-4 uppercase tracking-wider">
         set anchor balance for {accountName}
       </h2>
@@ -107,8 +102,8 @@ export default function AnchorBalanceForm({
         </div>
 
         <div className="text-xs tui-muted">
-          This sets the reference balance for this account at a specific point in time.
-          It&apos;s used to calculate running balances for transactions.
+          This sets the reference balance for this account at a specific point in time. It&apos;s
+          used to calculate running balances for transactions.
         </div>
 
         <div className="flex gap-2 pt-4">

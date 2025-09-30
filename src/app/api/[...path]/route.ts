@@ -24,7 +24,7 @@ function setCachedTokenValidation(token: string, valid: boolean, userId?: string
     expiresAt: Date.now() + CACHE_DURATION,
     userId,
   });
-  
+
   // Periodically clean up expired tokens (with 10% probability)
   if (Math.random() < 0.1) {
     cleanupExpiredTokens();
@@ -63,15 +63,15 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
         const session = await auth.api.getSession({
           headers: await headers(),
         });
-        
+
         if (!session?.user) {
           setCachedTokenValidation(token, false);
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
-        
+
         // Cache valid token
         setCachedTokenValidation(token, true, session.user.id);
-      } catch (validationError) {
+      } catch {
         setCachedTokenValidation(token, false);
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }

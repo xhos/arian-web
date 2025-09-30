@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 type CollapseProps = {
   open: boolean;
-  duration?: number;   // ms
-  easing?: string;     // css timing function
+  duration?: number; // ms
+  easing?: string; // css timing function
   children: React.ReactNode;
   className?: string;
 };
@@ -23,7 +23,7 @@ export function Collapse({
   useEffect(() => {
     const el = containerRef.current;
     if (!el || isInitialized) return;
-    
+
     el.style.height = open ? "auto" : "0px";
     setIsInitialized(true);
   }, [open, isInitialized]);

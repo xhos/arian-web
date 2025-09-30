@@ -79,7 +79,7 @@ export default function AccountGrid({
               </h3>
             </div>
           )}
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10">
             {groupAccounts.map((account) => (
               <AccountCard

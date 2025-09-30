@@ -9,12 +9,7 @@ interface FilterChipsProps {
   availableBanks: string[];
 }
 
-export default function FilterChips({
-  selectedFilter,
-  onFilterChange,
-  availableTypes,
-  availableBanks,
-}: FilterChipsProps) {
+export default function FilterChips({ selectedFilter, onFilterChange }: FilterChipsProps) {
   const filterOptions = [
     { label: "all", value: null },
     { label: "type", value: "type" },

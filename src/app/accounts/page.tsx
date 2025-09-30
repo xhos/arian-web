@@ -15,9 +15,10 @@ import CreateAccountSidebar from "./components/CreateAccountSidebar";
 
 const getAccountTypeName = (accountType: AccountType): string => {
   // Handle both string and numeric enum values
-  const normalizedType = typeof accountType === 'string' 
-    ? AccountType[accountType as keyof typeof AccountType] 
-    : accountType;
+  const normalizedType =
+    typeof accountType === "string"
+      ? AccountType[accountType as keyof typeof AccountType]
+      : accountType;
 
   switch (normalizedType) {
     case AccountType.ACCOUNT_UNSPECIFIED:
@@ -41,7 +42,7 @@ export default function AccountsPage() {
   const userId = useUserId();
   const queryClient = useQueryClient();
   const { accounts } = useAccounts();
-  
+
   const [error, setError] = useState("");
   const [showAnchorForm, setShowAnchorForm] = useState(false);
   const [anchorAccount, setAnchorAccount] = useState<Account | null>(null);
@@ -218,7 +219,9 @@ export default function AccountsPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to set anchor balance: ${errorData.message || response.statusText}`);
+        throw new Error(
+          `Failed to set anchor balance: ${errorData.message || response.statusText}`
+        );
       }
 
       return response.json();
@@ -239,15 +242,26 @@ export default function AccountsPage() {
     deleteAccountMutation.mutate(accountId);
   };
 
-
-  const handleSetAnchorBalance = (accountId: bigint, balance: { currencyCode: string; units: string; nanos: number }) => {
+  const handleSetAnchorBalance = (
+    accountId: bigint,
+    balance: { currencyCode: string; units: string; nanos: number }
+  ) => {
     setAnchorBalanceMutation.mutate({ accountId, balance });
   };
 
-  const handleUpdateAccount = (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string; mainCurrency?: string; colors?: string[] }) => {
+  const handleUpdateAccount = (
+    accountId: bigint,
+    data: {
+      name: string;
+      bank: string;
+      type: AccountType;
+      alias?: string;
+      mainCurrency?: string;
+      colors?: string[];
+    }
+  ) => {
     updateAccountMutation.mutate({ accountId, formData: data });
   };
-
 
   const handleCancelAnchorForm = () => {
     setShowAnchorForm(false);
@@ -255,18 +269,19 @@ export default function AccountsPage() {
   };
 
   // Check if any mutation is loading
-  const isOperationLoading = createAccountMutation.isPending || 
-                            updateAccountMutation.isPending || 
-                            deleteAccountMutation.isPending ||
-                            setAnchorBalanceMutation.isPending;
+  const isOperationLoading =
+    createAccountMutation.isPending ||
+    updateAccountMutation.isPending ||
+    deleteAccountMutation.isPending ||
+    setAnchorBalanceMutation.isPending;
 
   const availableTypes = useMemo(() => {
-    const types = new Set(accounts.map(account => getAccountTypeName(account.type)));
+    const types = new Set(accounts.map((account) => getAccountTypeName(account.type)));
     return Array.from(types).sort();
   }, [accounts]);
 
   const availableBanks = useMemo(() => {
-    const banks = new Set(accounts.map(account => account.bank));
+    const banks = new Set(accounts.map((account) => account.bank));
     return Array.from(banks).sort();
   }, [accounts]);
 
@@ -296,7 +311,11 @@ export default function AccountsPage() {
             <div className="flex items-center gap-4 text-sm tui-muted">
               <span>total: {accounts.length} accounts</span>
             </div>
-            <Button onClick={() => setIsCreatingAccount(true)} size="sm" disabled={isOperationLoading}>
+            <Button
+              onClick={() => setIsCreatingAccount(true)}
+              size="sm"
+              disabled={isOperationLoading}
+            >
               add account
             </Button>
           </div>
@@ -304,14 +323,15 @@ export default function AccountsPage() {
 
         {error && <div className="mb-6 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
 
-
         {showAnchorForm && anchorAccount && (
           <div className="mb-6">
             <AnchorBalanceForm
               accountId={anchorAccount.id}
               accountName={anchorAccount.name}
               currentBalance={anchorAccount.anchorBalance}
-              onSubmit={(balance) => setAnchorBalanceMutation.mutateAsync({ accountId: anchorAccount.id, balance })}
+              onSubmit={(balance) =>
+                setAnchorBalanceMutation.mutateAsync({ accountId: anchorAccount.id, balance })
+              }
               onCancel={handleCancelAnchorForm}
               isLoading={setAnchorBalanceMutation.isPending}
             />
@@ -328,7 +348,7 @@ export default function AccountsPage() {
         )}
 
         {accounts.length === 0 && !isCreatingAccount ? (
-          <div className="tui-border p-8 text-center">
+          <div className="tui-border rounded-lg p-8 text-center">
             <div className="text-sm tui-muted mb-2">No accounts yet</div>
             <div className="text-xs tui-muted">
               Add your first account to start tracking transactions
@@ -355,7 +375,7 @@ export default function AccountsPage() {
         getAccountTypeName={getAccountTypeName}
         isLoading={isOperationLoading}
       />
-      
+
       <CreateAccountSidebar
         isOpen={isCreatingAccount}
         onClose={handleCloseSidebar}

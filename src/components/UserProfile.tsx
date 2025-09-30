@@ -44,7 +44,9 @@ export default function UserProfile({ isCollapsed = false }: UserProfileProps) {
   return (
     <div className="relative">
       {isExpanded && (
-        <div className={`absolute bottom-full left-0 ${isCollapsed ? 'w-48' : 'w-full'} border-t border-b border-tui-border bg-tui-background ${isCollapsed ? 'ml-2' : ''}`}>
+        <div
+          className={`absolute bottom-full left-0 ${isCollapsed ? "w-48" : "w-full"} border-t border-b border-tui-border bg-tui-background ${isCollapsed ? "ml-2" : ""}`}
+        >
           <div className="p-3 space-y-2">
             {!isCollapsed && <div className="text-xs text-tui-muted">{user.email}</div>}
             {isCollapsed && <div className="text-xs text-tui-muted mb-2">{user.email}</div>}
@@ -71,7 +73,9 @@ export default function UserProfile({ isCollapsed = false }: UserProfileProps) {
         className="flex items-center justify-between w-full p-3 hover:bg-tui-border/20 transition-colors text-left"
         title={isCollapsed ? displayName : undefined}
       >
-        {!isCollapsed && <span className="text-xs text-tui-foreground truncate">{displayName}</span>}
+        {!isCollapsed && (
+          <span className="text-xs text-tui-foreground truncate">{displayName}</span>
+        )}
         {isCollapsed && <span className="text-xs text-tui-foreground">●</span>}
         <span className="text-xs text-tui-muted">{isExpanded ? "−" : "+"}</span>
       </button>

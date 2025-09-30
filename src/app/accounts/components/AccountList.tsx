@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -12,25 +11,31 @@ interface AccountListProps {
   accounts: Account[];
   onEdit: (account: Account) => void;
   onDelete: (accountId: bigint) => void;
-  onSetAnchorBalance: (accountId: bigint, balance: { currencyCode: string; units: string; nanos: number }) => void;
-  onUpdateAccount: (accountId: bigint, data: { name: string; bank: string; type: AccountType; alias?: string }) => void;
+  onSetAnchorBalance: (
+    accountId: bigint,
+    balance: { currencyCode: string; units: string; nanos: number }
+  ) => void;
+  onUpdateAccount: (
+    accountId: bigint,
+    data: { name: string; bank: string; type: AccountType; alias?: string }
+  ) => void;
   getAccountTypeName: (type: AccountType) => string;
   isLoading: boolean;
 }
 
 export default function AccountList({
   accounts,
-  onEdit,
   onDelete,
   onSetAnchorBalance,
-  onUpdateAccount,
   getAccountTypeName,
   isLoading,
 }: AccountListProps) {
   const [deleteConfirmation, setDeleteConfirmation] = useState<bigint | null>(null);
   const [editingAccount, setEditingAccount] = useState<bigint | null>(null);
   const [editingAnchor, setEditingAnchor] = useState<bigint | null>(null);
-  const [balances, setBalances] = useState<Map<string, { currencyCode: string; units: bigint; nanos: number }>>(new Map());
+  const [balances, setBalances] = useState<
+    Map<string, { currencyCode: string; units: bigint; nanos: number }>
+  >(new Map());
 
   // Fetch current balances for all accounts
   useEffect(() => {
@@ -66,12 +71,12 @@ export default function AccountList({
     nanos?: number;
   }) => {
     if (!balance?.units) return "—";
-    
+
     // Convert units to number and add nanos (fractional part)
     const unitsAmount = parseFloat(balance.units.toString());
     const nanosAmount = (balance.nanos || 0) / 1e9; // Convert nanos to decimal
     const totalAmount = unitsAmount + nanosAmount;
-    
+
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: balance.currencyCode || "USD",
@@ -102,28 +107,24 @@ export default function AccountList({
   return (
     <div className="space-y-4">
       {accounts.map((account) => (
-        <div key={account.id.toString()} className="tui-border p-4">
+        <div key={account.id.toString()} className="tui-border rounded-lg p-4">
           {/* Main account info */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               {editingAccount === account.id ? (
                 <div className="space-y-2">
-                  <Input 
+                  <Input
                     defaultValue={account.alias || account.name}
                     placeholder="Account display name"
                     className="font-medium"
                   />
                   <div className="flex gap-2">
-                    <Input 
+                    <Input
                       defaultValue={account.name}
                       placeholder="Internal name"
                       className="text-sm"
                     />
-                    <Input 
-                      defaultValue={account.bank}
-                      placeholder="Bank"
-                      className="text-sm"
-                    />
+                    <Input defaultValue={account.bank} placeholder="Bank" className="text-sm" />
                     <Select defaultValue={account.type.toString()}>
                       <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
                       <option value={AccountType.ACCOUNT_SAVINGS}>Savings</option>
@@ -136,14 +137,8 @@ export default function AccountList({
               ) : (
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-lg">
-                      {account.alias || account.name}
-                    </h3>
-                    {account.alias && (
-                      <span className="text-sm tui-muted">
-                        ({account.name})
-                      </span>
-                    )}
+                    <h3 className="font-medium text-lg">{account.alias || account.name}</h3>
+                    {account.alias && <span className="text-sm tui-muted">({account.name})</span>}
                   </div>
                   <div className="text-sm tui-muted">
                     {account.bank} • {getAccountTypeName(account.type)}
@@ -166,13 +161,16 @@ export default function AccountList({
                   <div className="text-xs tui-muted mb-1">anchor balance</div>
                   {editingAnchor === account.id ? (
                     <div className="flex gap-2 items-center">
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         step="0.01"
-                        defaultValue={parseFloat(account.anchorBalance.units?.toString() || "0") + (account.anchorBalance.nanos || 0) / 1e9}
+                        defaultValue={
+                          parseFloat(account.anchorBalance.units?.toString() || "0") +
+                          (account.anchorBalance.nanos || 0) / 1e9
+                        }
                         className="w-24 h-7 text-sm"
                       />
-                      <Select 
+                      <Select
                         defaultValue={account.anchorBalance.currencyCode || "USD"}
                         className="h-7 text-sm"
                       >
@@ -182,11 +180,20 @@ export default function AccountList({
                         <option value="GBP">GBP</option>
                         <option value="JPY">JPY</option>
                       </Select>
-                      <Button size="sm" className="h-7 text-xs">save</Button>
-                      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingAnchor(null)}>cancel</Button>
+                      <Button size="sm" className="h-7 text-xs">
+                        save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs"
+                        onClick={() => setEditingAnchor(null)}
+                      >
+                        cancel
+                      </Button>
                     </div>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => setEditingAnchor(account.id)}
                       className="text-sm hover:underline text-blue-600"
                     >
@@ -214,14 +221,21 @@ export default function AccountList({
               </>
             ) : (
               <>
-                <Button size="sm" variant="ghost" onClick={() => setEditingAccount(account.id)} disabled={isLoading}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditingAccount(account.id)}
+                  disabled={isLoading}
+                >
                   edit
                 </Button>
                 {!account.anchorBalance && (
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => onSetAnchorBalance(account.id, { currencyCode: "USD", units: "0", nanos: 0 })}
+                    onClick={() =>
+                      onSetAnchorBalance(account.id, { currencyCode: "USD", units: "0", nanos: 0 })
+                    }
                     disabled={isLoading}
                     className="text-blue-600 hover:bg-blue-50 border-blue-200"
                   >
@@ -232,7 +246,11 @@ export default function AccountList({
                   size="sm"
                   variant={deleteConfirmation === account.id ? "destructive" : "ghost"}
                   onClick={() => handleDeleteClick(account.id)}
-                  className={deleteConfirmation === account.id ? "min-h-8" : "text-red-500 hover:bg-red-500/10 border-red-500/50"}
+                  className={
+                    deleteConfirmation === account.id
+                      ? "min-h-8"
+                      : "text-red-500 hover:bg-red-500/10 border-red-500/50"
+                  }
                   disabled={isLoading}
                 >
                   {deleteConfirmation === account.id ? "confirm delete" : "delete"}

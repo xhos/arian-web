@@ -74,7 +74,7 @@ export default function AccountForm({ account, onSubmit, onCancel, isLoading }: 
   const isEditing = !!account;
 
   return (
-    <div className="tui-border p-4">
+    <div className="tui-border rounded-lg p-4">
       <h2 className="text-sm tui-muted mb-4 uppercase tracking-wider">
         {isEditing ? "edit account" : "add new account"}
       </h2>

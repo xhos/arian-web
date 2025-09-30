@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { create } from "@bufbuild/protobuf";
 import { categoryClient } from "@/lib/grpc-client";
-import { ListCategoriesRequestSchema, CreateCategoryRequestSchema, UpdateCategoryRequestSchema, DeleteCategoryRequestSchema } from "@/gen/arian/v1/category_services_pb";
+import {
+  ListCategoriesRequestSchema,
+  CreateCategoryRequestSchema,
+  UpdateCategoryRequestSchema,
+  DeleteCategoryRequestSchema,
+} from "@/gen/arian/v1/category_services_pb";
 import { useUserId } from "@/hooks/useSession";
 import type { Category } from "@/gen/arian/v1/category_pb";
 
@@ -25,11 +30,15 @@ export default function CategoriesPage() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data: categories = [], isLoading, error } = useQuery({
+  const {
+    data: categories = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["categories", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User not authenticated");
-      
+
       const request = create(ListCategoriesRequestSchema, { userId });
       const response = await categoryClient.listCategories(request);
       return response.categories;
@@ -41,8 +50,8 @@ export default function CategoriesPage() {
 
   const categoryTree = useMemo(() => {
     // Apply pending changes to create a preview of the new state
-    const categoriesWithPendingChanges = categories.map(category => {
-      const pendingChange = pendingChanges.find(change => change.categoryId === category.id);
+    const categoriesWithPendingChanges = categories.map((category) => {
+      const pendingChange = pendingChanges.find((change) => change.categoryId === category.id);
       if (pendingChange) {
         return { ...category, slug: pendingChange.newSlug };
       }
@@ -54,9 +63,9 @@ export default function CategoriesPage() {
 
   const handleCategoryMove = (newChanges: PendingChange[]) => {
     // Update pending changes, removing any existing changes for affected categories
-    const affectedCategoryIds = new Set(newChanges.map(change => change.categoryId));
-    const filteredExistingChanges = pendingChanges.filter(change =>
-      !affectedCategoryIds.has(change.categoryId)
+    const affectedCategoryIds = new Set(newChanges.map((change) => change.categoryId));
+    const filteredExistingChanges = pendingChanges.filter(
+      (change) => !affectedCategoryIds.has(change.categoryId)
     );
 
     setPendingChanges([...filteredExistingChanges, ...newChanges]);
@@ -65,7 +74,7 @@ export default function CategoriesPage() {
   const handleCreateCategory = async (name: string) => {
     const request = create(CreateCategoryRequestSchema, {
       slug: name,
-      color: generateRandomColor()
+      color: generateRandomColor(),
     });
 
     await categoryClient.createCategory(request);
@@ -74,18 +83,18 @@ export default function CategoriesPage() {
 
   const handleSaveChanges = async () => {
     if (pendingChanges.length === 0) return;
-    
+
     setIsSaving(true);
     try {
       for (const change of pendingChanges) {
         const request = create(UpdateCategoryRequestSchema, {
           id: change.categoryId,
           slug: change.newSlug,
-          updateMask: { paths: ["slug"] }
+          updateMask: { paths: ["slug"] },
         });
         await categoryClient.updateCategory(request);
       }
-      
+
       await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
       setPendingChanges([]);
     } catch (error) {
@@ -110,15 +119,15 @@ export default function CategoriesPage() {
     try {
       // Remove any pending changes for this category and its children
       const categorySlug = categoryToDelete.slug;
-      const updatedChanges = pendingChanges.filter(change => {
-        const changeCategory = categories.find(c => c.id === change.categoryId);
+      const updatedChanges = pendingChanges.filter((change) => {
+        const changeCategory = categories.find((c) => c.id === change.categoryId);
         return changeCategory && !changeCategory.slug.startsWith(categorySlug);
       });
       setPendingChanges(updatedChanges);
 
       // Delete category via API
       const request = create(DeleteCategoryRequestSchema, {
-        id: categoryToDelete.id
+        id: categoryToDelete.id,
       });
       await categoryClient.deleteCategory(request);
 
@@ -134,7 +143,6 @@ export default function CategoriesPage() {
   const cancelDelete = () => {
     setCategoryToDelete(null);
   };
-
 
   if (isLoading) {
     return (
@@ -168,7 +176,7 @@ export default function CategoriesPage() {
               {pendingChanges.length > 0 && (
                 <>
                   <span className="text-xs text-yellow-400">
-                    {pendingChanges.length} pending change{pendingChanges.length === 1 ? '' : 's'}
+                    {pendingChanges.length} pending change{pendingChanges.length === 1 ? "" : "s"}
                   </span>
                   <Button
                     onClick={handleDiscardChanges}
@@ -192,7 +200,6 @@ export default function CategoriesPage() {
           </div>
 
           <CategoryForm onCreateCategory={handleCreateCategory} />
-
         </header>
 
         <CategoryTree

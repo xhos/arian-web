@@ -12,7 +12,7 @@ interface DeleteConfirmationDialogProps {
 }
 
 function getDisplayName(slug: string): string {
-  const parts = slug.split('.');
+  const parts = slug.split(".");
   return parts[parts.length - 1];
 }
 
@@ -21,13 +21,11 @@ export function DeleteConfirmationDialog({
   categories,
   isDeleting,
   onConfirm,
-  onCancel
+  onCancel,
 }: DeleteConfirmationDialogProps) {
   if (!category) return null;
 
-  const childCount = categories.filter(c =>
-    c.slug.startsWith(category.slug + '.')
-  ).length;
+  const childCount = categories.filter((c) => c.slug.startsWith(category.slug + ".")).length;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -41,10 +39,7 @@ export function DeleteConfirmationDialog({
             Are you sure you want to delete the category:
           </p>
           <div className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: category.color }}
-            />
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: category.color }} />
             <span className="font-medium text-gray-900 dark:text-gray-100 capitalize">
               {getDisplayName(category.slug)}
             </span>
@@ -55,7 +50,7 @@ export function DeleteConfirmationDialog({
 
           {childCount > 0 && (
             <p className="text-amber-600 dark:text-amber-400 text-sm mt-3">
-              ⚠️ This will also delete {childCount} child categor{childCount === 1 ? 'y' : 'ies'}
+              ⚠️ This will also delete {childCount} child categor{childCount === 1 ? "y" : "ies"}
             </p>
           )}
         </div>

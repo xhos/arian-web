@@ -9,11 +9,11 @@ import { AccountType } from "@/gen/arian/v1/enums_pb";
 interface CreateAccountSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (data: { 
-    name: string; 
-    bank: string; 
-    type: AccountType; 
-    alias?: string; 
+  onCreate: (data: {
+    name: string;
+    bank: string;
+    type: AccountType;
+    alias?: string;
     anchorBalance: { currencyCode: string; units: string; nanos: number };
     mainCurrency?: string;
     colors?: string[];
@@ -28,13 +28,13 @@ export default function CreateAccountSidebar({
   isLoading,
 }: CreateAccountSidebarProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    bank: '',
+    name: "",
+    bank: "",
     type: AccountType.ACCOUNT_CHEQUING,
-    alias: '',
-    initialBalance: '0',
-    mainCurrency: 'USD',
-    colors: ['#1f2937', '#3b82f6', '#10b981']
+    alias: "",
+    initialBalance: "0",
+    mainCurrency: "USD",
+    colors: ["#1f2937", "#3b82f6", "#10b981"],
   });
 
   const handleSubmit = () => {
@@ -45,37 +45,37 @@ export default function CreateAccountSidebar({
       alias: formData.alias || undefined,
       anchorBalance: {
         currencyCode: formData.mainCurrency,
-        units: parseFloat(formData.initialBalance || '0').toString(),
-        nanos: Math.round((parseFloat(formData.initialBalance || '0') % 1) * 1e9)
+        units: parseFloat(formData.initialBalance || "0").toString(),
+        nanos: Math.round((parseFloat(formData.initialBalance || "0") % 1) * 1e9),
       },
       mainCurrency: formData.mainCurrency,
-      colors: formData.colors
+      colors: formData.colors,
     };
-    
+
     onCreate(createData);
-    
+
     // Reset form
     setFormData({
-      name: '',
-      bank: '',
+      name: "",
+      bank: "",
       type: AccountType.ACCOUNT_CHEQUING,
-      alias: '',
-      initialBalance: '0',
-      mainCurrency: 'USD',
-      colors: ['#1f2937', '#3b82f6', '#10b981']
+      alias: "",
+      initialBalance: "0",
+      mainCurrency: "USD",
+      colors: ["#1f2937", "#3b82f6", "#10b981"],
     });
   };
 
   const handleCancel = () => {
     // Reset form
     setFormData({
-      name: '',
-      bank: '',
+      name: "",
+      bank: "",
       type: AccountType.ACCOUNT_CHEQUING,
-      alias: '',
-      initialBalance: '0',
-      mainCurrency: 'USD',
-      colors: ['#1f2937', '#3b82f6', '#10b981']
+      alias: "",
+      initialBalance: "0",
+      mainCurrency: "USD",
+      colors: ["#1f2937", "#3b82f6", "#10b981"],
     });
     onClose();
   };
@@ -87,11 +87,8 @@ export default function CreateAccountSidebar({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/20 z-40"
-        onClick={handleCancel}
-      />
-      
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={handleCancel} />
+
       {/* Sidebar */}
       <div className="fixed right-0 top-0 h-full w-96 bg-tui-background tui-border-l z-50 overflow-y-auto">
         <div className="p-6">
@@ -119,7 +116,7 @@ export default function CreateAccountSidebar({
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">alias</label>
               <Input
@@ -129,7 +126,7 @@ export default function CreateAccountSidebar({
                 className="text-sm h-8"
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">bank</label>
               <Input
@@ -139,12 +136,14 @@ export default function CreateAccountSidebar({
                 required
               />
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">type</label>
-              <Select 
+              <Select
                 value={formData.type.toString()}
-                onChange={(e) => setFormData({ ...formData, type: parseInt(e.target.value) as AccountType })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: parseInt(e.target.value) as AccountType })
+                }
                 className="text-sm !h-8"
               >
                 <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
@@ -154,7 +153,7 @@ export default function CreateAccountSidebar({
                 <option value={AccountType.ACCOUNT_OTHER}>Other</option>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">currency</label>
               <Select
@@ -169,7 +168,7 @@ export default function CreateAccountSidebar({
                 <option value="JPY">JPY</option>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">colors</label>
               <div className="space-y-2">
@@ -186,13 +185,13 @@ export default function CreateAccountSidebar({
                       className="w-8 h-8 rounded border cursor-pointer"
                     />
                     <span className="text-xs text-tui-muted">
-                      {index === 0 ? 'Primary' : index === 1 ? 'Secondary' : 'Tertiary'}
+                      {index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary"}
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-            
+
             <div>
               <label className="text-xs text-tui-muted block mb-1">initial balance</label>
               <Input
