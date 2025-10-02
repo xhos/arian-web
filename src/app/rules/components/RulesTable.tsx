@@ -132,7 +132,7 @@ export function RulesTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Rule Name</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Conditions</TableHead>
             <TableHead>Source</TableHead>

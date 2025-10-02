@@ -10,7 +10,7 @@ import {
   useMemo,
 } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
-import { TransactionDirection, CategorizationStatus } from "@/gen/arian/v1/enums_pb";
+import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
 import { useTransactionsQuery } from "@/hooks/useTransactionsQuery";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useMultiSelect } from "@/hooks/useMultiSelect";
@@ -157,21 +157,14 @@ const TransactionCards = forwardRef<
     return { symbol: "-", className: "text-red-500", label: "out" };
   };
 
-  const getCategorizationStatusDisplay = (status: CategorizationStatus) => {
-    switch (status) {
-      case CategorizationStatus.CATEGORIZATION_MANUAL:
-        return { text: "manual", className: "tui-accent" };
-      case CategorizationStatus.CATEGORIZATION_AUTO:
-        return { text: "auto", className: "text-blue-500" };
-      case CategorizationStatus.CATEGORIZATION_VERIFIED:
-        return { text: "verified", className: "text-green-500" };
-      case CategorizationStatus.CATEGORIZATION_NONE:
-        return { text: "none", className: "tui-muted" };
-      case CategorizationStatus.CATEGORIZATION_UNSPECIFIED:
-        return { text: "unspecified", className: "tui-muted" };
-      default:
-        return { text: "unknown", className: "tui-muted" };
+  const getCategorizationStatusDisplay = (transaction: Transaction) => {
+    if (!transaction.categoryId) {
+      return { text: "none", className: "tui-muted" };
     }
+    if (transaction.categoryManuallySet) {
+      return { text: "manual", className: "tui-accent" };
+    }
+    return { text: "auto", className: "text-blue-500" };
   };
 
   const groupTransactionsByDay = useCallback((transactions: Transaction[]) => {
@@ -427,9 +420,7 @@ const TransactionCards = forwardRef<
             <div className="space-y-2">
               {group.transactions.map((transaction, localIndex) => {
                 const directionInfo = getDirectionDisplay(transaction.direction);
-                const categoryInfo = getCategorizationStatusDisplay(
-                  transaction.categorizationStatus
-                );
+                const categoryInfo = getCategorizationStatusDisplay(transaction);
                 const amount = formatAmount(transaction.txAmount);
                 const isExpanded = expandedTransaction === transaction.id;
                 const isTransactionSelected = isSelected(transaction.id);
@@ -511,12 +502,7 @@ const TransactionCards = forwardRef<
                                 </span>
                               </>
                             )}
-                            {transaction.categorizationStatus ===
-                              CategorizationStatus.CATEGORIZATION_MANUAL ||
-                            transaction.categorizationStatus ===
-                              CategorizationStatus.CATEGORIZATION_AUTO ||
-                            transaction.categorizationStatus ===
-                              CategorizationStatus.CATEGORIZATION_VERIFIED ? (
+                            {transaction.categoryId ? (
                               <>
                                 {(transaction.accountId || transaction.category?.label) && (
                                   <span className="tui-muted">•</span>
@@ -583,12 +569,7 @@ const TransactionCards = forwardRef<
                                   <span className="ml-2">{transaction.category.label}</span>
                                 </div>
                               )}
-                              {(transaction.categorizationStatus ===
-                                CategorizationStatus.CATEGORIZATION_MANUAL ||
-                                transaction.categorizationStatus ===
-                                  CategorizationStatus.CATEGORIZATION_AUTO ||
-                                transaction.categorizationStatus ===
-                                  CategorizationStatus.CATEGORIZATION_VERIFIED) && (
+                              {transaction.categoryId && (
                                 <div>
                                   <span className="tui-muted">Categorization:</span>
                                   <span className={`ml-2 ${categoryInfo.className}`}>

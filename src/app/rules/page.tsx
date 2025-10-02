@@ -69,7 +69,8 @@ export default function RulesPage() {
   const createRuleMutation = useMutation({
     mutationFn: async (ruleData: {
       ruleName: string;
-      categoryId: bigint;
+      categoryId?: bigint;
+      merchant?: string;
       conditions: TransactionRule;
       isActive: boolean;
       priorityOrder: number;
@@ -81,6 +82,7 @@ export default function RulesPage() {
         userId,
         ruleName: ruleData.ruleName,
         categoryId: ruleData.categoryId,
+        merchant: ruleData.merchant,
         conditions: ruleData.conditions,
         applyToExisting: ruleData.applyToExisting,
       });
@@ -108,6 +110,7 @@ export default function RulesPage() {
       ruleData: {
         ruleName?: string;
         categoryId?: bigint;
+        merchant?: string;
         conditions?: TransactionRule;
         isActive?: boolean;
         priorityOrder?: number;
@@ -118,6 +121,7 @@ export default function RulesPage() {
       const updatePaths = [];
       if (ruleData.ruleName !== undefined) updatePaths.push("rule_name");
       if (ruleData.categoryId !== undefined) updatePaths.push("category_id");
+      if (ruleData.merchant !== undefined) updatePaths.push("merchant");
       if (ruleData.conditions !== undefined) updatePaths.push("conditions");
       if (ruleData.isActive !== undefined) updatePaths.push("is_active");
       if (ruleData.priorityOrder !== undefined) updatePaths.push("priority_order");
@@ -167,7 +171,8 @@ export default function RulesPage() {
 
   const handleCreateRule = (ruleData: {
     ruleName: string;
-    categoryId: bigint;
+    categoryId?: bigint;
+    merchant?: string;
     conditions: TransactionRule;
     isActive: boolean;
     priorityOrder: number;
@@ -179,6 +184,7 @@ export default function RulesPage() {
   const handleUpdateRule = (ruleData: {
     ruleName?: string;
     categoryId?: bigint;
+    merchant?: string;
     conditions?: TransactionRule;
     isActive?: boolean;
     priorityOrder?: number;
@@ -203,6 +209,7 @@ export default function RulesPage() {
       ruleData: {
         ruleName: rule.ruleName,
         categoryId: rule.categoryId,
+        merchant: rule.merchant,
         conditions: rule.conditions as unknown as TransactionRule,
         isActive: !rule.isActive,
         priorityOrder: rule.priorityOrder,
@@ -289,8 +296,8 @@ export default function RulesPage() {
           onClose={() => setIsCreateDialogOpen(false)}
           onSubmit={handleCreateRule}
           categories={categories}
-          title="Create Rule"
-          submitText="Create Rule"
+          title="Create rule"
+          submitText="Create rule"
           isLoading={createRuleMutation.isPending}
         />
 
