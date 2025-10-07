@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -207,7 +207,7 @@ export default function EditAccountSidebar({
 
             <div>
               <label className="text-xs text-tui-muted block mb-1">type</label>
-              <Select
+              <select
                 value={editForm.type.toString()}
                 onChange={(e) =>
                   setEditForm({ ...editForm, type: parseInt(e.target.value) as AccountType })
@@ -219,12 +219,12 @@ export default function EditAccountSidebar({
                 <option value={AccountType.ACCOUNT_CREDIT_CARD}>Credit Card</option>
                 <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
                 <option value={AccountType.ACCOUNT_OTHER}>Other</option>
-              </Select>
+              </select>
             </div>
 
             <div>
               <label className="text-xs text-tui-muted block mb-1">currency</label>
-              <Select
+              <select
                 value={editForm.mainCurrency}
                 onChange={(e) => setEditForm({ ...editForm, mainCurrency: e.target.value })}
                 className="text-sm"
@@ -234,7 +234,7 @@ export default function EditAccountSidebar({
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
                 <option value="JPY">JPY</option>
-              </Select>
+              </select>
             </div>
 
             <div>

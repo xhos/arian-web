@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useUserId } from "@/hooks/useSession";
@@ -131,12 +130,13 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="account">account *</Label>
-            <Select
+            <select
               id="account"
               value={formData.accountId}
               onChange={(e) => setFormData((prev) => ({ ...prev, accountId: e.target.value }))}
               disabled={isLoading}
               required
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">select account</option>
               {accounts.map((account) => (
@@ -144,7 +144,7 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
                   {account.name} ({account.bank})
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <div>
@@ -163,23 +163,24 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
 
           <div>
             <Label htmlFor="currency">currency</Label>
-            <Select
+            <select
               id="currency"
               value={formData.currency}
               onChange={(e) => setFormData((prev) => ({ ...prev, currency: e.target.value }))}
               disabled={isLoading}
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               {currencyOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <div>
             <Label htmlFor="direction">type *</Label>
-            <Select
+            <select
               id="direction"
               value={formData.direction}
               onChange={(e) =>
@@ -190,22 +191,24 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
               }
               disabled={isLoading}
               required
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               {directionOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <div>
             <Label htmlFor="category">category</Label>
-            <Select
+            <select
               id="category"
               value={formData.categoryId}
               onChange={(e) => setFormData((prev) => ({ ...prev, categoryId: e.target.value }))}
               disabled={isLoading}
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">no category</option>
               {categories.map((category: { id: bigint; label: string }) => (
@@ -213,7 +216,7 @@ export default function TransactionForm({ onSubmit, onCancel, isLoading }: Trans
                   {category.label}
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <div>

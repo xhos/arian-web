@@ -1,30 +1,76 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
 import { Button } from "@/components/ui/button";
+import { formatAmount, formatCurrency } from "@/lib/utils/transaction";
 
-interface TransactionAnalyticsProps {
+interface TransactionSidebarProps {
   transactions: Transaction[];
   onClose: () => void;
   onDeleteSelected: () => Promise<void>;
   onBulkModify: () => void;
 }
 
-export default function TransactionAnalytics({
+function SelectionGuide() {
+  return (
+    <div className="w-80 border rounded-lg bg-background">
+      <div className="p-4 border-b">
+        <h3 className="text-sm font-medium text-muted-foreground">Multi-Select Guide</h3>
+      </div>
+      <div className="p-4 space-y-4">
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <div>
+            <div className="font-medium mb-1">Individual Selection:</div>
+            <div className="text-xs">
+              <kbd className="px-1 py-0.5 text-xs font-mono bg-muted rounded border">Ctrl</kbd> + click
+              transaction
+            </div>
+          </div>
+          <div>
+            <div className="font-medium mb-1">Range Selection:</div>
+            <div className="text-xs">
+              <kbd className="px-1 py-0.5 text-xs font-mono bg-muted rounded border">Shift</kbd> + click
+              transaction
+            </div>
+          </div>
+          <div>
+            <div className="font-medium mb-1">Select Entire Day:</div>
+            <div className="text-xs space-y-1">
+              <div>
+                <kbd className="px-1 py-0.5 text-xs font-mono bg-muted rounded border">Ctrl</kbd> + click
+                day header
+              </div>
+              <div>
+                <kbd className="px-1 py-0.5 text-xs font-mono bg-muted rounded border">Shift</kbd> + click
+                day header
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="pt-3 border-t">
+          <div className="text-xs text-muted-foreground">
+            Selected transactions will show analysis here including income, expenses, and net totals.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TransactionAnalytics({
   transactions,
   onClose,
   onDeleteSelected,
   onBulkModify,
-}: TransactionAnalyticsProps) {
+}: TransactionSidebarProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDeleteClick = async () => {
     if (!confirmDelete) {
       setConfirmDelete(true);
-      // Reset confirmation after 3 seconds
       setTimeout(() => setConfirmDelete(false), 3000);
       return;
     }
@@ -34,7 +80,6 @@ export default function TransactionAnalytics({
       await onDeleteSelected();
     } catch (error) {
       console.error("Failed to delete transactions:", error);
-      // You could add a proper error notification here instead of alert
     } finally {
       setIsDeleting(false);
       setConfirmDelete(false);
@@ -44,16 +89,6 @@ export default function TransactionAnalytics({
   const analytics = useMemo(() => {
     let totalIncome = 0;
     let totalExpenses = 0;
-
-    const formatAmount = (amount?: {
-      currencyCode?: string;
-      currency_code?: string;
-      units?: string;
-      nanos?: number;
-    }) => {
-      if (!amount?.units) return 0;
-      return parseFloat(amount.units) + (amount.nanos || 0) / 1e9;
-    };
 
     transactions.forEach((transaction) => {
       const amount = formatAmount(transaction.txAmount);
@@ -79,59 +114,37 @@ export default function TransactionAnalytics({
     };
   }, [transactions]);
 
-  const formatCurrency = (amount: number, currencyCode = "USD") => {
-    const isValidCurrency =
-      currencyCode && currencyCode.length === 3 && /^[A-Z]{3}$/.test(currencyCode);
-    const finalCurrencyCode = isValidCurrency ? currencyCode : "USD";
-
-    try {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: finalCurrencyCode,
-      }).format(amount);
-    } catch {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-    }
-  };
-
   return (
-    <div className="w-80 tui-border bg-background">
-      <div className="p-4 border-b border-border">
+    <div className="w-80 border rounded-lg bg-background">
+      <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium">Selection Analysis</h3>
-          <button
-            onClick={onClose}
-            className="text-xs tui-muted hover:text-foreground transition-colors"
-          >
+          <button onClick={onClose} className="text-xs text-muted-foreground hover:text-foreground">
             ✕
           </button>
         </div>
-        <div className="text-xs tui-muted mt-1">
-          {analytics.transactionCount} transaction{analytics.transactionCount !== 1 ? "s" : ""}{" "}
-          selected
+        <div className="text-xs text-muted-foreground mt-1">
+          {analytics.transactionCount} transaction{analytics.transactionCount !== 1 ? "s" : ""} selected
         </div>
       </div>
 
       <div className="p-4 space-y-4">
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm tui-muted">Income</span>
+            <span className="text-sm text-muted-foreground">Income</span>
             <span className="text-sm font-mono text-green-500">
               +{formatCurrency(analytics.totalIncome)}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-sm tui-muted">Expenses</span>
+            <span className="text-sm text-muted-foreground">Expenses</span>
             <span className="text-sm font-mono text-red-500">
               -{formatCurrency(analytics.totalExpenses)}
             </span>
           </div>
 
-          <div className="border-t border-border pt-3">
+          <div className="border-t pt-3">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Net Amount</span>
               <span
@@ -146,18 +159,18 @@ export default function TransactionAnalytics({
           </div>
         </div>
 
-        <div className="pt-2 border-t border-border">
-          <div className="text-xs tui-muted mb-2">Summary</div>
+        <div className="pt-2 border-t">
+          <div className="text-xs text-muted-foreground mb-2">Summary</div>
           <div className="space-y-1 text-xs">
             <div className="flex justify-between">
-              <span className="tui-muted">Average per transaction:</span>
+              <span className="text-muted-foreground">Average per transaction:</span>
               <span className="font-mono">
                 {formatCurrency(analytics.netAmount / analytics.transactionCount)}
               </span>
             </div>
             {analytics.totalIncome > 0 && (
               <div className="flex justify-between">
-                <span className="tui-muted">Income percentage:</span>
+                <span className="text-muted-foreground">Income percentage:</span>
                 <span className="font-mono text-green-500">
                   {(
                     (analytics.totalIncome / (analytics.totalIncome + analytics.totalExpenses)) *
@@ -169,7 +182,7 @@ export default function TransactionAnalytics({
             )}
             {analytics.totalExpenses > 0 && (
               <div className="flex justify-between">
-                <span className="tui-muted">Expense percentage:</span>
+                <span className="text-muted-foreground">Expense percentage:</span>
                 <span className="font-mono text-red-500">
                   {(
                     (analytics.totalExpenses / (analytics.totalIncome + analytics.totalExpenses)) *
@@ -182,17 +195,17 @@ export default function TransactionAnalytics({
           </div>
         </div>
 
-        <div className="pt-4 border-t border-border">
-          <div className="text-xs tui-muted mb-3">Actions</div>
+        <div className="pt-4 border-t">
+          <div className="text-xs text-muted-foreground mb-3">Actions</div>
           <div className="space-y-2">
-            <Button onClick={onBulkModify} className="w-full min-h-8" size="sm">
+            <Button onClick={onBulkModify} className="w-full" size="sm">
               Bulk Modify
             </Button>
             <Button
               onClick={handleDeleteClick}
               disabled={isDeleting}
               variant={confirmDelete ? "destructive" : "outline"}
-              className={`w-full min-h-8 ${
+              className={`w-full ${
                 !confirmDelete ? "hover:bg-red-50 hover:border-red-300 hover:text-red-700" : ""
               }`}
               size="sm"
@@ -207,5 +220,20 @@ export default function TransactionAnalytics({
         </div>
       </div>
     </div>
+  );
+}
+
+export function TransactionSidebar({ transactions, onClose, onDeleteSelected, onBulkModify }: TransactionSidebarProps) {
+  if (transactions.length === 0) {
+    return <SelectionGuide />;
+  }
+
+  return (
+    <TransactionAnalytics
+      transactions={transactions}
+      onClose={onClose}
+      onDeleteSelected={onDeleteSelected}
+      onBulkModify={onBulkModify}
+    />
   );
 }

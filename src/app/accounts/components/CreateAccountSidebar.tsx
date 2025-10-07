@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
 interface CreateAccountSidebarProps {
@@ -139,7 +139,7 @@ export default function CreateAccountSidebar({
 
             <div>
               <label className="text-xs text-tui-muted block mb-1">type</label>
-              <Select
+              <select
                 value={formData.type.toString()}
                 onChange={(e) =>
                   setFormData({ ...formData, type: parseInt(e.target.value) as AccountType })
@@ -151,12 +151,12 @@ export default function CreateAccountSidebar({
                 <option value={AccountType.ACCOUNT_CREDIT_CARD}>Credit Card</option>
                 <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
                 <option value={AccountType.ACCOUNT_OTHER}>Other</option>
-              </Select>
+              </select>
             </div>
 
             <div>
               <label className="text-xs text-tui-muted block mb-1">currency</label>
-              <Select
+              <select
                 value={formData.mainCurrency}
                 onChange={(e) => setFormData({ ...formData, mainCurrency: e.target.value })}
                 className="text-sm !h-8"
@@ -166,7 +166,7 @@ export default function CreateAccountSidebar({
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
                 <option value="JPY">JPY</option>
-              </Select>
+              </select>
             </div>
 
             <div>

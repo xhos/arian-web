@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -88,9 +87,10 @@ export default function AccountList({
     return balance ? formatBalance(balance) : "loading...";
   };
 
-  const formatDate = (timestamp?: { seconds?: string; nanos?: number }) => {
+  const formatDate = (timestamp?: { seconds?: string | bigint; nanos?: number }) => {
     if (!timestamp?.seconds) return "—";
-    return new Date(parseInt(timestamp.seconds) * 1000).toLocaleDateString();
+    const seconds = typeof timestamp.seconds === "bigint" ? Number(timestamp.seconds) : parseInt(timestamp.seconds);
+    return new Date(seconds * 1000).toLocaleDateString();
   };
 
   const handleDeleteClick = (accountId: bigint) => {
@@ -125,13 +125,13 @@ export default function AccountList({
                       className="text-sm"
                     />
                     <Input defaultValue={account.bank} placeholder="Bank" className="text-sm" />
-                    <Select defaultValue={account.type.toString()}>
+                    <select defaultValue={account.type.toString()} className="rounded-md border border-input bg-transparent px-3 py-2 text-sm">
                       <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
                       <option value={AccountType.ACCOUNT_SAVINGS}>Savings</option>
                       <option value={AccountType.ACCOUNT_CREDIT_CARD}>Credit Card</option>
                       <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
                       <option value={AccountType.ACCOUNT_OTHER}>Other</option>
-                    </Select>
+                    </select>
                   </div>
                 </div>
               ) : (
@@ -170,16 +170,16 @@ export default function AccountList({
                         }
                         className="w-24 h-7 text-sm"
                       />
-                      <Select
+                      <select
                         defaultValue={account.anchorBalance.currencyCode || "USD"}
-                        className="h-7 text-sm"
+                        className="h-7 text-sm rounded-md border border-input bg-transparent px-2"
                       >
                         <option value="USD">USD</option>
                         <option value="CAD">CAD</option>
                         <option value="EUR">EUR</option>
                         <option value="GBP">GBP</option>
                         <option value="JPY">JPY</option>
-                      </Select>
+                      </select>
                       <Button size="sm" className="h-7 text-xs">
                         save
                       </Button>

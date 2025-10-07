@@ -22,7 +22,7 @@ export default function FilterChips({ selectedFilter, onFilterChange }: FilterCh
         <Button
           key={option.label}
           size="sm"
-          variant={selectedFilter === option.value ? "accent" : "outline"}
+          variant={selectedFilter === option.value ? "default" : "outline"}
           onClick={() => onFilterChange(option.value)}
           className="text-xs"
         >

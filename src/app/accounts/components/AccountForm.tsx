@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import type { Account } from "@/gen/arian/v1/account_pb";
 
@@ -45,7 +44,7 @@ export default function AccountForm({ account, onSubmit, onCancel, isLoading }: 
         bank: account.bank,
         type: account.type,
         alias: account.alias || "",
-        anchorBalance: account.anchorBalance?.units || "",
+        anchorBalance: account.anchorBalance?.units ? String(account.anchorBalance.units) : "",
       });
     }
   }, [account]);
@@ -107,21 +106,22 @@ export default function AccountForm({ account, onSubmit, onCancel, isLoading }: 
 
           <div>
             <Label htmlFor="type">account type</Label>
-            <Select
+            <select
               id="type"
-              value={formData.type}
+              value={String(formData.type)}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, type: parseInt(e.target.value) as AccountType }))
               }
               disabled={isLoading}
               required
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               {accountTypeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </Select>
+            </select>
           </div>
 
           <div>
