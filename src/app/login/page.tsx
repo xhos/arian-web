@@ -22,8 +22,7 @@ export default function LoginPage() {
       try {
         const session = await authClient.getSession();
         if (session.data?.user) {
-          setIsLoggedIn(true);
-          setTimeout(() => router.push("/"), 2000);
+          router.push("/");
         } else {
           setIsLoggedIn(false);
         }
@@ -71,19 +70,7 @@ export default function LoginPage() {
   if (isLoggedIn === null) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-sm tui-muted">checking session...</div>
-      </div>
-    );
-  }
-
-  if (isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md text-center">
-          <h1 className="text-lg mb-2">arian // authentication</h1>
-          <p className="text-sm tui-muted mb-4">you&apos;ve successfully logged in</p>
-          <p className="text-xs font-mono text-green-600">redirecting...</p>
-        </div>
+        <div className="text-sm text-muted-foreground">checking session...</div>
       </div>
     );
   }

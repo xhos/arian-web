@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
 
 const publicRoutes = ["/login", "/api/auth", "/api/signup"];
 
@@ -11,24 +10,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  try {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    return NextResponse.next();
-  } catch {
+  const sessionToken = request.cookies.get("better-auth.session_token");
+
+  if (!sessionToken) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  // note: we only check cookie presence here, not validity.
+  // full validation happens in api routes via authClient.getSession()
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * match all request paths except for the ones starting with:
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.ico
      * - public folder
      */
     "/((?!_next/static|_next/image|favicon.ico|public).*)",
