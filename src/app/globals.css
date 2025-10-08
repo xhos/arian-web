@@ -117,4 +117,33 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* react-colorful theme adjustments */
+  .react-colorful {
+    width: 200px;
+    height: 200px;
+  }
+
+  .react-colorful__saturation {
+    border-radius: 0.5rem 0.5rem 0 0;
+    border-bottom: none;
+  }
+
+  .react-colorful__hue {
+    height: 24px;
+    border-radius: 0 0 0.5rem 0.5rem;
+  }
+
+  .react-colorful__pointer {
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .react-colorful__hue-pointer {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
 }

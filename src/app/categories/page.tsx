@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { create } from "@bufbuild/protobuf";
 import { categoryClient } from "@/lib/grpc-client";
@@ -13,22 +12,37 @@ import {
 } from "@/gen/arian/v1/category_services_pb";
 import { useUserId } from "@/hooks/useSession";
 import type { Category } from "@/gen/arian/v1/category_pb";
+import { DataTable } from "./data-table";
+import { createColumns, type CategoryRow } from "./columns";
+import { CategoryDialog } from "./category-dialog";
+import { DeleteDialog } from "./delete-dialog";
+import { toast } from "sonner";
 
-// Import our new components
-import { CategoryTree } from "./components/CategoryTree";
-import { CategoryForm } from "./components/CategoryForm";
-import { DeleteConfirmationDialog } from "./components/DeleteConfirmationDialog";
+function getDisplayName(slug: string): string {
+  const parts = slug.split(".");
+  return parts[parts.length - 1];
+}
 
-// Import utilities
-import { buildCategoryTree, generateRandomColor, type PendingChange } from "./utils/categoryUtils";
+function getParentSlug(slug: string): string | null {
+  const lastDotIndex = slug.lastIndexOf(".");
+  return lastDotIndex > 0 ? slug.substring(0, lastDotIndex) : null;
+}
+
+function getCategoryLevel(slug: string): number {
+  return slug.split(".").length - 1;
+}
+
+function countChildren(categorySlug: string, categories: Category[]): number {
+  return categories.filter((c) => c.slug.startsWith(categorySlug + ".")).length;
+}
 
 export default function CategoriesPage() {
   const userId = useUserId();
   const queryClient = useQueryClient();
-  const [pendingChanges, setPendingChanges] = useState<PendingChange[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [editingCategory, setEditingCategory] = React.useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = React.useState<Category | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [isFiltered, setIsFiltered] = React.useState(false);
 
   const {
     data: categories = [],
@@ -48,108 +62,105 @@ export default function CategoriesPage() {
     gcTime: 10 * 60 * 1000,
   });
 
-  const categoryTree = useMemo(() => {
-    // Apply pending changes to create a preview of the new state
-    const categoriesWithPendingChanges = categories.map((category) => {
-      const pendingChange = pendingChanges.find((change) => change.categoryId === category.id);
-      if (pendingChange) {
-        return { ...category, slug: pendingChange.newSlug };
-      }
-      return category;
-    });
+  const categoryRows: CategoryRow[] = categories.map((category) => ({
+    category,
+    level: getCategoryLevel(category.slug),
+    displayName: getDisplayName(category.slug),
+    parentSlug: getParentSlug(category.slug),
+  }));
 
-    return buildCategoryTree(categoriesWithPendingChanges);
-  }, [categories, pendingChanges]);
-
-  const handleCategoryMove = (newChanges: PendingChange[]) => {
-    // Update pending changes, removing any existing changes for affected categories
-    const affectedCategoryIds = new Set(newChanges.map((change) => change.categoryId));
-    const filteredExistingChanges = pendingChanges.filter(
-      (change) => !affectedCategoryIds.has(change.categoryId)
-    );
-
-    setPendingChanges([...filteredExistingChanges, ...newChanges]);
-  };
-
-  const handleCreateCategory = async (name: string) => {
-    const request = create(CreateCategoryRequestSchema, {
-      slug: name,
-      color: generateRandomColor(),
-    });
-
-    await categoryClient.createCategory(request);
-    await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
-  };
-
-  const handleSaveChanges = async () => {
-    if (pendingChanges.length === 0) return;
-
-    setIsSaving(true);
+  const handleCreateCategory = async (slug: string, color: string) => {
     try {
-      for (const change of pendingChanges) {
-        const request = create(UpdateCategoryRequestSchema, {
-          id: change.categoryId,
-          slug: change.newSlug,
-          updateMask: { paths: ["slug"] },
-        });
-        await categoryClient.updateCategory(request);
-      }
-
+      const request = create(CreateCategoryRequestSchema, { slug, color });
+      await categoryClient.createCategory(request);
       await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
-      setPendingChanges([]);
+      toast.success("Category created");
     } catch (error) {
-      console.error("Failed to save changes:", error);
-    } finally {
-      setIsSaving(false);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isDuplicateSlug = errorMessage.includes("duplicate key") || errorMessage.includes("unique constraint");
+
+      if (isDuplicateSlug) {
+        toast.error("A category with this slug already exists");
+      } else {
+        toast.error("Failed to create category");
+      }
+      throw error;
     }
   };
 
-  const handleDiscardChanges = () => {
-    setPendingChanges([]);
-  };
+  const handleUpdateCategory = async (slug: string, color: string) => {
+    if (!editingCategory) return;
 
-  const handleDeleteCategory = (category: Category) => {
-    setCategoryToDelete(category);
-  };
-
-  const confirmDelete = async () => {
-    if (!categoryToDelete) return;
-
-    setIsDeleting(true);
     try {
-      // Remove any pending changes for this category and its children
-      const categorySlug = categoryToDelete.slug;
-      const updatedChanges = pendingChanges.filter((change) => {
-        const changeCategory = categories.find((c) => c.id === change.categoryId);
-        return changeCategory && !changeCategory.slug.startsWith(categorySlug);
+      const request = create(UpdateCategoryRequestSchema, {
+        id: editingCategory.id,
+        slug,
+        color,
+        updateMask: { paths: ["slug", "color"] },
       });
-      setPendingChanges(updatedChanges);
 
-      // Delete category via API
+      await categoryClient.updateCategory(request);
+      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      toast.success("Category updated");
+      setEditingCategory(null);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isDuplicateSlug = errorMessage.includes("duplicate key") || errorMessage.includes("unique constraint");
+
+      if (isDuplicateSlug) {
+        toast.error("A category with this slug already exists");
+      } else {
+        toast.error("Failed to update category");
+      }
+      throw error;
+    }
+  };
+
+  const handleColorChange = async (category: Category, color: string) => {
+    try {
+      const request = create(UpdateCategoryRequestSchema, {
+        id: category.id,
+        slug: category.slug,
+        color,
+        updateMask: { paths: ["color"] },
+      });
+
+      await categoryClient.updateCategory(request);
+      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      toast.success("Color updated");
+    } catch (error) {
+      toast.error("Failed to update color");
+      console.error("Failed to update category color:", error);
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!deletingCategory) return;
+
+    try {
       const request = create(DeleteCategoryRequestSchema, {
-        id: categoryToDelete.id,
+        id: deletingCategory.id,
       });
-      await categoryClient.deleteCategory(request);
 
+      await categoryClient.deleteCategory(request);
       await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
-      setCategoryToDelete(null);
+      toast.success("Category deleted");
+      setDeletingCategory(null);
     } catch (error) {
+      toast.error("Failed to delete category");
       console.error("Failed to delete category:", error);
-    } finally {
-      setIsDeleting(false);
+      throw error;
     }
   };
 
-  const cancelDelete = () => {
-    setCategoryToDelete(null);
-  };
+  const columns = createColumns(setEditingCategory, setDeletingCategory, isFiltered, handleColorChange);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-8 tui-background">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-lg mb-8 tui-foreground">arian // categories</h1>
-          <div className="text-sm tui-muted">Loading categories...</div>
+      <div className="min-h-screen p-8">
+        <div className="container mx-auto">
+          <h1 className="text-2xl font-bold mb-8">Categories</h1>
+          <p className="text-muted-foreground">Loading categories...</p>
         </div>
       </div>
     );
@@ -157,65 +168,55 @@ export default function CategoriesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen p-8 tui-background">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-lg mb-8 tui-foreground">arian // categories</h1>
-          <div className="text-sm text-red-600">Error loading categories: {error.message}</div>
+      <div className="min-h-screen p-8">
+        <div className="container mx-auto">
+          <h1 className="text-2xl font-bold mb-8">Categories</h1>
+          <p className="text-destructive">Error loading categories: {error.message}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8 tui-background">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-lg tui-foreground">arian // categories</h1>
-            <div className="flex items-center gap-3">
-              {pendingChanges.length > 0 && (
-                <>
-                  <span className="text-xs text-yellow-400">
-                    {pendingChanges.length} pending change{pendingChanges.length === 1 ? "" : "s"}
-                  </span>
-                  <Button
-                    onClick={handleDiscardChanges}
-                    size="sm"
-                    variant="outline"
-                    className="text-xs h-8"
-                  >
-                    discard
-                  </Button>
-                  <Button
-                    onClick={handleSaveChanges}
-                    size="sm"
-                    disabled={isSaving}
-                    className="text-xs h-8"
-                  >
-                    {isSaving ? "saving..." : "save changes"}
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
+    <div className="min-h-screen p-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-4">Categories</h1>
+          <p className="text-muted-foreground mb-4">
+            Manage your transaction categories with hierarchical organization. Right-click rows for actions.
+          </p>
+        </div>
 
-          <CategoryForm onCreateCategory={handleCreateCategory} />
-        </header>
-
-        <CategoryTree
-          categoryTree={categoryTree}
-          categories={categories}
-          pendingChanges={pendingChanges}
-          onCategoryMove={handleCategoryMove}
-          onDelete={handleDeleteCategory}
+        <DataTable
+          columns={columns}
+          data={categoryRows}
+          onFilterChange={setIsFiltered}
+          onEdit={(row) => setEditingCategory(row.category)}
+          onDelete={(row) => setDeletingCategory(row.category)}
+          onCreateNew={() => setIsCreateDialogOpen(true)}
         />
 
-        <DeleteConfirmationDialog
-          category={categoryToDelete}
-          categories={categories}
-          isDeleting={isDeleting}
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
+        <CategoryDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          onSave={handleCreateCategory}
+          title="Create Category"
+        />
+
+        <CategoryDialog
+          open={!!editingCategory}
+          onOpenChange={(open) => !open && setEditingCategory(null)}
+          category={editingCategory}
+          onSave={handleUpdateCategory}
+          title="Edit Category"
+        />
+
+        <DeleteDialog
+          open={!!deletingCategory}
+          onOpenChange={(open) => !open && setDeletingCategory(null)}
+          category={deletingCategory}
+          childCount={deletingCategory ? countChildren(deletingCategory.slug, categories) : 0}
+          onConfirm={handleDeleteCategory}
         />
       </div>
     </div>

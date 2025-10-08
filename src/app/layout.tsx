@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import { QueryProvider } from "@/lib/query-client";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ConditionalLayout>{children}</ConditionalLayout>
+            <Toaster />
           </ThemeProvider>
         </QueryProvider>
       </body>
