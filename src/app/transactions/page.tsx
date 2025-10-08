@@ -1,23 +1,39 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
 import { TransactionHeader } from "./components/TransactionHeader";
-import { TransactionList, type TransactionListRef } from "./components/TransactionList";
+import { TransactionList } from "./components/TransactionList";
 import { TransactionSidebar } from "./components/TransactionSidebar";
-import TransactionForm from "./components/TransactionForm";
+import { TransactionDialog } from "./components/transaction-dialog";
+import { ErrorMessage } from "@/components/data-display";
+import { PageContainer, PageContent } from "@/components/ui/layout";
+import { useTransactionsQuery } from "@/hooks/useTransactionsQuery";
 
 export default function TransactionsPage() {
-  const [showForm, setShowForm] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [selectedTransactions, setSelectedTransactions] = useState<Transaction[]>([]);
-  const listRef = useRef<TransactionListRef>();
+
+  const {
+    deleteTransactions,
+    isDeleting,
+    createTransaction,
+    isCreating,
+    createError,
+    deleteError,
+    refetch,
+    isLoading,
+  } = useTransactionsQuery({});
+
+  void setEditingTransaction;
 
   const handleSelectionChange = useCallback((transactions: Transaction[]) => {
     setSelectedTransactions(transactions);
   }, []);
 
-  const handleCreateTransaction = async (formData: {
+  const handleSaveTransaction = async (formData: {
     accountId: bigint;
     txDate: Date;
     txAmount: { currencyCode: string; units: string; nanos: number };
@@ -27,34 +43,18 @@ export default function TransactionsPage() {
     userNotes?: string;
     categoryId?: bigint;
   }) => {
-    try {
-      if (listRef.current?.createTransaction) {
-        await listRef.current.createTransaction(formData);
-        setShowForm(false);
-      }
-    } catch (err) {
-      console.error("Create transaction error:", err);
-    }
+    await createTransaction(formData);
+    setIsDialogOpen(false);
   };
 
   const handleClearSelection = () => {
-    if (listRef.current?.clearSelection) {
-      listRef.current.clearSelection();
-    }
+    setSelectedTransactions([]);
   };
 
   const handleDeleteSelected = async () => {
     const transactionIds = selectedTransactions.map((t) => t.id);
-
-    try {
-      if (listRef.current?.deleteTransactions) {
-        listRef.current.deleteTransactions(transactionIds);
-        handleClearSelection();
-      }
-    } catch (err) {
-      console.error("Delete transactions error:", err);
-      throw err;
-    }
+    await deleteTransactions(transactionIds);
+    handleClearSelection();
   };
 
   const handleBulkModify = () => {
@@ -62,49 +62,47 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-full">
+    <PageContainer>
+      <PageContent>
         <TransactionHeader
           selectedCount={selectedTransactions.length}
           onClearSelection={handleClearSelection}
-          onRefresh={() => listRef.current?.refresh()}
-          onAddTransaction={() => setShowForm(!showForm)}
-          isLoading={listRef.current?.isLoading}
-          isCreating={listRef.current?.isCreating}
-          showForm={showForm}
+          onRefresh={refetch}
+          onAddTransaction={() => setIsDialogOpen(true)}
+          isLoading={isLoading}
+          isCreating={isCreating}
+          showForm={isDialogOpen}
         />
 
-        {(listRef.current?.createError || listRef.current?.deleteError) && (
-          <div className="mb-6 p-3 text-sm font-mono text-red-600 border rounded-lg">
-            {listRef.current?.createError?.message || listRef.current?.deleteError?.message}
-          </div>
+        {(createError || deleteError) && (
+          <ErrorMessage className="mb-6">
+            {createError?.message || deleteError?.message}
+          </ErrorMessage>
         )}
 
-        {showForm && (
-          <div className="mb-6">
-            <TransactionForm
-              onSubmit={handleCreateTransaction}
-              onCancel={() => setShowForm(false)}
-              isLoading={listRef.current?.isCreating || false}
-            />
-          </div>
-        )}
-
-        <div className="flex gap-6">
+        <div className="flex gap-8">
           <div className="flex-1 min-w-0">
-            <TransactionList ref={listRef} onSelectionChange={handleSelectionChange} />
+            <TransactionList onSelectionChange={handleSelectionChange} />
           </div>
 
-          <div className="flex-shrink-0 sticky top-6 h-fit">
+          <aside className="flex-shrink-0 sticky top-8 h-fit">
             <TransactionSidebar
               transactions={selectedTransactions}
               onClose={handleClearSelection}
               onDeleteSelected={handleDeleteSelected}
               onBulkModify={handleBulkModify}
             />
-          </div>
+          </aside>
         </div>
-      </div>
-    </div>
+
+        <TransactionDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          transaction={editingTransaction}
+          onSave={handleSaveTransaction}
+          title={editingTransaction ? "Edit Transaction" : "Create Transaction"}
+        />
+      </PageContent>
+    </PageContainer>
   );
 }

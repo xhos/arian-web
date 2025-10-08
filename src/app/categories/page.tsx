@@ -17,20 +17,10 @@ import { createColumns, type CategoryRow } from "./columns";
 import { CategoryDialog } from "./category-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { toast } from "sonner";
-
-function getDisplayName(slug: string): string {
-  const parts = slug.split(".");
-  return parts[parts.length - 1];
-}
-
-function getParentSlug(slug: string): string | null {
-  const lastDotIndex = slug.lastIndexOf(".");
-  return lastDotIndex > 0 ? slug.substring(0, lastDotIndex) : null;
-}
-
-function getCategoryLevel(slug: string): number {
-  return slug.split(".").length - 1;
-}
+import { PageContainer, PageContent, PageHeader } from "@/components/ui/layout";
+import { PageTitle, MetaText } from "@/components/ui/typography";
+import { LoadingCard, ErrorMessage } from "@/components/data-display";
+import { getCategoryDisplayName, getParentSlug, getCategoryLevel } from "@/lib/utils/category";
 
 function countChildren(categorySlug: string, categories: Category[]): number {
   return categories.filter((c) => c.slug.startsWith(categorySlug + ".")).length;
@@ -65,7 +55,7 @@ export default function CategoriesPage() {
   const categoryRows: CategoryRow[] = categories.map((category) => ({
     category,
     level: getCategoryLevel(category.slug),
-    displayName: getDisplayName(category.slug),
+    displayName: getCategoryDisplayName(category.slug),
     parentSlug: getParentSlug(category.slug),
   }));
 
@@ -157,35 +147,35 @@ export default function CategoriesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-8">
-        <div className="container mx-auto">
-          <h1 className="text-2xl font-bold mb-8">Categories</h1>
-          <p className="text-muted-foreground">Loading categories...</p>
-        </div>
-      </div>
+      <PageContainer>
+        <PageContent maxWidth="1200px">
+          <PageTitle className="mb-8">Categories</PageTitle>
+          <LoadingCard message="Loading categories..." />
+        </PageContent>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen p-8">
-        <div className="container mx-auto">
-          <h1 className="text-2xl font-bold mb-8">Categories</h1>
-          <p className="text-destructive">Error loading categories: {error.message}</p>
-        </div>
-      </div>
+      <PageContainer>
+        <PageContent maxWidth="1200px">
+          <PageTitle className="mb-8">Categories</PageTitle>
+          <ErrorMessage>Error loading categories: {error.message}</ErrorMessage>
+        </PageContent>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-4">Categories</h1>
-          <p className="text-muted-foreground mb-4">
+    <PageContainer>
+      <PageContent maxWidth="1200px">
+        <PageHeader>
+          <PageTitle className="mb-3">Categories</PageTitle>
+          <MetaText className="block">
             Manage your transaction categories with hierarchical organization. Right-click rows for actions.
-          </p>
-        </div>
+          </MetaText>
+        </PageHeader>
 
         <DataTable
           columns={columns}
@@ -218,7 +208,7 @@ export default function CategoriesPage() {
           childCount={deletingCategory ? countChildren(deletingCategory.slug, categories) : 0}
           onConfirm={handleDeleteCategory}
         />
-      </div>
-    </div>
+      </PageContent>
+    </PageContainer>
   );
 }

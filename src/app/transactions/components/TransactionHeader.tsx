@@ -2,6 +2,9 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/layout";
+import { PageTitle, MetaText } from "@/components/ui/typography";
+import { ActionBar } from "@/components/ui/layout";
 
 interface TransactionHeaderProps {
   selectedCount: number;
@@ -35,31 +38,34 @@ export function TransactionHeader({
     : 0;
 
   return (
-    <header className="mb-6">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-4">
-          <h1 className="text-lg">arian // transactions</h1>
+    <PageHeader>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-6">
+          <PageTitle>arian // transactions</PageTitle>
           {selectedCount > 0 && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{selectedCount} selected</span>
-              <button onClick={onClearSelection} className="text-xs underline hover:no-underline">
+            <div className="flex items-center gap-3">
+              <MetaText className="font-medium">{selectedCount} selected</MetaText>
+              <button
+                onClick={onClearSelection}
+                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+              >
                 clear
               </button>
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <ActionBar>
           <Button onClick={onRefresh} size="sm" variant="outline" disabled={isLoading}>
             {isLoading ? "↻" : "⟲"} refresh
           </Button>
           <Button onClick={onAddTransaction} size="sm" disabled={isCreating}>
             {showForm ? "cancel" : "add transaction"}
           </Button>
-        </div>
+        </ActionBar>
       </div>
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>total: {totalCount.toLocaleString()} transactions loaded</span>
-      </div>
-    </header>
+      <MetaText>
+        {totalCount.toLocaleString()} transaction{totalCount !== 1 ? "s" : ""} loaded
+      </MetaText>
+    </PageHeader>
   );
 }
