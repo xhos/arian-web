@@ -9,6 +9,7 @@ import { MetaText, SectionHeader } from "@/components/ui/typography";
 import { Stat } from "@/components/ui/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useTransactionAnalytics } from "@/hooks/useTransactionAnalytics";
 
 interface TransactionSidebarProps {
@@ -18,39 +19,32 @@ interface TransactionSidebarProps {
   onBulkModify: () => void;
 }
 
-const Kbd = ({ children }: { children: React.ReactNode }) => (
-  <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded border">{children}</kbd>
-);
-
 function SelectionGuide() {
   return (
-    <Card className="w-80">
+    <Card className="hidden xl:block">
       <CardContent className="p-0">
-        <div className="p-4 border-b">
-          <h3 className="text-sm font-semibold">Multi-Select Guide</h3>
-        </div>
         <div className="p-4 space-y-4">
           <div className="space-y-3">
             <div>
               <div className="text-sm font-medium mb-1.5">Individual Selection</div>
-              <MetaText className="text-xs">
-                <Kbd>Ctrl</Kbd> + click transaction
+              <MetaText className="text-xs flex items-center gap-1.5">
+                <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click transaction
               </MetaText>
             </div>
             <div>
               <div className="text-sm font-medium mb-1.5">Range Selection</div>
-              <MetaText className="text-xs">
-                <Kbd>Shift</Kbd> + click transaction
+              <MetaText className="text-xs flex items-center gap-1.5">
+                <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click transaction
               </MetaText>
             </div>
             <div>
               <div className="text-sm font-medium mb-1.5">Select Entire Day</div>
               <div className="space-y-1">
-                <MetaText className="text-xs block">
-                  <Kbd>Ctrl</Kbd> + click day header
+                <MetaText className="text-xs flex items-center gap-1.5">
+                  <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click day header
                 </MetaText>
-                <MetaText className="text-xs block">
-                  <Kbd>Shift</Kbd> + click day header
+                <MetaText className="text-xs flex items-center gap-1.5">
+                  <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click day header
                 </MetaText>
               </div>
             </div>
@@ -94,7 +88,7 @@ function TransactionAnalytics({
   };
 
   return (
-    <Card className="w-80">
+    <Card>
       <CardContent className="p-0">
         <div className="p-4 border-b">
           <div className="flex items-center justify-between mb-2">

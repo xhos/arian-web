@@ -67,7 +67,7 @@ export default function AppSidebar() {
   const userInitial = displayName[0].toUpperCase();
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="z-50">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

@@ -79,13 +79,15 @@ export function TransactionItem({
               {transaction.description || transaction.merchant || "Unknown transaction"}
             </h4>
             <div className="flex items-center gap-2 flex-wrap">
-              <MetaText className="text-xs truncate">
-                {(transaction.merchant && transaction.description !== transaction.merchant)
-                  ? transaction.merchant
-                  : "null"}
-              </MetaText>
-              <MetaText className="text-xs">•</MetaText>
-              {transaction.category?.slug ? (
+              {transaction.merchant && transaction.description !== transaction.merchant && (
+                <>
+                  <MetaText className="text-xs truncate">
+                    {transaction.merchant}
+                  </MetaText>
+                  <MetaText className="text-xs">•</MetaText>
+                </>
+              )}
+              {transaction.category?.slug && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -105,8 +107,6 @@ export function TransactionItem({
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              ) : (
-                <MetaText className="text-xs">null</MetaText>
               )}
             </div>
           </div>
@@ -118,11 +118,11 @@ export function TransactionItem({
               className="text-lg"
             />
             <div className="flex flex-col items-end gap-1">
-              <MetaText className="text-xs">
-                {transaction.accountId
-                  ? getAccountDisplayName(transaction.accountId, transaction.accountName)
-                  : "null"}
-              </MetaText>
+              {transaction.accountId && (
+                <MetaText className="text-xs">
+                  {getAccountDisplayName(transaction.accountId, transaction.accountName)}
+                </MetaText>
+              )}
               <MonoText className="text-xs text-muted-foreground">{formatTime(transaction.txDate)}</MonoText>
             </div>
           </div>

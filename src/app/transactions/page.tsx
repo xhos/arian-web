@@ -80,12 +80,12 @@ export default function TransactionsPage() {
           </ErrorMessage>
         )}
 
-        <div className="flex gap-8">
+        <div className="flex flex-col xl:flex-row gap-6 xl:gap-8">
           <div className="flex-1 min-w-0">
             <TransactionList onSelectionChange={handleSelectionChange} />
           </div>
 
-          <aside className="flex-shrink-0 sticky top-8 h-fit">
+          <aside className="xl:flex-shrink-0 xl:sticky xl:top-8 xl:h-fit xl:w-80">
             <TransactionSidebar
               transactions={selectedTransactions}
               onClose={handleClearSelection}
