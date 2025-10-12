@@ -45,6 +45,7 @@ interface RuleDialogProps {
   title: string;
   submitText: string;
   isLoading: boolean;
+  error?: string;
 }
 
 const DEFAULT_CONDITION: UICondition = {
@@ -63,6 +64,7 @@ export function RuleDialog({
   title,
   submitText,
   isLoading,
+  error: externalError,
 }: RuleDialogProps) {
   const [step, setStep] = useState(1);
   const [ruleName, setRuleName] = useState("");
@@ -72,9 +74,12 @@ export function RuleDialog({
   const [uiConditions, setUIConditions] = useState<UICondition[]>([DEFAULT_CONDITION]);
   const [priorityOrder, setPriorityOrder] = useState(1);
   const [applyToExisting, setApplyToExisting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    setValidationError(null);
 
     if (rule) {
       setRuleName(rule.ruleName);
@@ -196,10 +201,11 @@ export function RuleDialog({
       const validation = validateRule(transactionRule);
 
       if (!validation.isValid) {
-        alert(`Validation Error: ${validation.errors[0].message}`);
+        setValidationError(validation.errors[0].message);
         return;
       }
 
+      setValidationError(null);
       onSubmit({
         ruleName,
         categoryId: selectedCategoryId ? BigInt(selectedCategoryId) : undefined,
@@ -209,8 +215,8 @@ export function RuleDialog({
         priorityOrder,
         applyToExisting,
       });
-    } catch (error) {
-      alert(`Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`);
+    } catch (err) {
+      setValidationError(err instanceof Error ? err.message : "Unknown error occurred");
     }
   };
 
@@ -274,6 +280,14 @@ export function RuleDialog({
             />
           )}
         </div>
+
+        {(validationError || externalError) && (
+          <div className="px-6">
+            <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
+              {validationError || externalError}
+            </div>
+          </div>
+        )}
 
         <div className="px-6 pb-6">
           <DialogFooter>

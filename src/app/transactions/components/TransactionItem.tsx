@@ -8,6 +8,7 @@ import {
   formatTime,
   getDirectionDisplay,
   getCategorizationStatus,
+  getMerchantStatus,
 } from "@/lib/utils/transaction";
 import { getCategoryDisplayName } from "@/lib/utils/category";
 import { Amount } from "@/components/data-display";
@@ -60,6 +61,7 @@ export function TransactionItem({
 
   const directionInfo = getDirectionDisplay(transaction.direction);
   const categoryInfo = getCategorizationStatus(transaction);
+  const merchantInfo = getMerchantStatus(transaction);
   const amount = formatAmount(transaction.txAmount);
   const formattedAmount = formatCurrency(amount, transaction.txAmount?.currencyCode);
 
@@ -81,9 +83,18 @@ export function TransactionItem({
             <div className="flex items-center gap-2 flex-wrap">
               {transaction.merchant && transaction.description !== transaction.merchant && (
                 <>
-                  <MetaText className="text-xs truncate">
-                    {transaction.merchant}
-                  </MetaText>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <MetaText className="text-xs truncate cursor-help">
+                          {transaction.merchant}
+                        </MetaText>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{merchantInfo.text}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <MetaText className="text-xs">•</MetaText>
                 </>
               )}

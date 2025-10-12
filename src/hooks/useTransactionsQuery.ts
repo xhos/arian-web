@@ -148,8 +148,10 @@ export function useTransactionsQuery({
         direction: formData.direction,
         description: formData.description,
         merchant: formData.merchant,
+        merchant_manually_set: !!formData.merchant,
         user_notes: formData.userNotes,
-        category_id: formData.categoryId ? parseInt(formData.categoryId.toString()) : undefined,
+        category_id: formData.categoryId ? parseInt(formData.categoryId.toString()) : null,
+        category_manually_set: !!formData.categoryId,
       };
 
       const response = await fetch("/api/arian.v1.TransactionService/CreateTransaction", {

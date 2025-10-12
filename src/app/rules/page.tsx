@@ -29,7 +29,6 @@ export default function RulesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<Rule | null>(null);
-  const [error, setError] = useState("");
 
   // Fetch rules
   const {
@@ -93,10 +92,6 @@ export default function RulesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       setIsCreateDialogOpen(false);
-      setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to create rule");
     },
   });
 
@@ -140,10 +135,6 @@ export default function RulesPage() {
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       setIsEditDialogOpen(false);
       setSelectedRule(null);
-      setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to update rule");
     },
   });
 
@@ -162,10 +153,6 @@ export default function RulesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       setRuleToDelete(null);
-      setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to delete rule");
     },
   });
 
@@ -280,8 +267,6 @@ export default function RulesPage() {
           </div>
         </header>
 
-        {error && <div className="mb-6 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
-
         <RulesTable
           rules={rules}
           categories={categoriesMap}
@@ -293,12 +278,16 @@ export default function RulesPage() {
 
         <RuleDialog
           isOpen={isCreateDialogOpen}
-          onClose={() => setIsCreateDialogOpen(false)}
+          onClose={() => {
+            setIsCreateDialogOpen(false);
+            createRuleMutation.reset();
+          }}
           onSubmit={handleCreateRule}
           categories={categories}
           title="Create rule"
           submitText="Create rule"
           isLoading={createRuleMutation.isPending}
+          error={createRuleMutation.error?.message}
         />
 
         <RuleDialog
@@ -306,6 +295,7 @@ export default function RulesPage() {
           onClose={() => {
             setIsEditDialogOpen(false);
             setSelectedRule(null);
+            updateRuleMutation.reset();
           }}
           onSubmit={handleUpdateRule}
           categories={categories}
@@ -313,6 +303,7 @@ export default function RulesPage() {
           title="Edit Rule"
           submitText="Update Rule"
           isLoading={updateRuleMutation.isPending}
+          error={updateRuleMutation.error?.message}
         />
 
         <DeleteRuleDialog

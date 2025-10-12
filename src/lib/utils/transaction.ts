@@ -132,6 +132,16 @@ export function getCategorizationStatus(transaction: Transaction) {
   return { text: "auto", variant: "default" as const };
 }
 
+export function getMerchantStatus(transaction: Transaction) {
+  if (!transaction.merchant) {
+    return { text: "none", variant: "outline" as const };
+  }
+  if (transaction.merchantManuallySet) {
+    return { text: "manual", variant: "secondary" as const };
+  }
+  return { text: "auto", variant: "default" as const };
+}
+
 export interface DailyTransactionGroup {
   date: string;
   displayDate: string;
