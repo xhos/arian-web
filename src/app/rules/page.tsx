@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { create } from "@bufbuild/protobuf";
+import { create, type JsonObject } from "@bufbuild/protobuf";
 import { ruleClient, categoryClient } from "@/lib/grpc-client";
 import {
   ListRulesRequestSchema,
@@ -82,7 +82,7 @@ export default function RulesPage() {
         ruleName: ruleData.ruleName,
         categoryId: ruleData.categoryId,
         merchant: ruleData.merchant,
-        conditions: ruleData.conditions,
+        conditions: ruleData.conditions as unknown as JsonObject,
         applyToExisting: ruleData.applyToExisting,
       });
 
@@ -121,11 +121,13 @@ export default function RulesPage() {
       if (ruleData.isActive !== undefined) updatePaths.push("is_active");
       if (ruleData.priorityOrder !== undefined) updatePaths.push("priority_order");
 
+      const { conditions, ...restRuleData } = ruleData;
       const request = create(UpdateRuleRequestSchema, {
         ruleId,
         userId,
         updateMask: { paths: updatePaths },
-        ...ruleData,
+        ...restRuleData,
+        ...(conditions && { conditions: conditions as unknown as JsonObject }),
       });
 
       const response = await ruleClient.updateRule(request);
