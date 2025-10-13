@@ -14,8 +14,8 @@ import { createColumns, type CategoryRow } from "./columns";
 import { CategoryDialog } from "./category-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { toast } from "sonner";
-import { PageContainer, PageContent, PageHeader } from "@/components/ui/layout";
-import { PageTitle, MetaText } from "@/components/ui/typography";
+import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui/layout";
+import { MetaText } from "@/components/ui/typography";
 import { LoadingCard, ErrorMessage } from "@/components/data-display";
 import { getCategoryDisplayName, getParentSlug, getCategoryLevel } from "@/lib/utils/category";
 
@@ -116,8 +116,8 @@ export default function CategoriesPage() {
   if (isLoading) {
     return (
       <PageContainer>
-        <PageContent maxWidth="1200px">
-          <PageTitle className="mb-8">Categories</PageTitle>
+        <PageContent>
+          <PageHeaderWithTitle title="categories" />
           <LoadingCard message="Loading categories..." />
         </PageContent>
       </PageContainer>
@@ -127,8 +127,8 @@ export default function CategoriesPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageContent maxWidth="1200px">
-          <PageTitle className="mb-8">Categories</PageTitle>
+        <PageContent>
+          <PageHeaderWithTitle title="categories" />
           <ErrorMessage>Error loading categories: {error.message}</ErrorMessage>
         </PageContent>
       </PageContainer>
@@ -137,13 +137,11 @@ export default function CategoriesPage() {
 
   return (
     <PageContainer>
-      <PageContent maxWidth="1200px">
-        <PageHeader>
-          <PageTitle className="mb-3">Categories</PageTitle>
-          <MetaText className="block">
-            Manage your transaction categories with hierarchical organization. Right-click rows for actions.
-          </MetaText>
-        </PageHeader>
+      <PageContent>
+        <PageHeaderWithTitle
+          title="categories"
+          subtitle="Manage your transaction categories with hierarchical organization. Right-click rows for actions."
+        />
 
         <DataTable
           columns={columns}

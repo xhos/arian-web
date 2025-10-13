@@ -11,13 +11,13 @@ interface FilterChipsProps {
 
 export default function FilterChips({ selectedFilter, onFilterChange }: FilterChipsProps) {
   const filterOptions = [
-    { label: "all", value: null },
-    { label: "type", value: "type" },
-    { label: "bank", value: "bank" },
+    { label: "All", value: null },
+    { label: "Type", value: "type" },
+    { label: "Bank", value: "bank" },
   ];
 
   return (
-    <div className="flex gap-2 mb-6">
+    <div className="flex gap-2">
       {filterOptions.map((option) => (
         <Button
           key={option.label}

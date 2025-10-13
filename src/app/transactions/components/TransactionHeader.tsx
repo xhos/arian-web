@@ -2,9 +2,8 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/layout";
-import { PageTitle, MetaText } from "@/components/ui/typography";
-import { ActionBar } from "@/components/ui/layout";
+import { PageHeaderWithTitle } from "@/components/ui/layout";
+import { MetaText } from "@/components/ui/typography";
 
 interface TransactionHeaderProps {
   selectedCount: number;
@@ -38,34 +37,32 @@ export function TransactionHeader({
     : 0;
 
   return (
-    <PageHeader>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-6">
-          <PageTitle>arian // transactions</PageTitle>
-          {selectedCount > 0 && (
-            <div className="flex items-center gap-3">
-              <MetaText className="font-medium">{selectedCount} selected</MetaText>
-              <button
-                onClick={onClearSelection}
-                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
-              >
-                clear
-              </button>
-            </div>
-          )}
-        </div>
-        <ActionBar>
+    <PageHeaderWithTitle
+      title="transactions"
+      stats={
+        selectedCount > 0 && (
+          <div className="flex items-center gap-3">
+            <MetaText className="font-medium">{selectedCount} selected</MetaText>
+            <button
+              onClick={onClearSelection}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+            >
+              clear
+            </button>
+          </div>
+        )
+      }
+      actions={
+        <>
           <Button onClick={onRefresh} size="sm" variant="outline" disabled={isLoading}>
             {isLoading ? "↻" : "⟲"} refresh
           </Button>
           <Button onClick={onAddTransaction} size="sm" disabled={isCreating}>
             {showForm ? "cancel" : "add transaction"}
           </Button>
-        </ActionBar>
-      </div>
-      <MetaText>
-        {totalCount.toLocaleString()} transaction{totalCount !== 1 ? "s" : ""} loaded
-      </MetaText>
-    </PageHeader>
+        </>
+      }
+      subtitle={`${totalCount.toLocaleString()} transaction${totalCount !== 1 ? "s" : ""} loaded`}
+    />
   );
 }

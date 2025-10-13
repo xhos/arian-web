@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useUserId } from "@/hooks/useSession";
 import { useRules, useCreateRule, useUpdateRule, useDeleteRule } from "@/hooks/useRules";
 import { useCategories } from "@/hooks/useCategories";
+import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui/layout";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import type { TransactionRule } from "@/lib/rules";
@@ -114,44 +115,42 @@ export default function RulesPage() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen p-6">
-        <div className="text-sm tui-muted">loading session...</div>
-      </div>
+      <PageContainer>
+        <PageContent>
+          <div className="text-sm text-muted-foreground">loading session...</div>
+        </PageContent>
+      </PageContainer>
     );
   }
 
   if (rulesLoading) {
     return (
-      <div className="min-h-screen p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-mono mb-4">rules</h1>
-          <div className="text-sm tui-muted">Loading rules...</div>
-        </div>
-      </div>
+      <PageContainer>
+        <PageContent>
+          <PageHeaderWithTitle title="rules" />
+          <div className="text-sm text-muted-foreground">Loading rules...</div>
+        </PageContent>
+      </PageContainer>
     );
   }
 
   if (rulesError) {
     return (
-      <div className="min-h-screen p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-mono mb-4">rules</h1>
-          <div className="text-sm text-red-600">Error loading rules: {rulesError.message}</div>
-        </div>
-      </div>
+      <PageContainer>
+        <PageContent>
+          <PageHeaderWithTitle title="rules" />
+          <div className="text-sm text-destructive">Error loading rules: {rulesError.message}</div>
+        </PageContent>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl font-mono mb-4">rules</h1>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm tui-muted">
-              <span>total: {rules.length} rules</span>
-              <span>active: {rules.filter((r) => r.isActive).length}</span>
-            </div>
+    <PageContainer>
+      <PageContent>
+        <PageHeaderWithTitle
+          title="rules"
+          actions={
             <Button
               onClick={() => setIsCreateDialogOpen(true)}
               size="sm"
@@ -159,8 +158,8 @@ export default function RulesPage() {
             >
               create rule
             </Button>
-          </div>
-        </header>
+          }
+        />
 
         <RulesTable
           rules={rules}
@@ -207,7 +206,7 @@ export default function RulesPage() {
           onConfirm={handleDeleteRule}
           isLoading={isDeleting}
         />
-      </div>
-    </div>
+      </PageContent>
+    </PageContainer>
   );
 }

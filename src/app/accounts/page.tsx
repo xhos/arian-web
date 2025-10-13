@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui/layout";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import {
@@ -155,9 +157,11 @@ export default function AccountsPage() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen p-6">
-        <div className="text-sm tui-muted">loading session...</div>
-      </div>
+      <PageContainer>
+        <PageContent>
+          <div className="text-sm text-muted-foreground">loading session...</div>
+        </PageContent>
+      </PageContainer>
     );
   }
 
@@ -171,25 +175,11 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl font-mono mb-4">accounts</h1>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm tui-muted">
-              <span>total: {accounts.length} accounts</span>
-            </div>
-            <Button
-              onClick={() => setIsCreatingAccount(true)}
-              size="sm"
-              disabled={isOperationLoading}
-            >
-              add account
-            </Button>
-          </div>
-        </header>
+    <PageContainer>
+      <PageContent>
+        <PageHeaderWithTitle title="accounts" />
 
-        {error && <div className="mb-6 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
+        {error && <div className="mb-6 p-3 text-sm text-destructive border border-destructive rounded">{error}</div>}
 
         {showAnchorForm && anchorAccount && (
           <div className="mb-6">
@@ -205,18 +195,28 @@ export default function AccountsPage() {
         )}
 
         {!showAnchorForm && accounts.length > 0 && (
-          <FilterChips
-            selectedFilter={selectedFilter}
-            onFilterChange={setSelectedFilter}
-            availableTypes={availableTypes}
-            availableBanks={availableBanks}
-          />
+          <div className="flex items-center justify-between mb-6">
+            <FilterChips
+              selectedFilter={selectedFilter}
+              onFilterChange={setSelectedFilter}
+              availableTypes={availableTypes}
+              availableBanks={availableBanks}
+            />
+            <Button
+              onClick={() => setIsCreatingAccount(true)}
+              size="default"
+              disabled={isOperationLoading}
+            >
+              <Plus className="h-4 w-4" />
+              New
+            </Button>
+          </div>
         )}
 
         {accounts.length === 0 && !isCreatingAccount ? (
-          <div className="tui-border rounded-lg p-8 text-center">
-            <div className="text-sm tui-muted mb-2">No accounts yet</div>
-            <div className="text-xs tui-muted">
+          <div className="border rounded-lg p-8 text-center">
+            <div className="text-sm text-muted-foreground mb-2">No accounts yet</div>
+            <div className="text-xs text-muted-foreground">
               Add your first account to start tracking transactions
             </div>
           </div>
@@ -230,24 +230,24 @@ export default function AccountsPage() {
             />
           )
         )}
-      </div>
 
-      <EditAccountSidebar
-        account={selectedAccount}
-        onClose={handleCloseSidebar}
-        onUpdate={handleUpdateAccount}
-        onDelete={handleDeleteAccount}
-        onSetAnchorBalance={handleSetAnchorBalance}
-        getAccountTypeName={getAccountTypeName}
-        isLoading={isOperationLoading}
-      />
+        <EditAccountSidebar
+          account={selectedAccount}
+          onClose={handleCloseSidebar}
+          onUpdate={handleUpdateAccount}
+          onDelete={handleDeleteAccount}
+          onSetAnchorBalance={handleSetAnchorBalance}
+          getAccountTypeName={getAccountTypeName}
+          isLoading={isOperationLoading}
+        />
 
-      <CreateAccountSidebar
-        isOpen={isCreatingAccount}
-        onClose={handleCloseSidebar}
-        onCreate={handleCreateAccount}
-        isLoading={isOperationLoading}
-      />
-    </div>
+        <CreateAccountSidebar
+          isOpen={isCreatingAccount}
+          onClose={handleCloseSidebar}
+          onCreate={handleCreateAccount}
+          isLoading={isOperationLoading}
+        />
+      </PageContent>
+    </PageContainer>
   );
 }
