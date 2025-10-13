@@ -1,8 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { ruleClient } from "@/lib/grpc-client";
-import { create } from "@bufbuild/protobuf";
-import { ListRulesRequestSchema } from "@/gen/arian/v1/rule_services_pb";
+import { rulesApi, type CreateRuleInput, type UpdateRuleInput } from "@/lib/api/rules";
 import { useUserId } from "./useSession";
 
 export function useRules() {
@@ -12,18 +10,16 @@ export function useRules() {
     data: rules = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["rules", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User not authenticated");
-
-      const request = create(ListRulesRequestSchema, { userId });
-      const response = await ruleClient.listRules(request);
-      return response.rules;
+      return rulesApi.list(userId);
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const activeRules = useMemo(() => {
@@ -57,5 +53,74 @@ export function useRules() {
     rulesMap,
     isLoading,
     error,
+    refetch,
+  };
+}
+
+export function useCreateRule() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: CreateRuleInput) => {
+      if (!userId) throw new Error("User not authenticated");
+      return rulesApi.create(userId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rules"] });
+    },
+  });
+
+  return {
+    createRule: mutation.mutate,
+    createRuleAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+    reset: mutation.reset,
+  };
+}
+
+export function useUpdateRule() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({ ruleId, data }: { ruleId: string; data: UpdateRuleInput }) => {
+      if (!userId) throw new Error("User not authenticated");
+      return rulesApi.update(userId, ruleId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rules"] });
+    },
+  });
+
+  return {
+    updateRule: mutation.mutate,
+    updateRuleAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+    reset: mutation.reset,
+  };
+}
+
+export function useDeleteRule() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (ruleId: string) => {
+      if (!userId) throw new Error("User not authenticated");
+      return rulesApi.delete(userId, ruleId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rules"] });
+    },
+  });
+
+  return {
+    deleteRule: mutation.mutate,
+    deleteRuleAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
   };
 }

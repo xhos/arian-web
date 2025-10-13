@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
-import { useAccounts } from "@/hooks/useAccounts";
+import {
+  useAccounts,
+  useCreateAccount,
+  useUpdateAccount,
+  useDeleteAccount,
+  useSetAnchorBalance,
+} from "@/hooks/useAccounts";
 import { useUserId } from "@/hooks/useSession";
 import AccountGrid from "./components/AccountGrid";
 import AnchorBalanceForm from "./components/AnchorBalanceForm";
@@ -40,7 +45,6 @@ const getAccountTypeName = (accountType: AccountType): string => {
 //TODO: decimal support for balance on create account
 export default function AccountsPage() {
   const userId = useUserId();
-  const queryClient = useQueryClient();
   const { accounts } = useAccounts();
 
   const [error, setError] = useState("");
@@ -50,206 +54,35 @@ export default function AccountsPage() {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
-  // Create account mutation
-  const createAccountMutation = useMutation({
-    mutationFn: async (formData: {
-      name: string;
-      bank: string;
-      type: AccountType;
-      alias?: string;
-      anchorBalance?: { currencyCode: string; units: string; nanos: number };
-      mainCurrency?: string;
-      colors?: string[];
-    }) => {
-      if (!userId) throw new Error("User not authenticated");
+  const { createAccountAsync, isPending: isCreating } = useCreateAccount();
+  const { updateAccountAsync, isPending: isUpdating } = useUpdateAccount();
+  const { deleteAccountAsync, isPending: isDeleting } = useDeleteAccount();
+  const { setAnchorBalanceAsync, isPending: isSettingAnchor } = useSetAnchorBalance();
 
-      const response = await fetch("/api/arian.v1.AccountService/CreateAccount", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          name: formData.name,
-          bank: formData.bank,
-          type: formData.type,
-          alias: formData.alias,
-          anchorBalance: formData.anchorBalance,
-          mainCurrency: formData.mainCurrency,
-          colors: formData.colors,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        if (errorData.message?.includes("duplicate key value violates unique constraint")) {
-          throw new Error(
-            "An account with this name already exists. Please choose a different name."
-          );
-        }
-        throw new Error(`Failed to create account: ${response.statusText}`);
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
+  const handleDeleteAccount = async (accountId: bigint) => {
+    try {
+      await deleteAccountAsync(accountId);
       setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to create account");
-    },
-  });
-
-  // Update account mutation
-  const updateAccountMutation = useMutation({
-    mutationFn: async ({
-      accountId,
-      formData,
-    }: {
-      accountId: bigint;
-      formData: {
-        name: string;
-        bank: string;
-        type: AccountType;
-        alias?: string;
-        mainCurrency?: string;
-        colors?: string[];
-      };
-    }) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const response = await fetch("/api/arian.v1.AccountService/UpdateAccount", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          id: accountId.toString(),
-          updateMask: "name,bank,accountType,alias,mainCurrency,colors",
-          name: formData.name,
-          bank: formData.bank,
-          accountType: formData.type,
-          alias: formData.alias,
-          mainCurrency: formData.mainCurrency,
-          colors: formData.colors,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        if (errorData.message?.includes("duplicate key value violates unique constraint")) {
-          throw new Error(
-            "An account with this name already exists. Please choose a different name."
-          );
-        }
-        throw new Error(`Failed to update account: ${response.statusText}`);
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
-      setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to update account");
-    },
-  });
-
-  // Delete account mutation
-  const deleteAccountMutation = useMutation({
-    mutationFn: async (accountId: bigint) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const response = await fetch("/api/arian.v1.AccountService/DeleteAccount", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          id: accountId.toString(),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete account: ${response.statusText}`);
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
-      setError("");
-    },
-    onError: (err) => {
+    } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete account");
-    },
-  });
-
-  // Set anchor balance mutation
-  const setAnchorBalanceMutation = useMutation({
-    mutationFn: async ({
-      accountId,
-      balance,
-    }: {
-      accountId: bigint;
-      balance: {
-        currencyCode: string;
-        units: string;
-        nanos: number;
-      };
-    }) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const response = await fetch("/api/arian.v1.AccountService/SetAccountAnchor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: parseInt(accountId.toString()),
-          balance: {
-            currency_code: balance.currencyCode,
-            units: balance.units,
-            nanos: balance.nanos,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `Failed to set anchor balance: ${errorData.message || response.statusText}`
-        );
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
-      setShowAnchorForm(false);
-      setAnchorAccount(null);
-      setError("");
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to set anchor balance");
-    },
-  });
-
-  const handleDeleteAccount = (accountId: bigint) => {
-    deleteAccountMutation.mutate(accountId);
+    }
   };
 
-  const handleSetAnchorBalance = (
+  const handleSetAnchorBalance = async (
     accountId: bigint,
     balance: { currencyCode: string; units: string; nanos: number }
   ) => {
-    setAnchorBalanceMutation.mutate({ accountId, balance });
+    try {
+      await setAnchorBalanceAsync({ id: accountId, balance });
+      setShowAnchorForm(false);
+      setAnchorAccount(null);
+      setError("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to set anchor balance");
+    }
   };
 
-  const handleUpdateAccount = (
+  const handleUpdateAccount = async (
     accountId: bigint,
     data: {
       name: string;
@@ -260,7 +93,47 @@ export default function AccountsPage() {
       colors?: string[];
     }
   ) => {
-    updateAccountMutation.mutate({ accountId, formData: data });
+    try {
+      await updateAccountAsync({
+        id: accountId,
+        name: data.name,
+        bank: data.bank,
+        accountType: data.type,
+        alias: data.alias,
+        mainCurrency: data.mainCurrency,
+        colors: data.colors,
+      });
+      setError("");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update account";
+      if (errorMessage.includes("duplicate key")) {
+        setError("An account with this name already exists. Please choose a different name.");
+      } else {
+        setError(errorMessage);
+      }
+    }
+  };
+
+  const handleCreateAccount = async (formData: {
+    name: string;
+    bank: string;
+    type: AccountType;
+    alias?: string;
+    anchorBalance?: { currencyCode: string; units: string; nanos: number };
+    mainCurrency?: string;
+    colors?: string[];
+  }) => {
+    try {
+      await createAccountAsync(formData);
+      setError("");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create account";
+      if (errorMessage.includes("duplicate key")) {
+        setError("An account with this name already exists. Please choose a different name.");
+      } else {
+        setError(errorMessage);
+      }
+    }
   };
 
   const handleCancelAnchorForm = () => {
@@ -268,12 +141,7 @@ export default function AccountsPage() {
     setAnchorAccount(null);
   };
 
-  // Check if any mutation is loading
-  const isOperationLoading =
-    createAccountMutation.isPending ||
-    updateAccountMutation.isPending ||
-    deleteAccountMutation.isPending ||
-    setAnchorBalanceMutation.isPending;
+  const isOperationLoading = isCreating || isUpdating || isDeleting || isSettingAnchor;
 
   const availableTypes = useMemo(() => {
     const types = new Set(accounts.map((account) => getAccountTypeName(account.type)));
@@ -329,11 +197,9 @@ export default function AccountsPage() {
               accountId={anchorAccount.id}
               accountName={anchorAccount.name}
               currentBalance={anchorAccount.anchorBalance}
-              onSubmit={(balance) =>
-                setAnchorBalanceMutation.mutateAsync({ accountId: anchorAccount.id, balance })
-              }
+              onSubmit={(balance) => handleSetAnchorBalance(anchorAccount.id, balance)}
               onCancel={handleCancelAnchorForm}
-              isLoading={setAnchorBalanceMutation.isPending}
+              isLoading={isSettingAnchor}
             />
           </div>
         )}
@@ -379,7 +245,7 @@ export default function AccountsPage() {
       <CreateAccountSidebar
         isOpen={isCreatingAccount}
         onClose={handleCloseSidebar}
-        onCreate={(formData) => createAccountMutation.mutate(formData)}
+        onCreate={handleCreateAccount}
         isLoading={isOperationLoading}
       />
     </div>

@@ -1,25 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { accountClient } from "@/lib/grpc-client";
-import { create } from "@bufbuild/protobuf";
-import { ListAccountsRequestSchema } from "@/gen/arian/v1/account_services_pb";
+import {
+  accountsApi,
+  type CreateAccountInput,
+  type UpdateAccountInput,
+  type SetAnchorBalanceInput,
+} from "@/lib/api/accounts";
 import { useUserId } from "./useSession";
 
 export function useAccounts() {
   const userId = useUserId();
 
-  const { data: accounts = [] } = useQuery({
+  const { data: accounts = [], isLoading, error } = useQuery({
     queryKey: ["accounts", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User not authenticated");
-
-      const request = create(ListAccountsRequestSchema, { userId });
-      const response = await accountClient.listAccounts(request);
-      return response.accounts;
+      return accountsApi.list(userId);
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const accountsMap = useMemo(() => {
@@ -63,5 +63,100 @@ export function useAccounts() {
     accountsMap,
     getAccountDisplayName,
     getAccountFullName,
+    isLoading,
+    error,
+  };
+}
+
+export function useCreateAccount() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: Omit<CreateAccountInput, "userId">) => {
+      if (!userId) throw new Error("User not authenticated");
+      return accountsApi.create({ ...data, userId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
+    },
+  });
+
+  return {
+    createAccount: mutation.mutate,
+    createAccountAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useUpdateAccount() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: Omit<UpdateAccountInput, "userId">) => {
+      if (!userId) throw new Error("User not authenticated");
+      return accountsApi.update({ ...data, userId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
+    },
+  });
+
+  return {
+    updateAccount: mutation.mutate,
+    updateAccountAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useDeleteAccount() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!userId) throw new Error("User not authenticated");
+      return accountsApi.delete(userId, id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
+    },
+  });
+
+  return {
+    deleteAccount: mutation.mutate,
+    deleteAccountAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useSetAnchorBalance() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: SetAnchorBalanceInput) => {
+      return accountsApi.setAnchorBalance(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["accountBalance"] });
+    },
+  });
+
+  return {
+    setAnchorBalance: mutation.mutate,
+    setAnchorBalanceAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
   };
 }

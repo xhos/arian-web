@@ -1,162 +1,44 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { create, type JsonObject } from "@bufbuild/protobuf";
-import { ruleClient, categoryClient } from "@/lib/grpc-client";
-import {
-  ListRulesRequestSchema,
-  CreateRuleRequestSchema,
-  UpdateRuleRequestSchema,
-  DeleteRuleRequestSchema,
-} from "@/gen/arian/v1/rule_services_pb";
-import { ListCategoriesRequestSchema } from "@/gen/arian/v1/category_services_pb";
 import { useUserId } from "@/hooks/useSession";
+import { useRules, useCreateRule, useUpdateRule, useDeleteRule } from "@/hooks/useRules";
+import { useCategories } from "@/hooks/useCategories";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
+import type { TransactionRule } from "@/lib/rules";
 
 import { RulesTable } from "./components/RulesTable";
 import { RuleDialog } from "./components/RuleDialog";
 import { DeleteRuleDialog } from "./components/DeleteRuleDialog";
-import type { TransactionRule } from "@/lib/rules";
 
 export default function RulesPage() {
   const userId = useUserId();
-  const queryClient = useQueryClient();
 
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<Rule | null>(null);
 
-  // Fetch rules
+  const { rules, isLoading: rulesLoading, error: rulesError } = useRules();
+  const { categories } = useCategories();
+
   const {
-    data: rules = [],
-    isLoading: rulesLoading,
-    error: rulesError,
-  } = useQuery({
-    queryKey: ["rules", userId],
-    queryFn: async () => {
-      if (!userId) throw new Error("User not authenticated");
+    createRule,
+    isPending: isCreating,
+    error: createError,
+    reset: resetCreate,
+  } = useCreateRule();
 
-      const request = create(ListRulesRequestSchema, { userId });
-      const response = await ruleClient.listRules(request);
-      return response.rules;
-    },
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
+  const {
+    updateRule,
+    isPending: isUpdating,
+    error: updateError,
+    reset: resetUpdate,
+  } = useUpdateRule();
 
-  // Fetch categories for rule creation/editing
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories", userId],
-    queryFn: async () => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const request = create(ListCategoriesRequestSchema, { userId });
-      const response = await categoryClient.listCategories(request);
-      return response.categories;
-    },
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
-
-  // Create rule mutation
-  const createRuleMutation = useMutation({
-    mutationFn: async (ruleData: {
-      ruleName: string;
-      categoryId?: bigint;
-      merchant?: string;
-      conditions: TransactionRule;
-      isActive: boolean;
-      priorityOrder: number;
-      applyToExisting: boolean;
-    }) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const request = create(CreateRuleRequestSchema, {
-        userId,
-        ruleName: ruleData.ruleName,
-        categoryId: ruleData.categoryId,
-        merchant: ruleData.merchant,
-        conditions: ruleData.conditions as unknown as JsonObject,
-        applyToExisting: ruleData.applyToExisting,
-      });
-
-      const response = await ruleClient.createRule(request);
-      return response.rule;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rules"] });
-      setIsCreateDialogOpen(false);
-    },
-  });
-
-  // Update rule mutation
-  const updateRuleMutation = useMutation({
-    mutationFn: async ({
-      ruleId,
-      ruleData,
-    }: {
-      ruleId: string;
-      ruleData: {
-        ruleName?: string;
-        categoryId?: bigint;
-        merchant?: string;
-        conditions?: TransactionRule;
-        isActive?: boolean;
-        priorityOrder?: number;
-      };
-    }) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const updatePaths = [];
-      if (ruleData.ruleName !== undefined) updatePaths.push("rule_name");
-      if (ruleData.categoryId !== undefined) updatePaths.push("category_id");
-      if (ruleData.merchant !== undefined) updatePaths.push("merchant");
-      if (ruleData.conditions !== undefined) updatePaths.push("conditions");
-      if (ruleData.isActive !== undefined) updatePaths.push("is_active");
-      if (ruleData.priorityOrder !== undefined) updatePaths.push("priority_order");
-
-      const { conditions, ...restRuleData } = ruleData;
-      const request = create(UpdateRuleRequestSchema, {
-        ruleId,
-        userId,
-        updateMask: { paths: updatePaths },
-        ...restRuleData,
-        ...(conditions && { conditions: conditions as unknown as JsonObject }),
-      });
-
-      const response = await ruleClient.updateRule(request);
-      return response.rule;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rules"] });
-      setIsEditDialogOpen(false);
-      setSelectedRule(null);
-    },
-  });
-
-  // Delete rule mutation
-  const deleteRuleMutation = useMutation({
-    mutationFn: async (ruleId: string) => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const request = create(DeleteRuleRequestSchema, {
-        ruleId,
-        userId,
-      });
-
-      await ruleClient.deleteRule(request);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rules"] });
-      setRuleToDelete(null);
-    },
-  });
+  const { deleteRule, isPending: isDeleting } = useDeleteRule();
 
   const handleCreateRule = (ruleData: {
     ruleName: string;
@@ -167,7 +49,9 @@ export default function RulesPage() {
     priorityOrder: number;
     applyToExisting: boolean;
   }) => {
-    createRuleMutation.mutate(ruleData);
+    createRule(ruleData, {
+      onSuccess: () => setIsCreateDialogOpen(false),
+    });
   };
 
   const handleUpdateRule = (ruleData: {
@@ -179,12 +63,22 @@ export default function RulesPage() {
     priorityOrder?: number;
   }) => {
     if (!selectedRule) return;
-    updateRuleMutation.mutate({ ruleId: selectedRule.ruleId, ruleData });
+    updateRule(
+      { ruleId: selectedRule.ruleId, data: ruleData },
+      {
+        onSuccess: () => {
+          setIsEditDialogOpen(false);
+          setSelectedRule(null);
+        },
+      }
+    );
   };
 
   const handleDeleteRule = () => {
     if (!ruleToDelete) return;
-    deleteRuleMutation.mutate(ruleToDelete.ruleId);
+    deleteRule(ruleToDelete.ruleId, {
+      onSuccess: () => setRuleToDelete(null),
+    });
   };
 
   const handleEditRule = (rule: Rule) => {
@@ -193,9 +87,9 @@ export default function RulesPage() {
   };
 
   const handleToggleActiveRule = (rule: Rule) => {
-    updateRuleMutation.mutate({
+    updateRule({
       ruleId: rule.ruleId,
-      ruleData: {
+      data: {
         ruleName: rule.ruleName,
         categoryId: rule.categoryId,
         merchant: rule.merchant,
@@ -206,8 +100,7 @@ export default function RulesPage() {
     });
   };
 
-  const isOperationLoading =
-    createRuleMutation.isPending || updateRuleMutation.isPending || deleteRuleMutation.isPending;
+  const isOperationLoading = isCreating || isUpdating || isDeleting;
 
   const categoriesMap = useMemo(() => {
     return categories.reduce(
@@ -282,14 +175,14 @@ export default function RulesPage() {
           isOpen={isCreateDialogOpen}
           onClose={() => {
             setIsCreateDialogOpen(false);
-            createRuleMutation.reset();
+            resetCreate();
           }}
           onSubmit={handleCreateRule}
           categories={categories}
           title="Create rule"
           submitText="Create rule"
-          isLoading={createRuleMutation.isPending}
-          error={createRuleMutation.error?.message}
+          isLoading={isCreating}
+          error={createError?.message}
         />
 
         <RuleDialog
@@ -297,22 +190,22 @@ export default function RulesPage() {
           onClose={() => {
             setIsEditDialogOpen(false);
             setSelectedRule(null);
-            updateRuleMutation.reset();
+            resetUpdate();
           }}
           onSubmit={handleUpdateRule}
           categories={categories}
           rule={selectedRule}
           title="Edit Rule"
           submitText="Update Rule"
-          isLoading={updateRuleMutation.isPending}
-          error={updateRuleMutation.error?.message}
+          isLoading={isUpdating}
+          error={updateError?.message}
         />
 
         <DeleteRuleDialog
           rule={ruleToDelete}
           onClose={() => setRuleToDelete(null)}
           onConfirm={handleDeleteRule}
-          isLoading={deleteRuleMutation.isPending}
+          isLoading={isDeleting}
         />
       </div>
     </div>

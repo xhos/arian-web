@@ -1,26 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
-import type { Category } from "@/gen/arian/v1/category_pb";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
+import {
+  categoriesApi,
+  type CreateCategoryInput,
+  type UpdateCategoryInput,
+  type UpdateCategoryColorInput,
+} from "@/lib/api/categories";
+import { useUserId } from "./useSession";
+import type { Category } from "@/gen/arian/v1/category_pb";
 
 export function useCategories() {
+  const userId = useUserId();
+
   const { data: categories = [], isLoading, error } = useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", userId],
     queryFn: async () => {
-      const response = await fetch("/api/arian.v1.CategoryService/ListCategories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ limit: 1000 }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories");
-      }
-
-      const data = await response.json();
-      return (data.categories || []) as Category[];
+      if (!userId) throw new Error("User not authenticated");
+      return categoriesApi.list(userId);
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const categoryMap = useMemo(() => {
@@ -41,5 +41,89 @@ export function useCategories() {
     getCategoryById,
     isLoading,
     error,
+  };
+}
+
+export function useCreateCategory() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: CreateCategoryInput) => {
+      return categoriesApi.create(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+    },
+  });
+
+  return {
+    createCategory: mutation.mutate,
+    createCategoryAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useUpdateCategory() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: UpdateCategoryInput) => {
+      return categoriesApi.update(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+    },
+  });
+
+  return {
+    updateCategory: mutation.mutate,
+    updateCategoryAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useUpdateCategoryColor() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data: UpdateCategoryColorInput) => {
+      return categoriesApi.updateColor(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+    },
+  });
+
+  return {
+    updateCategoryColor: mutation.mutate,
+    updateCategoryColorAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+  };
+}
+
+export function useDeleteCategory() {
+  const userId = useUserId();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (id: bigint) => {
+      return categoriesApi.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+    },
+  });
+
+  return {
+    deleteCategory: mutation.mutate,
+    deleteCategoryAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
   };
 }

@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { create } from "@bufbuild/protobuf";
-import { categoryClient } from "@/lib/grpc-client";
 import {
-  ListCategoriesRequestSchema,
-  CreateCategoryRequestSchema,
-  UpdateCategoryRequestSchema,
-  DeleteCategoryRequestSchema,
-} from "@/gen/arian/v1/category_services_pb";
-import { useUserId } from "@/hooks/useSession";
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useUpdateCategoryColor,
+  useDeleteCategory,
+} from "@/hooks/useCategories";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import { DataTable } from "./data-table";
 import { createColumns, type CategoryRow } from "./columns";
@@ -27,30 +24,16 @@ function countChildren(categorySlug: string, categories: Category[]): number {
 }
 
 export default function CategoriesPage() {
-  const userId = useUserId();
-  const queryClient = useQueryClient();
   const [editingCategory, setEditingCategory] = React.useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = React.useState<Category | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
   const [isFiltered, setIsFiltered] = React.useState(false);
 
-  const {
-    data: categories = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["categories", userId],
-    queryFn: async () => {
-      if (!userId) throw new Error("User not authenticated");
-
-      const request = create(ListCategoriesRequestSchema, { userId });
-      const response = await categoryClient.listCategories(request);
-      return response.categories;
-    },
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
+  const { categories, isLoading, error } = useCategories();
+  const { createCategoryAsync } = useCreateCategory();
+  const { updateCategoryAsync } = useUpdateCategory();
+  const { updateCategoryColorAsync } = useUpdateCategoryColor();
+  const { deleteCategoryAsync } = useDeleteCategory();
 
   const categoryRows: CategoryRow[] = categories.map((category) => ({
     category,
@@ -61,9 +44,7 @@ export default function CategoriesPage() {
 
   const handleCreateCategory = async (slug: string, color: string) => {
     try {
-      const request = create(CreateCategoryRequestSchema, { slug, color });
-      await categoryClient.createCategory(request);
-      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      await createCategoryAsync({ slug, color });
       toast.success("Category created");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -82,15 +63,11 @@ export default function CategoriesPage() {
     if (!editingCategory) return;
 
     try {
-      const request = create(UpdateCategoryRequestSchema, {
+      await updateCategoryAsync({
         id: editingCategory.id,
         slug,
         color,
-        updateMask: { paths: ["slug", "color"] },
       });
-
-      await categoryClient.updateCategory(request);
-      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
       toast.success("Category updated");
       setEditingCategory(null);
     } catch (error) {
@@ -108,15 +85,11 @@ export default function CategoriesPage() {
 
   const handleColorChange = async (category: Category, color: string) => {
     try {
-      const request = create(UpdateCategoryRequestSchema, {
+      await updateCategoryColorAsync({
         id: category.id,
         slug: category.slug,
         color,
-        updateMask: { paths: ["color"] },
       });
-
-      await categoryClient.updateCategory(request);
-      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
       toast.success("Color updated");
     } catch (error) {
       toast.error("Failed to update color");
@@ -128,12 +101,7 @@ export default function CategoriesPage() {
     if (!deletingCategory) return;
 
     try {
-      const request = create(DeleteCategoryRequestSchema, {
-        id: deletingCategory.id,
-      });
-
-      await categoryClient.deleteCategory(request);
-      await queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      await deleteCategoryAsync(deletingCategory.id);
       toast.success("Category deleted");
       setDeletingCategory(null);
     } catch (error) {
