@@ -295,8 +295,8 @@ export default function EditAccountSidebar({
                 variant="ghost"
                 onClick={handleDeleteClick}
                 disabled={isLoading}
-                className={`w-full h-8 text-red-500 hover:bg-red-500/10 ${
-                  deleteConfirmation ? "bg-red-500 text-white hover:bg-red-600" : ""
+                className={`w-full h-8 text-destructive hover:bg-destructive/10 ${
+                  deleteConfirmation ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""
                 }`}
               >
                 {deleteConfirmation ? "confirm delete" : "delete"}

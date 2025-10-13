@@ -12,8 +12,8 @@ export const Amount = ({
   variant?: "positive" | "negative" | "neutral";
 } & React.HTMLAttributes<HTMLSpanElement>) => {
   const variantStyles = {
-    positive: "text-green-600 dark:text-green-500",
-    negative: "text-red-600 dark:text-red-500",
+    positive: "text-success",
+    negative: "text-destructive",
     neutral: "",
   };
 

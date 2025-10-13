@@ -15,10 +15,10 @@ import {
 } from "@/hooks/useAccounts";
 import { useUserId } from "@/hooks/useSession";
 import AccountGrid from "./components/AccountGrid";
-import AnchorBalanceForm from "./components/AnchorBalanceForm";
 import FilterChips from "./components/FilterChips";
-import EditAccountSidebar from "./components/EditAccountSidebar";
-import CreateAccountSidebar from "./components/CreateAccountSidebar";
+import { AccountDialog } from "./components/AccountDialog";
+import { DeleteAccountDialog } from "./components/DeleteAccountDialog";
+import { AnchorBalanceDialog } from "./components/AnchorBalanceDialog";
 
 const getAccountTypeName = (accountType: AccountType): string => {
   // Handle both string and numeric enum values
@@ -50,54 +50,76 @@ export default function AccountsPage() {
   const { accounts } = useAccounts();
 
   const [error, setError] = useState("");
-  const [showAnchorForm, setShowAnchorForm] = useState(false);
-  const [anchorAccount, setAnchorAccount] = useState<Account | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [deletingAccount, setDeletingAccount] = useState<Account | null>(null);
+  const [anchorAccount, setAnchorAccount] = useState<Account | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { createAccountAsync, isPending: isCreating } = useCreateAccount();
   const { updateAccountAsync, isPending: isUpdating } = useUpdateAccount();
   const { deleteAccountAsync, isPending: isDeleting } = useDeleteAccount();
   const { setAnchorBalanceAsync, isPending: isSettingAnchor } = useSetAnchorBalance();
 
-  const handleDeleteAccount = async (accountId: bigint) => {
+  const handleDeleteAccount = async () => {
+    if (!deletingAccount) return;
     try {
-      await deleteAccountAsync(accountId);
+      await deleteAccountAsync(deletingAccount.id);
       setError("");
+      setDeletingAccount(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete account");
     }
   };
 
   const handleSetAnchorBalance = async (
-    accountId: bigint,
     balance: { currencyCode: string; units: string; nanos: number }
   ) => {
+    if (!anchorAccount) return;
     try {
-      await setAnchorBalanceAsync({ id: accountId, balance });
-      setShowAnchorForm(false);
-      setAnchorAccount(null);
+      await setAnchorBalanceAsync({ id: anchorAccount.id, balance });
       setError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to set anchor balance");
+      throw err;
     }
   };
 
-  const handleUpdateAccount = async (
-    accountId: bigint,
-    data: {
-      name: string;
-      bank: string;
-      type: AccountType;
-      alias?: string;
-      mainCurrency?: string;
-      colors?: string[];
+  const handleCreateAccount = async (data: {
+    name: string;
+    bank: string;
+    type: AccountType;
+    alias?: string;
+    anchorBalance?: { currencyCode: string; units: string; nanos: number };
+    mainCurrency?: string;
+    colors?: string[];
+  }) => {
+    try {
+      await createAccountAsync(data);
+      setError("");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create account";
+      if (errorMessage.includes("duplicate key")) {
+        setError("An account with this name already exists. Please choose a different name.");
+      } else {
+        setError(errorMessage);
+      }
+      throw err;
     }
-  ) => {
+  };
+
+  const handleUpdateAccount = async (data: {
+    name: string;
+    bank: string;
+    type: AccountType;
+    alias?: string;
+    mainCurrency?: string;
+    colors?: string[];
+  }) => {
+    if (!editingAccount) return;
     try {
       await updateAccountAsync({
-        id: accountId,
+        id: editingAccount.id,
         name: data.name,
         bank: data.bank,
         accountType: data.type,
@@ -113,35 +135,10 @@ export default function AccountsPage() {
       } else {
         setError(errorMessage);
       }
+      throw err;
     }
   };
 
-  const handleCreateAccount = async (formData: {
-    name: string;
-    bank: string;
-    type: AccountType;
-    alias?: string;
-    anchorBalance?: { currencyCode: string; units: string; nanos: number };
-    mainCurrency?: string;
-    colors?: string[];
-  }) => {
-    try {
-      await createAccountAsync(formData);
-      setError("");
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create account";
-      if (errorMessage.includes("duplicate key")) {
-        setError("An account with this name already exists. Please choose a different name.");
-      } else {
-        setError(errorMessage);
-      }
-    }
-  };
-
-  const handleCancelAnchorForm = () => {
-    setShowAnchorForm(false);
-    setAnchorAccount(null);
-  };
 
   const isOperationLoading = isCreating || isUpdating || isDeleting || isSettingAnchor;
 
@@ -165,15 +162,6 @@ export default function AccountsPage() {
     );
   }
 
-  const handleAccountClick = (account: Account) => {
-    setSelectedAccount(account);
-  };
-
-  const handleCloseSidebar = () => {
-    setSelectedAccount(null);
-    setIsCreatingAccount(false);
-  };
-
   return (
     <PageContainer>
       <PageContent>
@@ -181,20 +169,7 @@ export default function AccountsPage() {
 
         {error && <div className="mb-6 p-3 text-sm text-destructive border border-destructive rounded">{error}</div>}
 
-        {showAnchorForm && anchorAccount && (
-          <div className="mb-6">
-            <AnchorBalanceForm
-              accountId={anchorAccount.id}
-              accountName={anchorAccount.name}
-              currentBalance={anchorAccount.anchorBalance}
-              onSubmit={(balance) => handleSetAnchorBalance(anchorAccount.id, balance)}
-              onCancel={handleCancelAnchorForm}
-              isLoading={isSettingAnchor}
-            />
-          </div>
-        )}
-
-        {!showAnchorForm && accounts.length > 0 && (
+        {accounts.length > 0 && (
           <div className="flex items-center justify-between mb-6">
             <FilterChips
               selectedFilter={selectedFilter}
@@ -203,7 +178,7 @@ export default function AccountsPage() {
               availableBanks={availableBanks}
             />
             <Button
-              onClick={() => setIsCreatingAccount(true)}
+              onClick={() => setIsCreateDialogOpen(true)}
               size="default"
               disabled={isOperationLoading}
             >
@@ -213,39 +188,54 @@ export default function AccountsPage() {
           </div>
         )}
 
-        {accounts.length === 0 && !isCreatingAccount ? (
+        {accounts.length === 0 ? (
           <div className="border rounded-lg p-8 text-center">
-            <div className="text-sm text-muted-foreground mb-2">No accounts yet</div>
-            <div className="text-xs text-muted-foreground">
-              Add your first account to start tracking transactions
-            </div>
+            <div className="text-sm text-muted-foreground mb-4">No accounts yet</div>
+            <Button onClick={() => setIsCreateDialogOpen(true)} disabled={isOperationLoading}>
+              <Plus className="h-4 w-4" />
+              Create Your First Account
+            </Button>
           </div>
         ) : (
-          !showAnchorForm && (
-            <AccountGrid
-              accounts={accounts}
-              selectedFilter={selectedFilter}
-              getAccountTypeName={getAccountTypeName}
-              onAccountClick={handleAccountClick}
-            />
-          )
+          <AccountGrid
+            accounts={accounts}
+            selectedFilter={selectedFilter}
+            getAccountTypeName={getAccountTypeName}
+            onAccountClick={setEditingAccount}
+            onEdit={setEditingAccount}
+            onDelete={setDeletingAccount}
+            onSetAnchor={setAnchorAccount}
+          />
         )}
 
-        <EditAccountSidebar
-          account={selectedAccount}
-          onClose={handleCloseSidebar}
-          onUpdate={handleUpdateAccount}
-          onDelete={handleDeleteAccount}
-          onSetAnchorBalance={handleSetAnchorBalance}
-          getAccountTypeName={getAccountTypeName}
-          isLoading={isOperationLoading}
+        <AccountDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          title="Create Account"
+          onSave={handleCreateAccount}
         />
 
-        <CreateAccountSidebar
-          isOpen={isCreatingAccount}
-          onClose={handleCloseSidebar}
-          onCreate={handleCreateAccount}
-          isLoading={isOperationLoading}
+        <AccountDialog
+          open={!!editingAccount}
+          onOpenChange={(open) => !open && setEditingAccount(null)}
+          account={editingAccount}
+          title="Edit Account"
+          onSave={handleUpdateAccount}
+        />
+
+        <DeleteAccountDialog
+          open={!!deletingAccount}
+          onOpenChange={(open) => !open && setDeletingAccount(null)}
+          account={deletingAccount}
+          getAccountTypeName={getAccountTypeName}
+          onConfirm={handleDeleteAccount}
+        />
+
+        <AnchorBalanceDialog
+          open={!!anchorAccount}
+          onOpenChange={(open) => !open && setAnchorAccount(null)}
+          account={anchorAccount}
+          onConfirm={handleSetAnchorBalance}
         />
       </PageContent>
     </PageContainer>

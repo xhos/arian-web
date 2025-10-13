@@ -78,7 +78,7 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>Are you sure you want to delete this rule? This action cannot be undone.</p>
-              <div className="p-3 bg-gray-50 rounded-lg space-y-2">
+              <div className="p-3 tui-border rounded-lg space-y-2">
                 <div>
                   <span className="text-sm font-medium">Rule Name:</span>
                   <span className="ml-2 text-sm font-mono">{rule.ruleName}</span>
@@ -95,7 +95,7 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
                 </div>
                 <div>
                   <span className="text-sm font-medium">Conditions:</span>
-                  <div className="ml-2 text-xs text-gray-600 mt-1">
+                  <div className="ml-2 text-xs tui-muted mt-1">
                     {formatConditionsPreview(rule.conditions)}
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {isLoading ? "Deleting..." : "Delete Rule"}
           </AlertDialogAction>

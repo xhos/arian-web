@@ -150,7 +150,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        {error && <div className="mt-4 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
+        {error && <div className="mt-4 p-3 text-sm font-mono text-destructive tui-border">{error}</div>}
       </div>
     </div>
   );

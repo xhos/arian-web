@@ -65,7 +65,7 @@ export default function AnchorBalanceForm({
         set anchor balance for {accountName}
       </h2>
 
-      {error && <div className="mb-4 p-3 text-sm font-mono text-red-600 tui-border">{error}</div>}
+      {error && <div className="mb-4 p-3 text-sm font-mono text-destructive tui-border">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

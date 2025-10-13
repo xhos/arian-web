@@ -117,9 +117,9 @@ export function getDirectionDisplay(direction: TransactionDirection) {
       : direction;
 
   if (normalizedDirection === TransactionDirection.DIRECTION_INCOMING) {
-    return { symbol: "+", className: "text-green-600 dark:text-green-500", label: "in" };
+    return { symbol: "+", className: "text-success", label: "in" };
   }
-  return { symbol: "-", className: "text-red-600 dark:text-red-500", label: "out" };
+  return { symbol: "-", className: "text-destructive", label: "out" };
 }
 
 export function getCategorizationStatus(transaction: Transaction) {

@@ -148,18 +148,7 @@ export default function RulesPage() {
   return (
     <PageContainer>
       <PageContent>
-        <PageHeaderWithTitle
-          title="rules"
-          actions={
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              size="sm"
-              disabled={isOperationLoading}
-            >
-              create rule
-            </Button>
-          }
-        />
+        <PageHeaderWithTitle title="rules" />
 
         <RulesTable
           rules={rules}
@@ -167,6 +156,7 @@ export default function RulesPage() {
           onEditRule={handleEditRule}
           onDeleteRule={setRuleToDelete}
           onToggleActive={handleToggleActiveRule}
+          onCreateNew={() => setIsCreateDialogOpen(true)}
           isLoading={isOperationLoading}
         />
 

@@ -3,14 +3,24 @@
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import { wagonBold } from "@/fonts/wagon";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { Pencil, Trash2, Anchor } from "lucide-react";
 
 interface AccountCardProps {
   account: Account;
   getAccountTypeName: (type: AccountType) => string;
   onClick: () => void;
+  onEdit?: (account: Account) => void;
+  onDelete?: (account: Account) => void;
+  onSetAnchor?: (account: Account) => void;
 }
 
-export default function AccountCard({ account, getAccountTypeName, onClick }: AccountCardProps) {
+export default function AccountCard({ account, getAccountTypeName, onClick, onEdit, onDelete, onSetAnchor }: AccountCardProps) {
   const formatBalance = (balance?: {
     currencyCode?: string;
     units?: string | bigint;
@@ -60,7 +70,7 @@ export default function AccountCard({ account, getAccountTypeName, onClick }: Ac
 
   const textColor = getTextColor(account.colors);
 
-  return (
+  const cardContent = (
     <div
       onClick={onClick}
       className="relative overflow-hidden rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -117,4 +127,36 @@ export default function AccountCard({ account, getAccountTypeName, onClick }: Ac
       </div>
     </div>
   );
+
+  if (onEdit || onDelete || onSetAnchor) {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          {cardContent}
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          {onEdit && (
+            <ContextMenuItem onClick={() => onEdit(account)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </ContextMenuItem>
+          )}
+          {onSetAnchor && (
+            <ContextMenuItem onClick={() => onSetAnchor(account)}>
+              <Anchor className="mr-2 h-4 w-4" />
+              Set Anchor Balance
+            </ContextMenuItem>
+          )}
+          {onDelete && (
+            <ContextMenuItem onClick={() => onDelete(account)} className="text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </ContextMenuItem>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+
+  return cardContent;
 }

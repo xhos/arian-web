@@ -10,6 +10,9 @@ interface AccountGridProps {
   selectedFilter: string | null;
   getAccountTypeName: (type: AccountType) => string;
   onAccountClick: (account: Account) => void;
+  onEdit?: (account: Account) => void;
+  onDelete?: (account: Account) => void;
+  onSetAnchor?: (account: Account) => void;
 }
 
 interface GroupedAccounts {
@@ -21,6 +24,9 @@ export default function AccountGrid({
   selectedFilter,
   getAccountTypeName,
   onAccountClick,
+  onEdit,
+  onDelete,
+  onSetAnchor,
 }: AccountGridProps) {
   const groupedAccounts = useMemo(() => {
     if (!selectedFilter) {
@@ -87,6 +93,9 @@ export default function AccountGrid({
                 account={account}
                 getAccountTypeName={getAccountTypeName}
                 onClick={() => onAccountClick(account)}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onSetAnchor={onSetAnchor}
               />
             ))}
           </div>

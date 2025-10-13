@@ -155,7 +155,7 @@ export default function AccountList({
 
           {/* Anchor balance info */}
           {account.anchorBalance && (
-            <div className="mb-4 p-3 bg-muted/30 rounded border-l-2 border-blue-200">
+            <div className="mb-4 p-3 bg-muted/30 rounded border-l-2 border-primary/20">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs tui-muted mb-1">anchor balance</div>
@@ -195,7 +195,7 @@ export default function AccountList({
                   ) : (
                     <button
                       onClick={() => setEditingAnchor(account.id)}
-                      className="text-sm hover:underline text-blue-600"
+                      className="text-sm hover:underline text-primary"
                     >
                       {formatBalance(account.anchorBalance)}
                     </button>
@@ -237,7 +237,7 @@ export default function AccountList({
                       onSetAnchorBalance(account.id, { currencyCode: "USD", units: "0", nanos: 0 })
                     }
                     disabled={isLoading}
-                    className="text-blue-600 hover:bg-blue-50 border-blue-200"
+                    className="text-primary hover:bg-primary/10 border-primary/20"
                   >
                     set anchor balance
                   </Button>
@@ -249,7 +249,7 @@ export default function AccountList({
                   className={
                     deleteConfirmation === account.id
                       ? "min-h-8"
-                      : "text-red-500 hover:bg-red-500/10 border-red-500/50"
+                      : "text-destructive hover:bg-destructive/10 border-destructive/50"
                   }
                   disabled={isLoading}
                 >
