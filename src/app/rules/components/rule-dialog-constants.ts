@@ -10,22 +10,22 @@ export const FIELD_OPTIONS = [
 ] as const;
 
 export const STRING_OPERATOR_OPTIONS = [
-  { value: "equals", label: "equals" },
-  { value: "not_equals", label: "not equals" },
   { value: "contains", label: "contains" },
-  { value: "not_contains", label: "does not contain" },
+  { value: "equals", label: "equals" },
   { value: "starts_with", label: "starts with" },
   { value: "ends_with", label: "ends with" },
+  { value: "not_contains", label: "does not contain" },
+  { value: "not_equals", label: "not equals" },
   { value: "contains_any", label: "contains any of" },
   { value: "regex", label: "matches regex" },
 ] as const;
 
 export const NUMERIC_OPERATOR_OPTIONS = [
   { value: "equals", label: "equals" },
-  { value: "not_equals", label: "not equals" },
   { value: "greater_than", label: "greater than" },
   { value: "less_than", label: "less than" },
   { value: "between", label: "between" },
+  { value: "not_equals", label: "not equals" },
 ] as const;
 
 export const TX_DIRECTION_OPTIONS = [

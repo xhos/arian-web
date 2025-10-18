@@ -23,10 +23,17 @@ interface Step1Props {
 }
 
 export function Step1({ ruleName, onRuleNameChange, onNext }: Step1Props) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && ruleName.trim() && onNext) {
       e.preventDefault();
-      onNext();
+      e.currentTarget.blur();
+      requestAnimationFrame(() => {
+        onNext();
+        requestAnimationFrame(() => {
+          const firstRadio = document.getElementById("all-conditions");
+          firstRadio?.focus();
+        });
+      });
     }
   };
 

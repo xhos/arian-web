@@ -49,7 +49,7 @@ interface RuleDialogProps {
 }
 
 const DEFAULT_CONDITION: UICondition = {
-  field: "merchant",
+  field: "tx_desc",
   operator: "contains",
   value: "",
   case_sensitive: false,
