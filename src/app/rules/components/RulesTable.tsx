@@ -170,9 +170,6 @@ export function RulesTable({
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Conditions</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Applied</TableHead>
-                <TableHead>Last Applied</TableHead>
                 <TableHead>Priority</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
@@ -187,13 +184,8 @@ export function RulesTable({
                   {getCategoryName(rule.categoryId)}
                 </Badge>
               </TableCell>
-              <TableCell className="max-w-[200px] truncate text-xs tui-muted">
+              <TableCell className="max-w-[200px] truncate text-xs">
                 {formatConditionsPreview(rule.conditions)}
-              </TableCell>
-              <TableCell>{getRuleSourceBadge(rule.ruleSource)}</TableCell>
-              <TableCell className="text-sm">{rule.timesApplied} times</TableCell>
-              <TableCell className="text-xs tui-muted">
-                {formatTimestamp(rule.lastAppliedAt)}
               </TableCell>
               <TableCell className="text-sm">{rule.priorityOrder}</TableCell>
               <TableCell>

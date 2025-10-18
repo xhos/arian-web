@@ -147,6 +147,9 @@ export function RuleDialog({
     if (condition.field === "tx_direction") {
       return condition.value !== undefined;
     }
+    if (NUMERIC_FIELDS.includes(condition.field)) {
+      return condition.value !== undefined && condition.value !== "" && !isNaN(Number(condition.value));
+    }
     return condition.value !== undefined && condition.value !== "";
   };
 

@@ -186,10 +186,18 @@ export function ConditionBuilder({
                 ))}
               </SelectContent>
             </Select>
+          ) : isNumericField(condition.field) ? (
+            <Input
+              type="number"
+              value={condition.value || ""}
+              onChange={(e) => onUpdate({ value: parseFloat(e.target.value) || undefined })}
+              placeholder="Enter amount"
+              className="w-48"
+            />
           ) : (
             <>
               <Input
-                type={isNumericField(condition.field) ? "number" : "text"}
+                type="text"
                 value={condition.currentInput || ""}
                 onChange={(e) => onUpdate({ currentInput: e.target.value })}
                 onKeyDown={(e) => {
@@ -198,7 +206,7 @@ export function ConditionBuilder({
                     handleAddChip();
                   }
                 }}
-                placeholder={isNumericField(condition.field) ? "Enter amount" : "Enter value"}
+                placeholder="Enter value"
                 className="w-48"
               />
               <Button

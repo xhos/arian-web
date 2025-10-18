@@ -15,6 +15,8 @@ import { DayHeader } from "./TransactionCard";
 interface TransactionListProps {
   accountId?: bigint;
   onSelectionChange?: (selectedTransactions: Transaction[]) => void;
+  onEditTransaction?: (transaction: Transaction) => void;
+  onDeleteTransaction?: (transaction: Transaction) => void;
 }
 
 function throttle(func: (...args: unknown[]) => void, limit: number) {
@@ -28,7 +30,7 @@ function throttle(func: (...args: unknown[]) => void, limit: number) {
   };
 }
 
-export function TransactionList({ accountId, onSelectionChange }: TransactionListProps) {
+export function TransactionList({ accountId, onSelectionChange, onEditTransaction, onDeleteTransaction }: TransactionListProps) {
   const {
     transactions,
     isLoading,
@@ -237,6 +239,8 @@ export function TransactionList({ accountId, onSelectionChange }: TransactionLis
                       onSelect={toggleSelection}
                       globalIndex={globalIndex}
                       getAccountDisplayName={getAccountDisplayName}
+                      onEdit={onEditTransaction}
+                      onDelete={onDeleteTransaction}
                     />
                   );
                 })}

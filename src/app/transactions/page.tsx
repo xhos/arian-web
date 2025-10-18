@@ -29,8 +29,6 @@ export default function TransactionsPage() {
     isLoading,
   } = useTransactionsQuery({});
 
-  void setEditingTransaction;
-
   const handleSelectionChange = useCallback((transactions: Transaction[]) => {
     setSelectedTransactions(transactions);
   }, []);
@@ -63,6 +61,15 @@ export default function TransactionsPage() {
     alert("Bulk modify functionality coming soon!");
   };
 
+  const handleEditTransaction = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    await deleteTransactions([transaction.id]);
+  };
+
   return (
     <PageContainer>
       <PageContent>
@@ -76,7 +83,11 @@ export default function TransactionsPage() {
 
         <div className="flex flex-col xl:flex-row gap-6 xl:gap-8">
           <div className="flex-1 min-w-0">
-            <TransactionList onSelectionChange={handleSelectionChange} />
+            <TransactionList
+              onSelectionChange={handleSelectionChange}
+              onEditTransaction={handleEditTransaction}
+              onDeleteTransaction={handleDeleteTransaction}
+            />
           </div>
 
           <aside className="xl:flex-shrink-0 xl:sticky xl:top-8 xl:h-fit xl:w-80 space-y-4">

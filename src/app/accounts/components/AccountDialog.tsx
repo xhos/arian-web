@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HexColorPicker } from "react-colorful";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -202,17 +204,26 @@ export function AccountDialog({
               <div className="flex gap-2">
                 {colors.map((color, index) => (
                   <div key={index} className="flex flex-col items-center gap-1">
-                    <input
-                      type="color"
-                      value={color}
-                      onChange={(e) => {
-                        const newColors = [...colors];
-                        newColors[index] = e.target.value;
-                        setColors(newColors);
-                      }}
-                      disabled={isLoading}
-                      className="w-12 h-12 rounded border cursor-pointer"
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          disabled={isLoading}
+                          className="h-12 w-12 cursor-pointer rounded border flex-shrink-0"
+                          style={{ backgroundColor: color }}
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-3">
+                        <HexColorPicker
+                          color={color}
+                          onChange={(newColor) => {
+                            const newColors = [...colors];
+                            newColors[index] = newColor;
+                            setColors(newColors);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <span className="text-xs text-muted-foreground">
                       {index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary"}
                     </span>
