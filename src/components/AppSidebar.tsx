@@ -114,7 +114,7 @@ export default function AppSidebar() {
                   {theme === "dark" ? <Sun /> : <Moon />}
                   <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
+                <DropdownMenuItem onClick={() => router.push("/settings")}>
                   <Settings />
                   <span>Settings</span>
                 </DropdownMenuItem>
