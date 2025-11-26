@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Wallet, Tag, FileText, LogOut, Settings, Moon, Sun, ChevronUp } from "lucide-react";
+import { Home, Wallet, Tag, FileText, LogOut, Settings, Moon, Sun, ChevronUp, LayoutDashboard } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
 const navigationItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Transactions", url: "/transactions", icon: Home },
   { title: "Accounts", url: "/accounts", icon: Wallet },
   { title: "Categories", url: "/categories", icon: Tag },

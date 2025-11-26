@@ -1,18 +1,45 @@
-"use client";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { NetWorthChart } from "@/components/dashboard/net-worth-chart";
+import { DashboardStats } from "@/components/dashboard/dashboard-stats";
+import { AccountBalancesCard } from "@/components/dashboard/account-balances-card";
+import { CategoryBreakdownCard } from "@/components/dashboard/category-breakdown-card";
+import { RecentTransactionsCard } from "@/components/dashboard/recent-transactions-card";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export default async function HomePage() {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-export default function HomePage() {
-  const router = useRouter();
+  if (!session?.user) {
+    redirect("/sign-in");
+  }
 
-  useEffect(() => {
-    router.push("/transactions");
-  }, [router]);
+  const userId = session.user.id;
 
   return (
-    <div className="min-h-screen p-6 flex items-center justify-center">
-      <div className="text-sm text-muted-foreground">redirecting to transactions...</div>
+    <div className="min-h-screen w-full bg-background p-4 lg:p-6">
+      <div className="mx-auto max-w-[1400px] space-y-4">
+        <DashboardStats userId={userId} />
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          {/* Left Column */}
+          <div className="space-y-4 lg:col-span-3">
+            <AccountBalancesCard userId={userId} />
+            <CategoryBreakdownCard userId={userId} />
+          </div>
+
+          {/* Center - Chart */}
+          <div className="lg:col-span-6">
+            <NetWorthChart userId={userId} />
+          </div>
+
+          {/* Right Column - Recent Transactions */}
+          <div className="lg:col-span-3">
+            <RecentTransactionsCard userId={userId} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

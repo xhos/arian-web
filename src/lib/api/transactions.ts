@@ -13,6 +13,13 @@ export interface ListTransactionsInput {
   limit?: number;
   accountId?: bigint;
   cursor?: Cursor;
+  startDate?: Date;
+  endDate?: Date;
+  categories?: string[];
+  categoryId?: bigint;
+  includeUncategorized?: boolean;
+  uncategorized?: boolean;
+  direction?: TransactionDirection;
 }
 
 export interface CreateTransactionInput {
@@ -38,6 +45,11 @@ export const transactionsApi = {
       limit: data.limit || 50,
       accountId: data.accountId,
       cursor: data.cursor,
+      startDate: data.startDate ? { seconds: BigInt(Math.floor(data.startDate.getTime() / 1000)) } : undefined,
+      endDate: data.endDate ? { seconds: BigInt(Math.floor(data.endDate.getTime() / 1000)) } : undefined,
+      categories: data.categories,
+      uncategorized: data.uncategorized,
+      direction: data.direction,
     });
     const response = await transactionClient.listTransactions(request);
     return {
@@ -51,7 +63,7 @@ export const transactionsApi = {
     const request = create(CreateTransactionRequestSchema, {
       userId: data.userId,
       accountId: data.accountId,
-      txDate: data.txDate.toISOString(),
+      txDate: { seconds: BigInt(Math.floor(data.txDate.getTime() / 1000)) },
       txAmount: data.txAmount,
       direction: data.direction,
       description: data.description,

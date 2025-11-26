@@ -12,6 +12,12 @@ export const PageContent = ({ children, className, ...props }: React.HTMLAttribu
   </div>
 );
 
+export const DashboardPageContent = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("mx-auto max-w-[1600px] px-6 py-8", className)} {...props}>
+    {children}
+  </div>
+);
+
 export const PageHeader = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <header className={cn("mb-8", className)} {...props}>
     {children}

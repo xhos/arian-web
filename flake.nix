@@ -34,7 +34,7 @@
             typescript
             bun
 
-            (writeShellScriptBin "buf-gen" ''
+            (writeShellScriptBin "regen" ''
               rm -rf src/gen/
               bun buf generate
             '')

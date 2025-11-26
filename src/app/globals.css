@@ -160,3 +160,74 @@
     border-radius: 50%;
   }
 }
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metallic-silver {
+    background: linear-gradient(
+      135deg,
+      #c0c0c0 0%,
+      #e8e8e8 25%,
+      #a8a8a8 50%,
+      #d8d8d8 75%,
+      #b8b8b8 100%
+    );
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metallic-silver::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 70%
+    );
+    background-size: 200% 200%;
+  }
+
+  .metallic-silver::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.4) 0%,
+      transparent 60%
+    );
+  }
+
+  .dark .metallic-silver {
+    background: linear-gradient(
+      135deg,
+      #505050 0%,
+      #707070 25%,
+      #404040 50%,
+      #606060 75%,
+      #484848 100%
+    );
+  }
+
+  .dark .metallic-silver::before {
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 70%
+    );
+  }
+
+  .dark .metallic-silver::after {
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.15) 0%,
+      transparent 60%
+    );
+  }
+}

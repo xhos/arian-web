@@ -5,6 +5,7 @@ import { TransactionService } from "@/gen/arian/v1/transaction_services_pb";
 import { CategoryService } from "@/gen/arian/v1/category_services_pb";
 import { RuleService } from "@/gen/arian/v1/rule_services_pb";
 import { BackupService } from "@/gen/arian/v1/backup_services_pb";
+import { DashboardService } from "@/gen/arian/v1/dashboard_services_pb";
 
 const transport = createConnectTransport({
   baseUrl: "/api",
@@ -17,3 +18,4 @@ export const transactionClient = createClient(TransactionService, transport);
 export const categoryClient = createClient(CategoryService, transport);
 export const ruleClient = createClient(RuleService, transport);
 export const backupClient = createClient(BackupService, transport);
+export const dashboardClient = createClient(DashboardService, transport);
