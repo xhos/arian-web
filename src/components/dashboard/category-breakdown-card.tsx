@@ -67,14 +67,16 @@ export function CategoryBreakdownCard({ userId }: CategoryBreakdownCardProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Spending Breakdown</CardTitle>
             <CardDescription>
               {data?.currentPeriod?.label || "Category distribution by percentage"}
             </CardDescription>
           </div>
-          <PeriodSelector value={periodType} onChange={handlePeriodChange} />
+          <div className="shrink-0">
+            <PeriodSelector value={periodType} onChange={handlePeriodChange} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -91,7 +93,7 @@ export function CategoryBreakdownCard({ userId }: CategoryBreakdownCardProps) {
           <>
             <div className="mb-4 text-center">
               <p className="text-xs text-muted-foreground">Total Spending</p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl">
                 ${formatAmount(data.totals?.currentPeriodTotal).toFixed(2)}
               </p>
             </div>

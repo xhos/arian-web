@@ -46,14 +46,14 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
 
   return (
     <div className="inline-flex items-center gap-2">
-      <div className="inline-flex items-center rounded-lg border bg-muted p-1 text-muted-foreground">
+      <div className="inline-flex items-center rounded-xs border border-input bg-input p-0.5 text-muted-foreground">
         {periods.map((period) => (
           <button
             key={period.value}
             onClick={() => onChange(period.value)}
             className={cn(
-              "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
-              value === period.value && "bg-background text-foreground shadow-sm",
+              "px-2.5 py-1 text-xs font-normal rounded-xs transition-all",
+              value === period.value && "bg-background text-foreground",
               value !== period.value && "hover:text-foreground"
             )}
           >
@@ -67,16 +67,16 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
           <Button
             variant={isCustom ? "default" : "outline"}
             size="sm"
-            className={cn("gap-2", !isCustom && "text-muted-foreground")}
+            className="gap-1.5"
           >
             <CalendarIcon className="h-4 w-4" />
-            {customLabel}
+            <span className="text-xs">{customLabel}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="end">
           <div className="p-3 border-b">
-            <p className="text-sm font-medium">Select date range</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm">Select date range</p>
+            <p className="text-xs text-muted-foreground mt-1">
               {dateRange.start
                 ? dateRange.end
                   ? "Range selected"

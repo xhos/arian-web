@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2, Target, Search, Plus } from "lucide-react";
+import { VStack, HStack } from "@/components/lib";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import type { TransactionRule } from "@/lib/rules";
@@ -46,7 +46,8 @@ export function RulesTable({
 }: RulesTableProps) {
   const [searchValue, setSearchValue] = useState("");
 
-  const getCategoryName = (categoryId: bigint) => {
+  const getCategoryName = (categoryId: bigint | undefined) => {
+    if (!categoryId) return 'Uncategorized';
     const category = categories[categoryId.toString()];
     return category ? category.slug : `Unknown (${categoryId})`;
   };
@@ -91,7 +92,7 @@ export function RulesTable({
 
       // Fallback to old format
       const conditionsObj = conditions as Record<string, unknown>;
-      if (conditionsObj.description) {
+      if (conditionsObj.description && typeof conditionsObj.description === 'string') {
         return conditionsObj.description;
       }
 
@@ -108,33 +109,10 @@ export function RulesTable({
     }
   };
 
-  const getRuleSourceBadge = (source: string) => {
-    switch (source) {
-      case "user_created":
-        return <Badge variant="default">User</Badge>;
-      case "ai_suggested":
-        return <Badge variant="secondary">AI Suggested</Badge>;
-      case "ai_approved":
-        return <Badge variant="outline">AI Approved</Badge>;
-      default:
-        return <Badge variant="outline">{source}</Badge>;
-    }
-  };
-
-  const formatTimestamp = (timestamp: unknown) => {
-    if (!timestamp) return "Never";
-
-    try {
-      const date = new Date(timestamp.seconds * 1000);
-      return formatDistanceToNow(date, { addSuffix: true });
-    } catch {
-      return "Invalid date";
-    }
-  };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <VStack spacing="md">
+      <HStack spacing="md" justify="between" className="w-full">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -148,7 +126,7 @@ export function RulesTable({
           <Plus className="h-4 w-4" />
           New
         </Button>
-      </div>
+      </HStack>
 
       {rules.length === 0 ? (
         <div className="tui-border rounded-lg p-8 text-center">
@@ -224,6 +202,6 @@ export function RulesTable({
           </Table>
         </div>
       )}
-    </div>
+    </VStack>
   );
 }

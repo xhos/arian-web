@@ -15,11 +15,9 @@ export default function TestDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const response = await dashboardApi.getCategorySpendingComparison({
         userId: "test-user-id",
         periodType: PeriodType.PERIOD_TYPE_90_DAYS,
-        timezone: userTimezone,
       });
       setData(response);
     } catch (err) {

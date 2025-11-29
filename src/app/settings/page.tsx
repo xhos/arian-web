@@ -5,6 +5,7 @@ import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Upload, FileJson, AlertCircle, CheckCircle2 } from "lucide-react";
+import { VStack, HStack, Muted } from "@/components/lib";
 import { cn } from "@/lib/utils";
 import { backupApi } from "@/lib/api/backup";
 
@@ -107,7 +108,7 @@ export default function SettingsPage() {
           subtitle="Manage your account and data preferences"
         />
 
-        <div className="max-w-3xl mx-auto space-y-6">
+        <VStack spacing="lg" className="max-w-3xl mx-auto">
           <Card>
             <CardHeader>
               <CardTitle>Export Data</CardTitle>
@@ -134,91 +135,93 @@ export default function SettingsPage() {
                 Import your data from a JSON file. This will merge with your existing data.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={cn(
-                  "border-2 border-dashed rounded-lg p-12 text-center transition-colors",
-                  isDragging && "border-primary bg-primary/5",
-                  !isDragging && "border-muted-foreground/25 hover:border-muted-foreground/50"
-                )}
-              >
-                <div className="flex flex-col items-center gap-4">
-                  <div className={cn(
-                    "rounded-full p-4 transition-colors",
-                    isDragging ? "bg-primary/10" : "bg-muted"
-                  )}>
-                    <FileJson className={cn(
-                      "h-8 w-8 transition-colors",
-                      isDragging ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
-                      {isDragging ? "Drop your file here" : "Drag and drop your JSON file"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      or click below to browse
-                    </p>
-                  </div>
-
-                  <label htmlFor="file-upload">
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept=".json,application/json"
-                      onChange={handleFileSelect}
-                      className="sr-only"
-                      disabled={isImporting}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isImporting}
-                      onClick={() => document.getElementById("file-upload")?.click()}
-                    >
-                      <Upload className="h-4 w-4" />
-                      {isImporting ? "Importing..." : "Select File"}
-                    </Button>
-                  </label>
-                </div>
-              </div>
-
-              {importStatus !== "idle" && (
-                <div className={cn(
-                  "flex items-start gap-3 p-4 rounded-lg border",
-                  importStatus === "success" && "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900",
-                  importStatus === "error" && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900"
-                )}>
-                  {importStatus === "success" ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
+            <CardContent>
+              <VStack spacing="md">
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={cn(
+                    "border-2 border-dashed rounded-lg p-12 text-center transition-colors",
+                    isDragging && "border-primary bg-primary/5",
+                    !isDragging && "border-muted-foreground/25 hover:border-muted-foreground/50"
                   )}
-                  <div className="flex-1 space-y-1">
-                    <p className={cn(
-                      "text-sm font-medium",
-                      importStatus === "success" && "text-green-900 dark:text-green-100",
-                      importStatus === "error" && "text-red-900 dark:text-red-100"
+                >
+                  <VStack spacing="md" align="center">
+                    <div className={cn(
+                      "rounded-full p-4 transition-colors",
+                      isDragging ? "bg-primary/10" : "bg-muted"
                     )}>
-                      {importStatus === "success" ? "Success" : "Error"}
-                    </p>
-                    <p className={cn(
-                      "text-sm",
-                      importStatus === "success" && "text-green-700 dark:text-green-300",
-                      importStatus === "error" && "text-red-700 dark:text-red-300"
-                    )}>
-                      {importMessage}
-                    </p>
-                  </div>
+                      <FileJson className={cn(
+                        "h-8 w-8 transition-colors",
+                        isDragging ? "text-primary" : "text-muted-foreground"
+                      )} />
+                    </div>
+
+                    <VStack spacing="xs" align="center">
+                      <p className="text-sm font-medium">
+                        {isDragging ? "Drop your file here" : "Drag and drop your JSON file"}
+                      </p>
+                      <Muted size="xs">
+                        or click below to browse
+                      </Muted>
+                    </VStack>
+
+                    <label htmlFor="file-upload">
+                      <input
+                        id="file-upload"
+                        type="file"
+                        accept=".json,application/json"
+                        onChange={handleFileSelect}
+                        className="sr-only"
+                        disabled={isImporting}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isImporting}
+                        onClick={() => document.getElementById("file-upload")?.click()}
+                      >
+                        <Upload className="h-4 w-4" />
+                        {isImporting ? "Importing..." : "Select File"}
+                      </Button>
+                    </label>
+                  </VStack>
                 </div>
-              )}
+
+                {importStatus !== "idle" && (
+                  <HStack spacing="sm" align="start" className={cn(
+                    "p-4 rounded-lg border",
+                    importStatus === "success" && "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900",
+                    importStatus === "error" && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900"
+                  )}>
+                    {importStatus === "success" ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
+                    )}
+                    <VStack spacing="xs" className="flex-1">
+                      <p className={cn(
+                        "text-sm font-medium",
+                        importStatus === "success" && "text-green-900 dark:text-green-100",
+                        importStatus === "error" && "text-red-900 dark:text-red-100"
+                      )}>
+                        {importStatus === "success" ? "Success" : "Error"}
+                      </p>
+                      <p className={cn(
+                        "text-sm",
+                        importStatus === "success" && "text-green-700 dark:text-green-300",
+                        importStatus === "error" && "text-red-700 dark:text-red-300"
+                      )}>
+                        {importMessage}
+                      </p>
+                    </VStack>
+                  </HStack>
+                )}
+              </VStack>
             </CardContent>
           </Card>
-        </div>
+        </VStack>
       </PageContent>
     </PageContainer>
   );

@@ -1,4 +1,4 @@
-import { create, toJson, fromJson } from "@bufbuild/protobuf";
+import { create, toJson, fromJson, type JsonValue } from "@bufbuild/protobuf";
 import { backupClient } from "@/lib/grpc-client";
 import {
   ExportBackupRequestSchema,
@@ -19,7 +19,7 @@ export const backupApi = {
   },
 
   async importData(jsonData: unknown) {
-    const backup = fromJson(BackupSchema, jsonData);
+    const backup = fromJson(BackupSchema, jsonData as JsonValue);
     const request = create(ImportBackupRequestSchema, { backup });
     const response = await backupClient.importBackup(request);
 

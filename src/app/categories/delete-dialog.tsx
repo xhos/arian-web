@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
+import { VStack } from "@/components/lib";
 import type { Category } from "@/gen/arian/v1/category_pb";
 
 interface DeleteDialogProps {
@@ -52,7 +53,7 @@ export function DeleteDialog({
             Delete Category
           </DialogTitle>
         </DialogHeader>
-        <div className="py-4 space-y-3">
+        <VStack spacing="sm" className="py-4">
           <div className="bg-muted rounded p-3">
             <span className="font-medium font-mono">{category.slug}</span>
           </div>
@@ -63,7 +64,7 @@ export function DeleteDialog({
               </p>
             </div>
           )}
-        </div>
+        </VStack>
         <DialogFooter>
           <Button
             type="button"

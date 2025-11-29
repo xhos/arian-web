@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useRef, useEffect, useCallback, useMemo } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { useTransactionsQuery } from "@/hooks/useTransactionsQuery";
 import { useAccounts } from "@/hooks/useAccounts";
@@ -8,8 +8,7 @@ import { useMultiSelect } from "@/hooks/useMultiSelect";
 import { useCategories } from "@/hooks/useCategories";
 import { TransactionItem } from "./TransactionItem";
 import { groupTransactionsByDay, formatCurrency } from "@/lib/utils/transaction";
-import { LoadingCard, EmptyState, ErrorMessage, Amount } from "@/components/data-display";
-import { MetaText } from "@/components/ui/typography";
+import { VStack, Amount, EmptyState, LoadingSkeleton, Muted } from "@/components/lib";
 import { DayHeader } from "./TransactionCard";
 
 interface TransactionListProps {
@@ -17,6 +16,7 @@ interface TransactionListProps {
   onSelectionChange?: (selectedTransactions: Transaction[]) => void;
   onEditTransaction?: (transaction: Transaction) => void;
   onDeleteTransaction?: (transaction: Transaction) => void;
+  onViewDetails?: (transaction: Transaction) => void;
 }
 
 function throttle(func: (...args: unknown[]) => void, limit: number) {
@@ -30,7 +30,7 @@ function throttle(func: (...args: unknown[]) => void, limit: number) {
   };
 }
 
-export function TransactionList({ accountId, onSelectionChange, onEditTransaction, onDeleteTransaction }: TransactionListProps) {
+export function TransactionList({ accountId, onSelectionChange, onEditTransaction, onDeleteTransaction, onViewDetails }: TransactionListProps) {
   const {
     transactions,
     isLoading,
@@ -42,11 +42,10 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
 
   const { getAccountDisplayName } = useAccounts();
   const { categoryMap } = useCategories();
-  const [expandedTransaction, setExpandedTransaction] = useState<bigint | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const { isSelected, toggleSelection, clearSelection, hasSelection, toggleItems } = useMultiSelect({
+  const { isSelected, toggleSelection, hasSelection, toggleItems } = useMultiSelect({
     items: transactions,
     getId: (transaction) => transaction.id,
   });
@@ -63,10 +62,6 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
     },
     [categoryMap]
   );
-
-  const toggleTransactionExpansion = useCallback((transactionId: bigint) => {
-    setExpandedTransaction((prev) => (prev === transactionId ? null : transactionId));
-  }, []);
 
   const handleDayHeaderClick = useCallback(
     (event: React.MouseEvent, dayTransactions: Transaction[]) => {
@@ -157,11 +152,15 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
   }, [hasMore, isLoadingMore, loadMore]);
 
   if (isLoading) {
-    return <LoadingCard message="loading transactions..." />;
+    return <LoadingSkeleton lines={5} />;
   }
 
   if (error) {
-    return <ErrorMessage>{String(error)}</ErrorMessage>;
+    return (
+      <div className="rounded-md border border-destructive/50 bg-destructive/5 p-4">
+        <p className="text-sm text-destructive">{String(error)}</p>
+      </div>
+    );
   }
 
   const groupedTransactions = groupTransactionsByDay(transactions);
@@ -180,12 +179,12 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
     }
 
     return (
-      <div className="space-y-8">
+      <VStack spacing="2xl">
         {groupedTransactions.map((group, groupIndex) => {
           const currencyCode = group.transactions[0]?.txAmount?.currencyCode;
 
           return (
-            <div key={group.date} className="space-y-4">
+            <VStack key={group.date} spacing="xs">
               <DayHeader
                 selectable={hasSelection}
                 onClick={(event) => handleDayHeaderClick(event, group.transactions)}
@@ -196,31 +195,29 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
                 }
               >
                 <div>
-                  <h3 className="text-sm font-semibold tracking-tight">{group.displayDate}</h3>
-                  <MetaText className="text-xs mt-0.5">
+                  <div className="text-sm font-semibold tracking-tight">{group.displayDate}</div>
+                  <Muted size="xs" className="mt-1">
                     {group.transactions.length} transaction{group.transactions.length !== 1 ? "s" : ""}
-                  </MetaText>
+                  </Muted>
                 </div>
                 <div className="text-right space-y-1">
                   <div className="flex items-center gap-2.5 text-sm">
-                    <Amount variant="positive" value={`+${formatCurrency(group.totalIn, currencyCode)}`} />
-                    <MetaText className="text-xs">/</MetaText>
-                    <Amount variant="negative" value={`-${formatCurrency(group.totalOut, currencyCode)}`} />
+                    <Amount value={parseFloat(formatCurrency(group.totalIn, currencyCode).replace(/[^0-9.-]/g, ''))} variant="positive" />
+                    <Muted size="xs">/</Muted>
+                    <Amount value={parseFloat(formatCurrency(group.totalOut, currencyCode).replace(/[^0-9.-]/g, ''))} variant="negative" />
                   </div>
                   <div className="text-xs">
-                    <MetaText className="mr-1.5">net:</MetaText>
+                    <Muted size="xs" className="mr-1.5">net:</Muted>
                     <Amount
+                      value={parseFloat(formatCurrency(group.netAmount, currencyCode).replace(/[^0-9.-]/g, ''))}
                       variant={group.netAmount >= 0 ? "positive" : "negative"}
-                      value={formatCurrency(group.netAmount, currencyCode)}
-                      className="text-xs"
                     />
                   </div>
                 </div>
               </DayHeader>
 
-              <div>
+              <VStack spacing="sm">
                 {group.transactions.map((transaction, localIndex) => {
-                  const isExpanded = expandedTransaction === transaction.id;
                   const isTransactionSelected = isSelected(transaction.id);
 
                   let globalIndex = 0;
@@ -233,19 +230,18 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
                     <TransactionItem
                       key={transaction.id.toString()}
                       transaction={enrichTransaction(transaction)}
-                      isExpanded={isExpanded}
                       isSelected={isTransactionSelected}
-                      onToggleExpansion={toggleTransactionExpansion}
                       onSelect={toggleSelection}
                       globalIndex={globalIndex}
                       getAccountDisplayName={getAccountDisplayName}
                       onEdit={onEditTransaction}
                       onDelete={onDeleteTransaction}
+                      onViewDetails={onViewDetails}
                     />
                   );
                 })}
-              </div>
-            </div>
+              </VStack>
+            </VStack>
           );
         })}
 
@@ -253,15 +249,15 @@ export function TransactionList({ accountId, onSelectionChange, onEditTransactio
 
         {isLoadingMore && (
           <div className="py-6 text-center">
-            <MetaText>loading more...</MetaText>
+            <Muted>loading more...</Muted>
           </div>
         )}
 
         {!hasMore && groupedTransactions.length > 0 && (
           <div className="py-6 text-center border-t">
-            <MetaText className="text-xs">all transactions loaded</MetaText>
+            <Muted size="xs">all transactions loaded</Muted>
           </div>
         )}
-      </div>
+      </VStack>
     );
 }

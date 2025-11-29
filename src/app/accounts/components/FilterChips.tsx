@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { HStack } from "@/components/lib";
 
 interface FilterChipsProps {
   selectedFilter: string | null;
@@ -17,7 +18,7 @@ export default function FilterChips({ selectedFilter, onFilterChange }: FilterCh
   ];
 
   return (
-    <div className="flex gap-2">
+    <HStack spacing="xs">
       {filterOptions.map((option) => (
         <Button
           key={option.label}
@@ -29,6 +30,6 @@ export default function FilterChips({ selectedFilter, onFilterChange }: FilterCh
           {option.label}
         </Button>
       ))}
-    </div>
+    </HStack>
   );
 }

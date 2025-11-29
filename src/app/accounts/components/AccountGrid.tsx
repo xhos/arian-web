@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
+import { VStack, Muted } from "@/components/lib";
 import AccountCard from "./AccountCard";
 
 interface AccountGridProps {
@@ -65,28 +66,24 @@ export default function AccountGrid({
 
   if (accounts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-sm tui-muted mb-2">No accounts found</div>
-        <div className="text-xs tui-muted">
-          Accounts matching your filter criteria will appear here
-        </div>
-      </div>
+      <VStack spacing="xs" align="center" className="py-12">
+        <Muted size="sm">No accounts found</Muted>
+        <Muted size="xs">Accounts matching your filter criteria will appear here</Muted>
+      </VStack>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <VStack spacing="2xl">
       {Object.entries(groupedAccounts).map(([groupName, groupAccounts]) => (
-        <div key={groupName}>
+        <VStack key={groupName} spacing="md">
           {selectedFilter && (
-            <div className="mb-4">
-              <h3 className="text-sm font-mono text-tui-muted uppercase tracking-wide border-b border-tui-border pb-2">
-                {groupName}
-              </h3>
-            </div>
+            <Muted size="sm" className="uppercase text-xs border-b border-border pb-2">
+              {groupName}
+            </Muted>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {groupAccounts.map((account) => (
               <AccountCard
                 key={account.id.toString()}
@@ -99,8 +96,8 @@ export default function AccountGrid({
               />
             ))}
           </div>
-        </div>
+        </VStack>
       ))}
-    </div>
+    </VStack>
   );
 }

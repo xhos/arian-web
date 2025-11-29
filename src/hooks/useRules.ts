@@ -29,6 +29,7 @@ export function useRules() {
   const rulesByCategory = useMemo(() => {
     const map = new Map<string, typeof rules>();
     rules.forEach((rule) => {
+      if (!rule.categoryId) return;
       const categoryId = rule.categoryId.toString();
       if (!map.has(categoryId)) {
         map.set(categoryId, []);

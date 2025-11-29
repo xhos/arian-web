@@ -21,21 +21,34 @@ interface DonutDataItem {
   slug: string | null;
 }
 
-const renderActiveShape = (props: any) => {
+const renderActiveShape = (props: unknown) => {
+  const recordData = props as Record<string, unknown>;
   const RADIAN = Math.PI / 180;
   const {
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle,
-    fill,
-    payload,
-    percent,
-    value,
-  } = props;
+    cx = 0,
+    cy = 0,
+    midAngle = 0,
+    innerRadius = 0,
+    outerRadius = 0,
+    startAngle = 0,
+    endAngle = 0,
+    fill = '#000000',
+    payload = {},
+    percent = 0,
+    value = 0,
+  } = recordData as {
+    cx?: number;
+    cy?: number;
+    midAngle?: number;
+    innerRadius?: number;
+    outerRadius?: number;
+    startAngle?: number;
+    endAngle?: number;
+    fill?: string;
+    payload?: Record<string, unknown>;
+    percent?: number;
+    value?: number;
+  };
   const sin = Math.sin(-RADIAN * midAngle);
   const cos = Math.cos(-RADIAN * midAngle);
   const sx = cx + (outerRadius + 10) * cos;
@@ -49,7 +62,7 @@ const renderActiveShape = (props: any) => {
   return (
     <g>
       <text x={cx} y={cy} dy={8} textAnchor="middle" className="fill-foreground text-sm font-semibold">
-        {payload.name}
+        {String((payload as Record<string, unknown>)?.name || 'Category')}
       </text>
       <Sector
         cx={cx}
@@ -151,7 +164,7 @@ export function CategorySpendingDonut({ data, onCategoryClick }: CategorySpendin
           content={
             <ChartTooltipContent
               hideLabel
-              formatter={(value, name) => (
+              formatter={(value) => (
                 <div className="flex items-center gap-2">
                   <span className="font-medium">${(value as number).toFixed(2)}</span>
                   <span className="text-xs text-muted-foreground">

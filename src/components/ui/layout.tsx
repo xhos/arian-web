@@ -7,7 +7,7 @@ export const PageContainer = ({ children, className, ...props }: React.HTMLAttri
 );
 
 export const PageContent = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("mx-auto max-w-7xl px-6 py-8", className)} {...props}>
+  <div className={cn("mx-auto max-w-full px-4 sm:px-6 py-6 sm:py-8", className)} {...props}>
     {children}
   </div>
 );

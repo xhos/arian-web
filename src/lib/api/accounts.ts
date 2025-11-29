@@ -58,7 +58,11 @@ export const accountsApi = {
       bank: data.bank,
       type: data.type,
       alias: data.alias,
-      anchorBalance: data.anchorBalance,
+      anchorBalance: data.anchorBalance ? {
+        currencyCode: data.anchorBalance.currencyCode,
+        units: BigInt(data.anchorBalance.units),
+        nanos: data.anchorBalance.nanos,
+      } : undefined,
       mainCurrency: data.mainCurrency,
       colors: data.colors,
     });
@@ -93,9 +97,13 @@ export const accountsApi = {
   async setAnchorBalance(data: SetAnchorBalanceInput) {
     const request = create(SetAccountAnchorRequestSchema, {
       id: data.id,
-      balance: data.balance,
+      balance: data.balance ? {
+        currencyCode: data.balance.currencyCode,
+        units: BigInt(data.balance.units),
+        nanos: data.balance.nanos,
+      } : undefined,
     });
     const response = await accountClient.setAccountAnchor(request);
-    return response.account;
+    return response;
   },
 };

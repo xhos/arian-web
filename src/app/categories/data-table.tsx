@@ -30,6 +30,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { VStack, HStack } from "@/components/lib";
 import type { CategoryRow } from "./columns";
 
 interface DataTableProps<TData extends CategoryRow, TValue> {
@@ -81,8 +82,8 @@ export function DataTable<TData extends CategoryRow, TValue>({ columns, data, on
   const searchValue = (slugColumn?.getFilterValue() as string) ?? "";
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <VStack spacing="md">
+      <HStack spacing="md" justify="between" className="w-full">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -98,7 +99,7 @@ export function DataTable<TData extends CategoryRow, TValue>({ columns, data, on
             New
           </Button>
         )}
-      </div>
+      </HStack>
 
       <div className="rounded-md border">
         <Table>
@@ -175,6 +176,6 @@ export function DataTable<TData extends CategoryRow, TValue>({ columns, data, on
           </div>
         </div>
       )}
-    </div>
+    </VStack>
   );
 }

@@ -3,8 +3,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { dashboardApi } from "@/lib/api/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { VStack, HStack, Caption } from "@/components/lib";
 import { formatAmount } from "@/lib/utils/transaction";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
+import type { AccountBalance } from "@/gen/arian/v1/account_pb";
 
 interface AccountBalancesCardProps {
   userId: string;
@@ -27,7 +29,7 @@ const getAccountTypeLabel = (type: AccountType): string => {
   }
 };
 
-const sortAccountsByType = (accounts: any[]) => {
+const sortAccountsByType = (accounts: AccountBalance[]) => {
   const typeOrder: Record<AccountType, number> = {
     [AccountType.ACCOUNT_UNSPECIFIED]: 99,
     [AccountType.ACCOUNT_CHEQUING]: 1,
@@ -53,7 +55,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
   return (
     <div className="rounded-lg bg-card p-5 shadow-sm">
       <h3 className="mb-4 text-sm font-medium text-muted-foreground">ACCOUNT BALANCES</h3>
-      <div className="space-y-3">
+      <VStack spacing="sm">
         {isLoading ? (
           <>
             {[...Array(3)].map((_, i) => (
@@ -61,22 +63,22 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
             ))}
           </>
         ) : data && data.balances.length > 0 ? (
-          sortAccountsByType(data.balances).map((account) => {
+          sortAccountsByType(data.balances).map((account, index) => {
             const balance = formatAmount(account.currentBalance);
             const isDebt = account.accountType === AccountType.ACCOUNT_CREDIT_CARD;
             const isBorderTop = account.accountType === AccountType.ACCOUNT_CREDIT_CARD;
 
             return (
-              <div
+              <HStack
                 key={account.id}
-                className={`flex items-center justify-between ${isBorderTop ? "border-t pt-3" : ""}`}
+                spacing="md"
+                justify="between"
+                className={isBorderTop && index > 0 ? "border-t pt-3" : ""}
               >
-                <div>
+                <VStack spacing="xs" align="start">
                   <div className="text-sm font-medium">{account.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {getAccountTypeLabel(account.accountType)}
-                  </div>
-                </div>
+                  <Caption>{getAccountTypeLabel(account.accountType)}</Caption>
+                </VStack>
                 <div
                   className={`text-sm font-semibold tabular-nums ${isDebt ? "text-red-600" : ""}`}
                 >
@@ -86,7 +88,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
                     maximumFractionDigits: 2,
                   })}
                 </div>
-              </div>
+              </HStack>
             );
           })
         ) : (
@@ -94,7 +96,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
             No accounts found
           </div>
         )}
-      </div>
+      </VStack>
     </div>
   );
 }

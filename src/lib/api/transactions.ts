@@ -64,7 +64,11 @@ export const transactionsApi = {
       userId: data.userId,
       accountId: data.accountId,
       txDate: { seconds: BigInt(Math.floor(data.txDate.getTime() / 1000)) },
-      txAmount: data.txAmount,
+      txAmount: {
+        currencyCode: data.txAmount.currencyCode,
+        units: BigInt(data.txAmount.units),
+        nanos: data.txAmount.nanos,
+      },
       direction: data.direction,
       description: data.description,
       merchant: data.merchant,

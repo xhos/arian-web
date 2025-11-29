@@ -90,7 +90,7 @@ export function AccountDialog({
 
     setIsLoading(true);
     try {
-      const data: any = {
+      const data: Parameters<typeof onSave>[0] = {
         name,
         bank,
         type,

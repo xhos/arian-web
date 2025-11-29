@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui/layout";
+import { HStack, ErrorMessage, EmptyState } from "@/components/lib";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import {
@@ -167,10 +168,10 @@ export default function AccountsPage() {
       <PageContent>
         <PageHeaderWithTitle title="accounts" />
 
-        {error && <div className="mb-6 p-3 text-sm text-destructive border border-destructive rounded">{error}</div>}
+        {error && <ErrorMessage className="mb-6">{error}</ErrorMessage>}
 
         {accounts.length > 0 && (
-          <div className="flex items-center justify-between mb-6">
+          <HStack spacing="md" justify="between" className="mb-6">
             <FilterChips
               selectedFilter={selectedFilter}
               onFilterChange={setSelectedFilter}
@@ -185,17 +186,19 @@ export default function AccountsPage() {
               <Plus className="h-4 w-4" />
               New
             </Button>
-          </div>
+          </HStack>
         )}
 
         {accounts.length === 0 ? (
-          <div className="border rounded-lg p-8 text-center">
-            <div className="text-sm text-muted-foreground mb-4">No accounts yet</div>
-            <Button onClick={() => setIsCreateDialogOpen(true)} disabled={isOperationLoading}>
-              <Plus className="h-4 w-4" />
-              Create Your First Account
-            </Button>
-          </div>
+          <EmptyState
+            title="No accounts yet"
+            action={
+              <Button onClick={() => setIsCreateDialogOpen(true)} disabled={isOperationLoading}>
+                <Plus className="h-4 w-4" />
+                Create Your First Account
+              </Button>
+            }
+          />
         ) : (
           <AccountGrid
             accounts={accounts}

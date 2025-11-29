@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { VStack, HStack, Muted } from "@/components/lib";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { TransactionRule } from "@/lib/rules";
 
@@ -53,7 +54,7 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
 
       // Fallback to old format
       const conditionsObj = conditions as Record<string, unknown>;
-      if (conditionsObj.description) {
+      if (conditionsObj.description && typeof conditionsObj.description === 'string') {
         return conditionsObj.description;
       }
 
@@ -76,31 +77,31 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Rule</AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className="space-y-3">
+            <VStack spacing="sm">
               <p>Are you sure you want to delete this rule? This action cannot be undone.</p>
-              <div className="p-3 tui-border rounded-lg space-y-2">
-                <div>
+              <VStack spacing="xs" className="p-3 tui-border rounded-lg">
+                <HStack spacing="sm">
                   <span className="text-sm font-medium">Rule Name:</span>
-                  <span className="ml-2 text-sm font-mono">{rule.ruleName}</span>
-                </div>
-                <div>
+                  <span className="text-sm font-mono">{rule.ruleName}</span>
+                </HStack>
+                <HStack spacing="sm">
                   <span className="text-sm font-medium">Applied:</span>
-                  <span className="ml-2 text-sm">{rule.timesApplied} times</span>
-                </div>
-                <div>
+                  <span className="text-sm">{rule.timesApplied} times</span>
+                </HStack>
+                <HStack spacing="sm">
                   <span className="text-sm font-medium">Status:</span>
-                  <Badge variant={rule.isActive ? "default" : "secondary"} className="ml-2">
+                  <Badge variant={rule.isActive ? "default" : "secondary"}>
                     {rule.isActive ? "Active" : "Inactive"}
                   </Badge>
-                </div>
-                <div>
+                </HStack>
+                <VStack spacing="xs">
                   <span className="text-sm font-medium">Conditions:</span>
-                  <div className="ml-2 text-xs tui-muted mt-1">
+                  <Muted size="xs">
                     {formatConditionsPreview(rule.conditions)}
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </Muted>
+                </VStack>
+              </VStack>
+            </VStack>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

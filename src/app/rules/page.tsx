@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { useUserId } from "@/hooks/useSession";
 import { useRules, useCreateRule, useUpdateRule, useDeleteRule } from "@/hooks/useRules";
 import { useCategories } from "@/hooks/useCategories";

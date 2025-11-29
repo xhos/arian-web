@@ -40,7 +40,7 @@
             '')
 
             (writeShellScriptBin "run" ''
-              bun run dev -p 3001
+              bun run dev -p 5001
             '')
 
             (writeShellScriptBin "auth-schema-gen" ''

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import { VStack, Caption, Muted } from "@/components/lib";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
 interface CreateAccountSidebarProps {
@@ -90,61 +90,60 @@ export default function CreateAccountSidebar({
       <div className="fixed inset-0 bg-black/20 z-40" onClick={handleCancel} />
 
       {/* Sidebar */}
-      <div className="fixed right-0 top-0 h-full w-96 bg-tui-background tui-border-l z-50 overflow-y-auto">
-        <div className="p-6">
+      <div className="fixed right-0 top-0 h-full w-96 bg-background border-l border-border z-50 overflow-y-auto">
+        <VStack spacing="md" className="p-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-mono">add</h2>
+          <div className="flex items-center justify-between w-full">
+            <h2 className="text-lg font-semibold">Add Account</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleCancel}
-              className="text-tui-muted hover:text-tui-foreground"
             >
               ✕
             </Button>
           </div>
 
           {/* Form */}
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">name</label>
+          <VStack spacing="sm">
+            <VStack spacing="xs">
+              <Caption>Name</Caption>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="text-sm h-8"
                 required
               />
-            </div>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">alias</label>
+            <VStack spacing="xs">
+              <Caption>Alias</Caption>
               <Input
                 value={formData.alias}
                 onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
                 placeholder="Display name (optional)"
                 className="text-sm h-8"
               />
-            </div>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">bank</label>
+            <VStack spacing="xs">
+              <Caption>Bank</Caption>
               <Input
                 value={formData.bank}
                 onChange={(e) => setFormData({ ...formData, bank: e.target.value })}
                 className="text-sm h-8"
                 required
               />
-            </div>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">type</label>
+            <VStack spacing="xs">
+              <Caption>Type</Caption>
               <select
                 value={formData.type.toString()}
                 onChange={(e) =>
                   setFormData({ ...formData, type: parseInt(e.target.value) as AccountType })
                 }
-                className="text-sm !h-8"
+                className="text-sm h-8 rounded-sm border border-border bg-background"
               >
                 <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
                 <option value={AccountType.ACCOUNT_SAVINGS}>Savings</option>
@@ -152,14 +151,14 @@ export default function CreateAccountSidebar({
                 <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
                 <option value={AccountType.ACCOUNT_OTHER}>Other</option>
               </select>
-            </div>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">currency</label>
+            <VStack spacing="xs">
+              <Caption>Currency</Caption>
               <select
                 value={formData.mainCurrency}
                 onChange={(e) => setFormData({ ...formData, mainCurrency: e.target.value })}
-                className="text-sm !h-8"
+                className="text-sm h-8 rounded-sm border border-border bg-background"
               >
                 <option value="USD">USD</option>
                 <option value="CAD">CAD</option>
@@ -167,11 +166,11 @@ export default function CreateAccountSidebar({
                 <option value="GBP">GBP</option>
                 <option value="JPY">JPY</option>
               </select>
-            </div>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">colors</label>
-              <div className="space-y-2">
+            <VStack spacing="xs">
+              <Caption>Colors</Caption>
+              <VStack spacing="xs">
                 {formData.colors.map((color, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <input
@@ -184,16 +183,16 @@ export default function CreateAccountSidebar({
                       }}
                       className="w-8 h-8 rounded border cursor-pointer"
                     />
-                    <span className="text-xs text-tui-muted">
+                    <Muted size="xs">
                       {index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary"}
-                    </span>
+                    </Muted>
                   </div>
                 ))}
-              </div>
-            </div>
+              </VStack>
+            </VStack>
 
-            <div>
-              <label className="text-xs text-tui-muted block mb-1">initial balance</label>
+            <VStack spacing="xs">
+              <Caption>Initial Balance</Caption>
               <Input
                 type="number"
                 step="0.01"
@@ -203,20 +202,18 @@ export default function CreateAccountSidebar({
                 className="text-sm h-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 required
               />
-            </div>
+            </VStack>
 
-            <div className="pt-4">
-              <Button
-                size="sm"
-                onClick={handleSubmit}
-                disabled={isLoading || !isValid}
-                className="w-full"
-              >
-                create
-              </Button>
-            </div>
-          </div>
-        </div>
+            <Button
+              size="sm"
+              onClick={handleSubmit}
+              disabled={isLoading || !isValid}
+              className="w-full"
+            >
+              Create
+            </Button>
+          </VStack>
+        </VStack>
       </div>
     </>
   );

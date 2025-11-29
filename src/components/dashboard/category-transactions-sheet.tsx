@@ -10,7 +10,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { transactionsApi } from "@/lib/api/transactions";
+import { VStack, HStack, Muted } from "@/components/lib";
+import { transactionsApi, type ListTransactionsInput } from "@/lib/api/transactions";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { formatAmount } from "@/lib/utils/transaction";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
@@ -45,7 +46,7 @@ export function CategoryTransactionsSheet({
     const fetchTransactions = async () => {
       setLoading(true);
       try {
-        const params: any = {
+        const params: ListTransactionsInput = {
           userId,
           startDate,
           endDate,
@@ -95,7 +96,7 @@ export function CategoryTransactionsSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-4">
+        <VStack spacing="md" className="mt-6">
           {loading && (
             <>
               {[...Array(5)].map((_, i) => (
@@ -119,24 +120,27 @@ export function CategoryTransactionsSheet({
                   : tx.direction) === TransactionDirection.DIRECTION_INCOMING;
 
               return (
-                <div
+                <HStack
                   key={tx.id}
-                  className="flex items-start justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                  spacing="md"
+                  justify="between"
+                  align="start"
+                  className="p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
-                  <div className="flex-1 min-w-0">
+                  <VStack spacing="xs" className="flex-1 min-w-0">
                     <p className="font-medium truncate">
                       {tx.merchant || tx.description || "Unknown"}
                     </p>
                     {tx.description && tx.merchant && (
-                      <p className="text-xs text-muted-foreground truncate">
+                      <Muted size="xs">
                         {tx.description}
-                      </p>
+                      </Muted>
                     )}
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <Muted size="xs">
                       {tx.txDate && format(new Date(Number(tx.txDate.seconds) * 1000), "MMM d, yyyy")}
-                    </p>
-                  </div>
-                  <div className="ml-4 text-right flex-shrink-0">
+                    </Muted>
+                  </VStack>
+                  <VStack spacing="xs" align="end" className="flex-shrink-0">
                     <p
                       className={`font-semibold ${
                         isIncoming ? "text-green-600" : ""
@@ -145,15 +149,15 @@ export function CategoryTransactionsSheet({
                       {isIncoming ? "+" : "-"}${amount.toFixed(2)}
                     </p>
                     {tx.accountName && (
-                      <p className="text-xs text-muted-foreground">
+                      <Muted size="xs">
                         {tx.accountName}
-                      </p>
+                      </Muted>
                     )}
-                  </div>
-                </div>
+                  </VStack>
+                </HStack>
               );
             })}
-        </div>
+        </VStack>
       </SheetContent>
     </Sheet>
   );

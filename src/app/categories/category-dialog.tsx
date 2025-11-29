@@ -10,9 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
+import { VStack, HStack, Caption, Muted, ErrorMessage } from "@/components/lib";
 import type { Category } from "@/gen/arian/v1/category_pb";
 
 interface CategoryDialogProps {
@@ -105,9 +105,9 @@ export function CategoryDialog({
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="slug">Slug</Label>
+          <VStack spacing="md" className="py-4">
+            <VStack spacing="xs">
+              <Caption>Slug</Caption>
               <Input
                 id="slug"
                 value={slug}
@@ -116,13 +116,13 @@ export function CategoryDialog({
                 disabled={isLoading}
                 className="font-mono"
               />
-              <p className="text-xs text-muted-foreground">
+              <Muted size="xs">
                 Use dots to create hierarchy: <code className="text-xs">parent.child</code>
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="color">Color</Label>
-              <div className="flex gap-2">
+              </Muted>
+            </VStack>
+            <VStack spacing="xs">
+              <Caption>Color</Caption>
+              <HStack spacing="sm">
                 <Popover>
                   <PopoverTrigger asChild>
                     <button
@@ -137,6 +137,7 @@ export function CategoryDialog({
                   </PopoverContent>
                 </Popover>
                 <Input
+                  id="color"
                   value={color || "#"}
                   onChange={handleColorInputChange}
                   placeholder="#3b82f6"
@@ -144,14 +145,10 @@ export function CategoryDialog({
                   className="font-mono"
                   maxLength={7}
                 />
-              </div>
-            </div>
-            {error && (
-              <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
-                {error}
-              </p>
-            )}
-          </div>
+              </HStack>
+            </VStack>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </VStack>
           <DialogFooter>
             <Button
               type="button"

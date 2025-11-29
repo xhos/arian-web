@@ -15,8 +15,8 @@ import { CategoryDialog } from "./category-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { toast } from "sonner";
 import { PageContainer, PageContent, PageHeaderWithTitle } from "@/components/ui/layout";
-import { MetaText } from "@/components/ui/typography";
-import { LoadingCard, ErrorMessage } from "@/components/data-display";
+import { ErrorMessage } from "@/components/lib";
+import { LoadingCard } from "@/components/data-display";
 import { getCategoryDisplayName, getParentSlug, getCategoryLevel } from "@/lib/utils/category";
 
 function countChildren(categorySlug: string, categories: Category[]): number {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { VStack, HStack, Caption, Muted } from "@/components/lib";
 
 interface AnchorBalanceFormProps {
   accountId: bigint;
@@ -60,60 +60,62 @@ export default function AnchorBalanceForm({
   };
 
   return (
-    <div className="tui-border rounded-lg p-4">
-      <h2 className="text-sm tui-muted mb-4 uppercase tracking-wider">
+    <div className="border border-border rounded-lg p-4">
+      <h2 className="text-sm text-muted-foreground mb-4 uppercase tracking-wider">
         set anchor balance for {accountName}
       </h2>
 
-      {error && <div className="mb-4 p-3 text-sm font-mono text-destructive tui-border">{error}</div>}
+      {error && <div className="mb-4 p-3 text-sm font-mono text-destructive border border-border">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="amount">amount *</Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              value={formData.amount}
-              onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
-              placeholder="0.00"
-              disabled={isLoading}
-              required
-            />
+      <form onSubmit={handleSubmit}>
+        <VStack spacing="lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <VStack spacing="xs">
+              <Caption>amount *</Caption>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
+                placeholder="0.00"
+                disabled={isLoading}
+                required
+              />
+            </VStack>
+
+            <VStack spacing="xs">
+              <Caption>currency</Caption>
+              <select
+                id="currency"
+                value={formData.currency}
+                onChange={(e) => setFormData((prev) => ({ ...prev, currency: e.target.value }))}
+                disabled={isLoading}
+                className="rounded-sm border border-border bg-background h-9 px-3 text-sm"
+              >
+                {currencyOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </VStack>
           </div>
 
-          <div>
-            <Label htmlFor="currency">currency</Label>
-            <select
-              id="currency"
-              value={formData.currency}
-              onChange={(e) => setFormData((prev) => ({ ...prev, currency: e.target.value }))}
-              disabled={isLoading}
-              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {currencyOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+          <Muted>
+            This sets the reference balance for this account at a specific point in time. It&apos;s
+            used to calculate running balances for transactions.
+          </Muted>
 
-        <div className="text-xs tui-muted">
-          This sets the reference balance for this account at a specific point in time. It&apos;s
-          used to calculate running balances for transactions.
-        </div>
-
-        <div className="flex gap-2 pt-4">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "setting..." : "set anchor balance"}
-          </Button>
-          <Button type="button" onClick={onCancel} variant="ghost" disabled={isLoading}>
-            cancel
-          </Button>
-        </div>
+          <HStack spacing="sm" className="pt-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "setting..." : "set anchor balance"}
+            </Button>
+            <Button type="button" onClick={onCancel} variant="ghost" disabled={isLoading}>
+              cancel
+            </Button>
+          </HStack>
+        </VStack>
       </form>
     </div>
   );

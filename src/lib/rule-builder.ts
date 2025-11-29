@@ -259,7 +259,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
   }
 
   const allFields = [...STRING_FIELDS, ...NUMERIC_FIELDS];
-  if (!allFields.includes(condition.field)) {
+  if (!allFields.includes(condition.field as FieldName)) {
     errors.push({
       code: ERROR_CODES.INVALID_FIELD,
       message: `Invalid field: ${condition.field}`,
@@ -280,17 +280,17 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
     return errors;
   }
 
-  const isStringField = STRING_FIELDS.includes(condition.field);
-  const isNumericField = NUMERIC_FIELDS.includes(condition.field);
+  const isStringField = STRING_FIELDS.includes(condition.field as FieldName);
+  const isNumericField = NUMERIC_FIELDS.includes(condition.field as FieldName);
 
-  if (isStringField && !STRING_OPERATORS.includes(condition.operator)) {
+  if (isStringField && !STRING_OPERATORS.includes(condition.operator as StringOperator)) {
     errors.push({
       code: ERROR_CODES.INVALID_OPERATOR_FOR_FIELD,
       message: `Invalid operator '${condition.operator}' for string field '${condition.field}'`,
       field: "operator",
       path,
     });
-  } else if (isNumericField && !NUMERIC_OPERATORS.includes(condition.operator)) {
+  } else if (isNumericField && !NUMERIC_OPERATORS.includes(condition.operator as NumericOperator)) {
     errors.push({
       code: ERROR_CODES.INVALID_OPERATOR_FOR_FIELD,
       message: `Invalid operator '${condition.operator}' for numeric field '${condition.field}'`,
@@ -325,7 +325,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
         field: "min_value,max_value",
         path,
       });
-    } else if (condition.min_value >= condition.max_value) {
+    } else if ((condition.min_value as number) >= (condition.max_value as number)) {
       errors.push({
         code: ERROR_CODES.INVALID_RANGE,
         message: "min_value must be less than max_value",
@@ -382,7 +382,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
 
   // Validate tx_direction values
   if (condition.field === "tx_direction" && condition.value !== undefined) {
-    if (![0, 1, 2].includes(condition.value)) {
+    if (![0, 1, 2].includes(condition.value as number)) {
       errors.push({
         code: ERROR_CODES.INVALID_VALUE,
         message: "tx_direction must be 0, 1, or 2",
@@ -394,7 +394,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
 
   // Validate amount values
   if (condition.field === "amount") {
-    if (condition.value !== undefined && condition.value < 0) {
+    if (condition.value !== undefined && (condition.value as number) < 0) {
       errors.push({
         code: ERROR_CODES.INVALID_VALUE,
         message: "amount must be non-negative",
@@ -402,7 +402,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
         path,
       });
     }
-    if (condition.min_value !== undefined && condition.min_value < 0) {
+    if (condition.min_value !== undefined && (condition.min_value as number) < 0) {
       errors.push({
         code: ERROR_CODES.INVALID_VALUE,
         message: "min_value must be non-negative",
@@ -410,7 +410,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
         path,
       });
     }
-    if (condition.max_value !== undefined && condition.max_value < 0) {
+    if (condition.max_value !== undefined && (condition.max_value as number) < 0) {
       errors.push({
         code: ERROR_CODES.INVALID_VALUE,
         message: "max_value must be non-negative",
@@ -423,7 +423,7 @@ function validateCondition(condition: Record<string, unknown>, index: number): V
   // Validate regex patterns
   if (condition.operator === "regex" && condition.value) {
     try {
-      new RegExp(condition.value);
+      new RegExp(condition.value as string);
     } catch (e) {
       errors.push({
         code: ERROR_CODES.INVALID_REGEX,

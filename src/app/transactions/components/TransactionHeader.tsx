@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { PageHeaderWithTitle } from "@/components/ui/layout";
-import { MetaText } from "@/components/ui/typography";
+import { Muted } from "@/components/lib";
 
 interface TransactionHeaderProps {
   selectedCount: number;
@@ -39,18 +39,20 @@ export function TransactionHeader({
   return (
     <PageHeaderWithTitle
       title="transactions"
-      stats={
-        selectedCount > 0 && (
-          <div className="flex items-center gap-3">
-            <MetaText className="font-medium">{selectedCount} selected</MetaText>
-            <button
-              onClick={onClearSelection}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
-            >
-              clear
-            </button>
-          </div>
-        )
+      subtitle={
+        selectedCount > 0
+          ? (
+            <div className="flex items-center gap-3">
+              <Muted className="font-medium">{selectedCount} selected</Muted>
+              <button
+                onClick={onClearSelection}
+                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+              >
+                clear
+              </button>
+            </div>
+          )
+          : `${totalCount.toLocaleString()} transaction${totalCount !== 1 ? "s" : ""} loaded`
       }
       actions={
         <>
@@ -62,7 +64,6 @@ export function TransactionHeader({
           </Button>
         </>
       }
-      subtitle={`${totalCount.toLocaleString()} transaction${totalCount !== 1 ? "s" : ""} loaded`}
     />
   );
 }

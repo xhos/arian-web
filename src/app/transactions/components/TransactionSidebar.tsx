@@ -3,9 +3,8 @@
 import { useState } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { Button } from "@/components/ui/button";
+import { Amount, Text, SectionTitle } from "@/components/lib";
 import { formatCurrency } from "@/lib/utils/transaction";
-import { Amount } from "@/components/data-display";
-import { MetaText, SectionHeader, SmallText } from "@/components/ui/typography";
 import { Stat } from "@/components/ui/layout";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useTransactionAnalytics } from "@/hooks/useTransactionAnalytics";
@@ -38,32 +37,32 @@ function SelectionGuide() {
         <div className="space-y-3">
           <div>
             <div className="text-sm font-medium mb-1.5">Individual Selection</div>
-            <SmallText className="flex items-center gap-1.5">
+            <Text size="sm" color="muted" className="flex items-center gap-1.5">
               <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click transaction
-            </SmallText>
+            </Text>
           </div>
           <div>
             <div className="text-sm font-medium mb-1.5">Range Selection</div>
-            <SmallText className="flex items-center gap-1.5">
+            <Text size="sm" color="muted" className="flex items-center gap-1.5">
               <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click transaction
-            </SmallText>
+            </Text>
           </div>
           <div>
             <div className="text-sm font-medium mb-1.5">Select Entire Day</div>
             <div className="space-y-1">
-              <SmallText className="flex items-center gap-1.5">
+              <Text size="sm" color="muted" className="flex items-center gap-1.5">
                 <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click day header
-              </SmallText>
-              <SmallText className="flex items-center gap-1.5">
+              </Text>
+              <Text size="sm" color="muted" className="flex items-center gap-1.5">
                 <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click day header
-              </SmallText>
+              </Text>
             </div>
           </div>
         </div>
         <PanelDivider />
-        <SmallText className="block">
+        <Text size="sm" color="muted" className="block">
           Selected transactions will show analysis here including income, expenses, and net totals.
-        </SmallText>
+        </Text>
       </PanelSection>
     </Panel>
   );
@@ -109,20 +108,20 @@ function TransactionAnalytics({
             ✕
           </button>
         </div>
-        <SmallText>
+        <Text size="sm" color="muted">
           {analytics.transactionCount} transaction{analytics.transactionCount !== 1 ? "s" : ""} selected
-        </SmallText>
+        </Text>
       </PanelSection>
 
       <PanelSection className="space-y-5">
         <div className="space-y-2.5">
           <Stat
             label="Income"
-            value={<Amount variant="positive" value={`+${formatCurrency(analytics.totalIncome)}`} className="text-sm" />}
+            value={<Amount variant="positive" value={analytics.totalIncome} className="text-sm" />}
           />
           <Stat
             label="Expenses"
-            value={<Amount variant="negative" value={`-${formatCurrency(analytics.totalExpenses)}`} className="text-sm" />}
+            value={<Amount variant="negative" value={analytics.totalExpenses} className="text-sm" />}
           />
         </div>
 
@@ -133,7 +132,7 @@ function TransactionAnalytics({
           value={
             <Amount
               variant={analytics.netAmount >= 0 ? "positive" : "negative"}
-              value={`${analytics.netAmount >= 0 ? "+" : ""}${formatCurrency(analytics.netAmount)}`}
+              value={analytics.netAmount}
               className="text-sm font-semibold"
             />
           }
@@ -142,7 +141,7 @@ function TransactionAnalytics({
         <PanelDivider />
 
         <div>
-          <SectionHeader className="mb-2">Summary</SectionHeader>
+          <SectionTitle className="mb-2 text-xs">Summary</SectionTitle>
           <div className="space-y-2 text-xs">
             <Stat
               label="Average per transaction"
@@ -156,11 +155,9 @@ function TransactionAnalytics({
               <Stat
                 label="Income percentage"
                 value={
-                  <Amount
-                    variant="positive"
-                    value={`${analytics.incomePercentage.toFixed(1)}%`}
-                    className="text-xs"
-                  />
+                  <span className="font-mono text-xs text-success">
+                    {analytics.incomePercentage.toFixed(1)}%
+                  </span>
                 }
               />
             )}
@@ -168,11 +165,9 @@ function TransactionAnalytics({
               <Stat
                 label="Expense percentage"
                 value={
-                  <Amount
-                    variant="negative"
-                    value={`${analytics.expensePercentage.toFixed(1)}%`}
-                    className="text-xs"
-                  />
+                  <span className="font-mono text-xs text-destructive">
+                    {analytics.expensePercentage.toFixed(1)}%
+                  </span>
                 }
               />
             )}
@@ -182,7 +177,7 @@ function TransactionAnalytics({
         <PanelDivider />
 
         <div>
-          <SectionHeader className="mb-3">Actions</SectionHeader>
+          <SectionTitle className="mb-3 text-xs">Actions</SectionTitle>
           <div className="space-y-2">
             <Button onClick={onBulkModify} className="w-full" size="sm">
               Bulk Modify

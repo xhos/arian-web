@@ -17,10 +17,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             // Retry failed requests
             retry: 3,
             // Refetch on window focus for fresh data
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
             // Enable deduplication for same queries
-            refetchOnMount: "stale",
-            refetchOnReconnect: "stale",
+            refetchOnMount: false,
+            refetchOnReconnect: false,
           },
         },
       })
