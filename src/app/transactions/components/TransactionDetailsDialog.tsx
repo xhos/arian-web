@@ -95,13 +95,6 @@ export function TransactionDetailsDialog({ transaction }: TransactionDetailsDial
             </div>
           </VStack>
         )}
-
-        {transaction.receiptId && (
-          <VStack spacing="xs" align="start">
-            <Caption>RECEIPT</Caption>
-            <div className="font-mono text-sm">#{transaction.receiptId.toString()}</div>
-          </VStack>
-        )}
       </div>
 
       {/* Timestamps */}

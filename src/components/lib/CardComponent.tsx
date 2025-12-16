@@ -7,7 +7,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: 'default' | 'subtle' | 'outline' | 'elevated';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   interactive?: boolean;

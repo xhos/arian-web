@@ -5,14 +5,8 @@ import {
   type GetCategorySpendingComparisonResponse,
   GetNetWorthHistoryRequestSchema,
   type GetNetWorthHistoryResponse,
-  GetAccountBalancesRequestSchema,
-  type GetAccountBalancesResponse,
-  GetNetBalanceRequestSchema,
-  type GetNetBalanceResponse,
-  GetTotalBalanceRequestSchema,
-  type GetTotalBalanceResponse,
-  GetTotalDebtRequestSchema,
-  type GetTotalDebtResponse,
+  GetFinancialSummaryRequestSchema,
+  type GetFinancialSummaryResponse,
   GetDashboardSummaryRequestSchema,
   type GetDashboardSummaryResponse,
 } from "@/gen/arian/v1/dashboard_services_pb";
@@ -64,24 +58,9 @@ export const dashboardApi = {
     return await dashboardClient.getNetWorthHistory(request);
   },
 
-  async getAccountBalances(userId: string): Promise<GetAccountBalancesResponse> {
-    const request = create(GetAccountBalancesRequestSchema, { userId });
-    return await dashboardClient.getAccountBalances(request);
-  },
-
-  async getNetBalance(userId: string): Promise<GetNetBalanceResponse> {
-    const request = create(GetNetBalanceRequestSchema, { userId });
-    return await dashboardClient.getNetBalance(request);
-  },
-
-  async getTotalBalance(userId: string): Promise<GetTotalBalanceResponse> {
-    const request = create(GetTotalBalanceRequestSchema, { userId });
-    return await dashboardClient.getTotalBalance(request);
-  },
-
-  async getTotalDebt(userId: string): Promise<GetTotalDebtResponse> {
-    const request = create(GetTotalDebtRequestSchema, { userId });
-    return await dashboardClient.getTotalDebt(request);
+  async getFinancialSummary(userId: string): Promise<GetFinancialSummaryResponse> {
+    const request = create(GetFinancialSummaryRequestSchema, { userId });
+    return await dashboardClient.getFinancialSummary(request);
   },
 
   async getDashboardSummary(

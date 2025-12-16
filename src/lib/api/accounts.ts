@@ -5,7 +5,6 @@ import {
   CreateAccountRequestSchema,
   UpdateAccountRequestSchema,
   DeleteAccountRequestSchema,
-  SetAccountAnchorRequestSchema,
 } from "@/gen/arian/v1/account_services_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -36,6 +35,7 @@ export interface UpdateAccountInput {
 }
 
 export interface SetAnchorBalanceInput {
+  userId: string;
   id: bigint;
   balance: {
     currencyCode: string;
@@ -82,8 +82,7 @@ export const accountsApi = {
       mainCurrency: data.mainCurrency,
       colors: data.colors,
     });
-    const response = await accountClient.updateAccount(request);
-    return response.account;
+    await accountClient.updateAccount(request);
   },
 
   async delete(userId: string, id: bigint) {
@@ -95,15 +94,17 @@ export const accountsApi = {
   },
 
   async setAnchorBalance(data: SetAnchorBalanceInput) {
-    const request = create(SetAccountAnchorRequestSchema, {
+    const request = create(UpdateAccountRequestSchema, {
+      userId: data.userId,
       id: data.id,
-      balance: data.balance ? {
+      updateMask: { paths: ["anchor_balance", "anchor_date"] },
+      anchorBalance: data.balance ? {
         currencyCode: data.balance.currencyCode,
         units: BigInt(data.balance.units),
         nanos: data.balance.nanos,
       } : undefined,
+      anchorDate: { seconds: BigInt(Math.floor(Date.now() / 1000)) },
     });
-    const response = await accountClient.setAccountAnchor(request);
-    return response;
+    await accountClient.updateAccount(request);
   },
 };

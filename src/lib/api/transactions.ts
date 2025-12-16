@@ -3,7 +3,7 @@ import { transactionClient } from "@/lib/grpc-client";
 import {
   ListTransactionsRequestSchema,
   CreateTransactionRequestSchema,
-  BulkDeleteTransactionsRequestSchema,
+  DeleteTransactionRequestSchema,
 } from "@/gen/arian/v1/transaction_services_pb";
 import type { Cursor } from "@/gen/arian/v1/common_pb";
 import { TransactionDirection } from "@/gen/arian/v1/enums_pb";
@@ -80,10 +80,10 @@ export const transactionsApi = {
   },
 
   async bulkDelete(userId: string, transactionIds: bigint[]) {
-    const request = create(BulkDeleteTransactionsRequestSchema, {
+    const request = create(DeleteTransactionRequestSchema, {
       userId,
-      transactionIds,
+      ids: transactionIds,
     });
-    await transactionClient.bulkDeleteTransactions(request);
+    await transactionClient.deleteTransaction(request);
   },
 };

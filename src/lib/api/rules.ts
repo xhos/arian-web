@@ -67,8 +67,7 @@ export const rulesApi = {
       ...(conditions && { conditions: toJsonObject(conditions) }),
     });
 
-    const response = await ruleClient.updateRule(request);
-    return response.rule;
+    await ruleClient.updateRule(request);
   },
 
   async delete(userId: string, ruleId: string) {

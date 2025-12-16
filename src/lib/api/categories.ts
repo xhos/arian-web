@@ -47,8 +47,7 @@ export const categoriesApi = {
       color: data.color,
       updateMask: { paths: ["slug", "color"] },
     });
-    const response = await categoryClient.updateCategory(request);
-    return response.category;
+    await categoryClient.updateCategory(request);
   },
 
   async updateColor(data: UpdateCategoryColorInput) {
@@ -58,8 +57,7 @@ export const categoriesApi = {
       color: data.color,
       updateMask: { paths: ["color"] },
     });
-    const response = await categoryClient.updateCategory(request);
-    return response.category;
+    await categoryClient.updateCategory(request);
   },
 
   async delete(id: bigint) {

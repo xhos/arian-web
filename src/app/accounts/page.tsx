@@ -76,9 +76,9 @@ export default function AccountsPage() {
   const handleSetAnchorBalance = async (
     balance: { currencyCode: string; units: string; nanos: number }
   ) => {
-    if (!anchorAccount) return;
+    if (!anchorAccount || !userId) return;
     try {
-      await setAnchorBalanceAsync({ id: anchorAccount.id, balance });
+      await setAnchorBalanceAsync({ userId, id: anchorAccount.id, balance });
       setError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to set anchor balance");

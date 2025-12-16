@@ -11,22 +11,10 @@ interface DashboardStatsProps {
 }
 
 export function DashboardStats({ userId }: DashboardStatsProps) {
-  const { data: netBalance, isLoading: netBalanceLoading } = useQuery({
-    queryKey: ["net-balance", userId],
-    queryFn: () => dashboardApi.getNetBalance(userId),
+  const { data: financialSummary, isLoading } = useQuery({
+    queryKey: ["financial-summary", userId],
+    queryFn: () => dashboardApi.getFinancialSummary(userId),
   });
-
-  const { data: totalBalance, isLoading: totalBalanceLoading } = useQuery({
-    queryKey: ["total-balance", userId],
-    queryFn: () => dashboardApi.getTotalBalance(userId),
-  });
-
-  const { data: totalDebt, isLoading: totalDebtLoading } = useQuery({
-    queryKey: ["total-debt", userId],
-    queryFn: () => dashboardApi.getTotalDebt(userId),
-  });
-
-  const isLoading = netBalanceLoading || totalBalanceLoading || totalDebtLoading;
 
   if (isLoading) {
     return (
@@ -38,9 +26,9 @@ export function DashboardStats({ userId }: DashboardStatsProps) {
     );
   }
 
-  const netWorthValue = netBalance?.netBalance ? formatAmount(netBalance.netBalance) : 0;
-  const totalBalanceValue = totalBalance?.totalBalance ? formatAmount(totalBalance.totalBalance) : 0;
-  const totalDebtValue = totalDebt?.totalDebt ? formatAmount(totalDebt.totalDebt) : 0;
+  const netWorthValue = financialSummary?.netBalance ? formatAmount(financialSummary.netBalance) : 0;
+  const totalBalanceValue = financialSummary?.totalBalance ? formatAmount(financialSummary.totalBalance) : 0;
+  const totalDebtValue = financialSummary?.totalDebt ? formatAmount(financialSummary.totalDebt) : 0;
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

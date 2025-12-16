@@ -10,18 +10,14 @@ interface TransactionDetailsProps {
 export function TransactionDetails({ transaction }: TransactionDetailsProps) {
   const hasUserNotes = !!transaction.userNotes;
   const hasBalanceAfter = !!transaction.balanceAfter;
-  const hasReceiptId = !!transaction.receiptId;
   const hasForeignAmount = !!transaction.foreignAmount;
   const hasExchangeRate = !!transaction.exchangeRate;
-  const hasSuggestions = transaction.suggestions && transaction.suggestions.length > 0;
 
   const hasAnyDetails =
     hasUserNotes ||
     hasBalanceAfter ||
-    hasReceiptId ||
     hasForeignAmount ||
-    hasExchangeRate ||
-    hasSuggestions;
+    hasExchangeRate;
 
   return (
     <Card variant="subtle" padding="sm">
@@ -48,13 +44,6 @@ export function TransactionDetails({ transaction }: TransactionDetailsProps) {
               </VStack>
             )}
 
-            {transaction.receiptId && (
-              <VStack spacing="xs" align="start">
-                <Caption>RECEIPT ID</Caption>
-                <Text size="sm" className="font-mono">#{transaction.receiptId.toString()}</Text>
-              </VStack>
-            )}
-
             {transaction.foreignAmount && (
               <VStack spacing="xs" align="start">
                 <Caption>FOREIGN AMOUNT</Caption>
@@ -72,21 +61,6 @@ export function TransactionDetails({ transaction }: TransactionDetailsProps) {
                 <Caption>EXCHANGE RATE</Caption>
                 <Text size="sm" className="font-mono">{transaction.exchangeRate}</Text>
               </VStack>
-            )}
-
-            {hasSuggestions && (
-              <div className="md:col-span-2">
-                <VStack spacing="xs" align="start" className="w-full">
-                  <Caption>SUGGESTIONS</Caption>
-                  <HStack spacing="sm" className="flex-wrap gap-2">
-                    {transaction.suggestions!.map((suggestion, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {suggestion}
-                      </Badge>
-                    ))}
-                  </HStack>
-                </VStack>
-              </div>
             )}
           </div>
         )}

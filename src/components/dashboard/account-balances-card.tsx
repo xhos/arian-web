@@ -1,12 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { dashboardApi } from "@/lib/api/dashboard";
+import { accountsApi } from "@/lib/api/accounts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, VStack, HStack, Caption } from "@/components/lib";
 import { formatAmount } from "@/lib/utils/transaction";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
-import type { AccountBalance } from "@/gen/arian/v1/account_pb";
+import type { Account } from "@/gen/arian/v1/account_pb";
 
 interface AccountBalancesCardProps {
   userId: string;
@@ -29,7 +29,7 @@ const getAccountTypeLabel = (type: AccountType): string => {
   }
 };
 
-const sortAccountsByType = (accounts: AccountBalance[]) => {
+const sortAccountsByType = (accounts: Account[]) => {
   const typeOrder: Record<AccountType, number> = {
     [AccountType.ACCOUNT_UNSPECIFIED]: 99,
     [AccountType.ACCOUNT_CHEQUING]: 1,
@@ -40,16 +40,16 @@ const sortAccountsByType = (accounts: AccountBalance[]) => {
   };
 
   return [...accounts].sort((a, b) => {
-    const orderA = typeOrder[a.accountType as AccountType] ?? 99;
-    const orderB = typeOrder[b.accountType as AccountType] ?? 99;
+    const orderA = typeOrder[a.type as AccountType] ?? 99;
+    const orderB = typeOrder[b.type as AccountType] ?? 99;
     return orderA - orderB;
   });
 };
 
 export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ["account-balances", userId],
-    queryFn: () => dashboardApi.getAccountBalances(userId),
+    queryKey: ["accounts", userId],
+    queryFn: () => accountsApi.list(userId),
   });
 
   return (
@@ -61,11 +61,11 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </>
-        ) : data && data.balances.length > 0 ? (
-          sortAccountsByType(data.balances).map((account, index) => {
-            const balance = formatAmount(account.currentBalance);
-            const isDebt = account.accountType === AccountType.ACCOUNT_CREDIT_CARD;
-            const isBorderTop = account.accountType === AccountType.ACCOUNT_CREDIT_CARD;
+        ) : data && data.length > 0 ? (
+          sortAccountsByType(data).map((account, index) => {
+            const balance = account.balance ? formatAmount(account.balance) : 0;
+            const isDebt = account.type === AccountType.ACCOUNT_CREDIT_CARD;
+            const isBorderTop = account.type === AccountType.ACCOUNT_CREDIT_CARD;
 
             return (
               <HStack
@@ -76,7 +76,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
               >
                 <VStack spacing="xs" align="start">
                   <div className="text-sm font-medium">{account.name}</div>
-                  <Caption>{getAccountTypeLabel(account.accountType)}</Caption>
+                  <Caption>{getAccountTypeLabel(account.type)}</Caption>
                 </VStack>
                 <div
                   className={`text-sm font-semibold tabular-nums ${isDebt ? "text-red-600" : ""}`}
