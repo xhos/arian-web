@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VStack, HStack, Caption } from "@/components/lib";
+import { VStack, HStack, Caption, Card, Muted } from "@/components/lib";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import type { Account } from "@/gen/arian/v1/account_pb";
 
@@ -73,13 +73,12 @@ export default function AccountForm({ account, onSubmit, onCancel, isLoading }: 
   const isEditing = !!account;
 
   return (
-    <div className="border border-border rounded-lg p-4">
-      <h2 className="text-sm text-muted-foreground mb-4 uppercase tracking-wider">
-        {isEditing ? "edit account" : "add new account"}
-      </h2>
-
+    <Card padding="md">
       <form onSubmit={handleSubmit}>
         <VStack spacing="lg">
+          <Muted size="xs" weight="medium" className="uppercase tracking-wider">
+            {isEditing ? "edit account" : "add new account"}
+          </Muted>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <VStack spacing="xs">
               <Caption>account name</Caption>
@@ -170,6 +169,6 @@ export default function AccountForm({ account, onSubmit, onCancel, isLoading }: 
           </HStack>
         </VStack>
       </form>
-    </div>
+    </Card>
   );
 }

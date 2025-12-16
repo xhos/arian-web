@@ -2,7 +2,7 @@
 
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
-import { Card, VStack, HStack, Muted, Caption } from "@/components/lib";
+import { Card, VStack, HStack, Muted, Caption, Text } from "@/components/lib";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -49,11 +49,11 @@ export default function AccountCard({ account, getAccountTypeName, onClick, onEd
         <HStack spacing="md" justify="between" className="w-full">
           <VStack spacing="xs" align="start">
             <Caption>{account.bank}</Caption>
-            <div className="text-sm">{account.alias || account.name}</div>
+            <Text size="sm">{account.alias || account.name}</Text>
           </VStack>
           <Muted size="xs">{getAccountTypeName(account.type)}</Muted>
         </HStack>
-        <div className="text-lg font-semibold">{formatBalance(account.balance)}</div>
+        <Text weight="semibold" size="lg">{formatBalance(account.balance)}</Text>
       </VStack>
     </Card>
   );

@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { PageHeaderWithTitle } from "@/components/ui/layout";
-import { Muted } from "@/components/lib";
+import { Muted, HStack } from "@/components/lib";
 
 interface TransactionHeaderProps {
   selectedCount: number;
@@ -42,15 +42,15 @@ export function TransactionHeader({
       subtitle={
         selectedCount > 0
           ? (
-            <div className="flex items-center gap-3">
-              <Muted className="font-medium">{selectedCount} selected</Muted>
+            <HStack spacing="md" align="center">
+              <Muted weight="medium">{selectedCount} selected</Muted>
               <button
                 onClick={onClearSelection}
                 className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
               >
                 clear
               </button>
-            </div>
+            </HStack>
           )
           : `${totalCount.toLocaleString()} transaction${totalCount !== 1 ? "s" : ""} loaded`
       }

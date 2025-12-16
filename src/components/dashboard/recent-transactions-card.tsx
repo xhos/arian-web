@@ -24,17 +24,19 @@ export function RecentTransactionsCard({ userId }: RecentTransactionsCardProps) 
   });
 
   return (
-    <Card padding="lg" className="h-full flex flex-col">
-      <HStack justify="between" align="center" className="mb-4">
-        <div className="text-base font-medium">recent transactions</div>
+    <Card
+      padding="lg"
+      className="h-full"
+      title="recent transactions"
+      action={
         <Button variant="ghost" size="sm" asChild>
           <Link href="/transactions">
             view all
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
-      </HStack>
-
+      }
+    >
       <div className="flex-1">
         {isLoading ? (
           <div className="flex justify-center py-8">

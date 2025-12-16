@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VStack, Caption, Muted } from "@/components/lib";
+import { VStack, Caption, Muted, Text, HStack } from "@/components/lib";
 
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
@@ -157,8 +157,8 @@ export default function EditAccountSidebar({
       <div className="fixed right-0 top-0 h-full w-96 bg-background border-l border-border z-50 overflow-y-auto">
         <div className="p-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-mono">details</h2>
+          <HStack spacing="md" justify="between" align="center" className="mb-6">
+            <Text size="lg" weight="semibold" className="font-mono">details</Text>
             <Button
               variant="ghost"
               size="sm"
@@ -167,13 +167,13 @@ export default function EditAccountSidebar({
             >
               ✕
             </Button>
-          </div>
+          </HStack>
 
           {/* Form */}
           <VStack spacing="lg">
             <VStack spacing="xs">
               <Caption>id</Caption>
-              <Muted className="font-mono">{account.id.toString()}</Muted>
+              <Text size="sm" className="font-mono">{account.id.toString()}</Text>
             </VStack>
 
             <VStack spacing="xs">
@@ -272,12 +272,12 @@ export default function EditAccountSidebar({
                 className="text-sm h-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               {account.anchorDate && (
-                <Muted className="mt-1">
+                <Text size="xs" color="muted" className="mt-1">
                   last set on{" "}
                   {new Date(
                     parseInt(account.anchorDate.seconds?.toString() || "0") * 1000
                   ).toLocaleDateString()}
-                </Muted>
+                </Text>
               )}
             </VStack>
 

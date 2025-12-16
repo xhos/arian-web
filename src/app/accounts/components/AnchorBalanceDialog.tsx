@@ -51,17 +51,21 @@ export function AnchorBalanceDialog({
 
     if (!account) return;
 
-    if (!amount || parseFloat(amount) < 0) {
+    if (!amount) {
       setError("Please enter a valid amount");
       return;
     }
 
     setIsLoading(true);
     try {
+      const numAmount = parseFloat(amount);
+      const units = Math.trunc(numAmount);
+      const nanos = Math.round((numAmount - units) * 1e9);
+
       await onConfirm({
         currencyCode: account.mainCurrency || "USD",
-        units: Math.floor(parseFloat(amount)).toString(),
-        nanos: Math.round((parseFloat(amount) % 1) * 1e9),
+        units: units.toString(),
+        nanos,
       });
       onOpenChange(false);
     } catch (err) {
@@ -114,6 +118,7 @@ export function AnchorBalanceDialog({
                 placeholder="0.00"
                 disabled={isLoading}
                 required
+                min={undefined}
               />
             </div>
 

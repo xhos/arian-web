@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PeriodType } from "@/gen/arian/v1/enums_pb";
 import { useCategorySpending } from "@/hooks/useCategorySpending";
@@ -9,6 +8,7 @@ import { CategorySpendingDonut } from "./category-spending-donut";
 import { PeriodSelector } from "./period-selector";
 import { formatAmount } from "@/lib/utils/transaction";
 import { CategoryTransactionsSheet } from "./category-transactions-sheet";
+import { Card, VStack, Text, Muted } from "@/components/lib";
 
 interface CategoryBreakdownCardProps {
   userId: string;
@@ -65,42 +65,30 @@ export function CategoryBreakdownCard({ userId }: CategoryBreakdownCardProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Spending Breakdown</CardTitle>
-            <CardDescription>
-              {data?.currentPeriod?.label || "Category distribution by percentage"}
-            </CardDescription>
-          </div>
-          <div className="shrink-0">
-            <PeriodSelector value={periodType} onChange={handlePeriodChange} />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {loading && <Skeleton className="h-[280px]" />}
-        {error && (
-          <div className="flex justify-center items-center h-64 text-destructive">
-            <div className="text-center">
-              <p className="font-semibold">Failed to load data</p>
-              <p className="text-sm text-muted-foreground">{error.message}</p>
-            </div>
-          </div>
-        )}
-        {!loading && !error && data && (
-          <>
-            <div className="mb-4 text-center">
-              <p className="text-xs text-muted-foreground">Total Spending</p>
-              <p className="text-xl">
-                ${formatAmount(data.totals?.currentPeriodTotal).toFixed(2)}
-              </p>
-            </div>
-            <CategorySpendingDonut data={data} onCategoryClick={handleCategoryClick} />
-          </>
-        )}
-      </CardContent>
+    <Card
+      padding="md"
+      title="spending breakdown"
+      action={<PeriodSelector value={periodType} onChange={handlePeriodChange} />}
+    >
+      {loading && <Skeleton className="h-[280px]" />}
+      {error && (
+        <VStack spacing="sm" align="center" justify="center" className="h-64">
+          <Text weight="semibold" color="destructive">Failed to load data</Text>
+          <Muted size="sm">{error.message}</Muted>
+        </VStack>
+      )}
+      {!loading && !error && data && (
+        <VStack spacing="md" align="center">
+          <VStack spacing="xs" align="center">
+            <Muted size="xs">Total Spending</Muted>
+            <Text weight="semibold" size="lg">
+              ${formatAmount(data.totals?.currentPeriodTotal).toFixed(2)}
+            </Text>
+          </VStack>
+          <CategorySpendingDonut data={data} onCategoryClick={handleCategoryClick} />
+        </VStack>
+      )}
+
       <CategoryTransactionsSheet
         open={!!selectedCategory}
         onOpenChange={(open) => !open && setSelectedCategory(null)}

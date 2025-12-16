@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { VStack, HStack, Muted } from "@/components/lib";
+import { VStack, HStack, Muted, Text } from "@/components/lib";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { TransactionRule } from "@/lib/rules";
 
@@ -80,22 +80,22 @@ export function DeleteRuleDialog({ rule, onClose, onConfirm, isLoading }: Delete
             <VStack spacing="sm">
               <p>Are you sure you want to delete this rule? This action cannot be undone.</p>
               <VStack spacing="xs" className="p-3 tui-border rounded-lg">
-                <HStack spacing="sm">
-                  <span className="text-sm font-medium">Rule Name:</span>
-                  <span className="text-sm font-mono">{rule.ruleName}</span>
+                <HStack spacing="sm" justify="between">
+                  <Text size="sm" weight="medium">Rule Name:</Text>
+                  <Text size="sm" className="font-mono">{rule.ruleName}</Text>
                 </HStack>
-                <HStack spacing="sm">
-                  <span className="text-sm font-medium">Applied:</span>
-                  <span className="text-sm">{rule.timesApplied} times</span>
+                <HStack spacing="sm" justify="between">
+                  <Text size="sm" weight="medium">Applied:</Text>
+                  <Text size="sm">{rule.timesApplied} times</Text>
                 </HStack>
-                <HStack spacing="sm">
-                  <span className="text-sm font-medium">Status:</span>
+                <HStack spacing="sm" justify="between">
+                  <Text size="sm" weight="medium">Status:</Text>
                   <Badge variant={rule.isActive ? "default" : "secondary"}>
                     {rule.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </HStack>
                 <VStack spacing="xs">
-                  <span className="text-sm font-medium">Conditions:</span>
+                  <Text size="sm" weight="medium">Conditions:</Text>
                   <Muted size="xs">
                     {formatConditionsPreview(rule.conditions)}
                   </Muted>

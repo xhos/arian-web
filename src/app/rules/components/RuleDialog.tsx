@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { HStack, ErrorMessage } from "@/components/lib";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import {
@@ -285,37 +286,35 @@ export function RuleDialog({
 
         {(validationError || externalError) && (
           <div className="px-6">
-            <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
-              {validationError || externalError}
-            </div>
+            <ErrorMessage>{validationError || externalError}</ErrorMessage>
           </div>
         )}
 
         <div className="px-6 pb-6">
           <DialogFooter>
-            <div className="flex justify-between w-full">
-            {step > 1 && (
-              <Button variant="outline" onClick={() => setStep(step - 1)} disabled={isLoading}>
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back
-              </Button>
-            )}
-            <div className={step === 1 ? "flex gap-2 ml-auto" : "flex gap-2"}>
-              <Button variant="outline" onClick={onClose} disabled={isLoading}>
-                Cancel
-              </Button>
-              {step < 4 ? (
-                <Button onClick={() => setStep(step + 1)} disabled={isLoading || !canProceed}>
-                  Next
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              ) : (
-                <Button onClick={handleSubmit} disabled={isLoading || !canSubmit}>
-                  {isLoading ? "Saving..." : submitText}
+            <HStack spacing="sm" justify="between" className="w-full">
+              {step > 1 && (
+                <Button variant="outline" onClick={() => setStep(step - 1)} disabled={isLoading}>
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back
                 </Button>
               )}
-              </div>
-            </div>
+              <HStack spacing="sm" justify="end" className={step === 1 ? "ml-auto" : ""}>
+                <Button variant="outline" onClick={onClose} disabled={isLoading}>
+                  Cancel
+                </Button>
+                {step < 4 ? (
+                  <Button onClick={() => setStep(step + 1)} disabled={isLoading || !canProceed}>
+                    Next
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleSubmit} disabled={isLoading || !canSubmit}>
+                    {isLoading ? "Saving..." : submitText}
+                  </Button>
+                )}
+              </HStack>
+            </HStack>
           </DialogFooter>
         </div>
       </DialogContent>

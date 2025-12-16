@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
+import { VStack, HStack, ErrorMessage, Muted } from "@/components/lib";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -123,8 +124,8 @@ export function AccountDialog({
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
+          <VStack spacing="md" className="py-4">
+            <VStack spacing="xs">
               <Label htmlFor="name">Name *</Label>
               <Input
                 id="name"
@@ -134,9 +135,9 @@ export function AccountDialog({
                 disabled={isLoading}
                 required
               />
-            </div>
+            </VStack>
 
-            <div className="grid gap-2">
+            <VStack spacing="xs">
               <Label htmlFor="alias">Alias</Label>
               <Input
                 id="alias"
@@ -145,9 +146,9 @@ export function AccountDialog({
                 placeholder="Display name (optional)"
                 disabled={isLoading}
               />
-            </div>
+            </VStack>
 
-            <div className="grid gap-2">
+            <VStack spacing="xs">
               <Label htmlFor="bank">Bank *</Label>
               <Input
                 id="bank"
@@ -157,9 +158,9 @@ export function AccountDialog({
                 disabled={isLoading}
                 required
               />
-            </div>
+            </VStack>
 
-            <div className="grid gap-2">
+            <VStack spacing="xs">
               <Label htmlFor="type">Type</Label>
               <Select
                 value={type.toString()}
@@ -177,9 +178,9 @@ export function AccountDialog({
                   <SelectItem value={AccountType.ACCOUNT_OTHER.toString()}>Other</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </VStack>
 
-            <div className="grid gap-2">
+            <VStack spacing="xs">
               <Label htmlFor="currency">Currency</Label>
               <Select
                 value={mainCurrency}
@@ -197,11 +198,11 @@ export function AccountDialog({
                   <SelectItem value="JPY">JPY</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </VStack>
 
-            <div className="grid gap-2">
+            <VStack spacing="xs">
               <Label>Colors</Label>
-              <div className="flex gap-2">
+              <HStack spacing="sm">
                 {colors.map((color, index) => (
                   <div key={index} className="flex flex-col items-center gap-1">
                     <Popover>
@@ -224,16 +225,16 @@ export function AccountDialog({
                         />
                       </PopoverContent>
                     </Popover>
-                    <span className="text-xs text-muted-foreground">
+                    <Muted size="xs">
                       {index === 0 ? "Primary" : index === 1 ? "Secondary" : "Tertiary"}
-                    </span>
+                    </Muted>
                   </div>
                 ))}
-              </div>
-            </div>
+              </HStack>
+            </VStack>
 
             {!account && (
-              <div className="grid gap-2">
+              <VStack spacing="xs">
                 <Label htmlFor="initialBalance">Initial Balance *</Label>
                 <Input
                   id="initialBalance"
@@ -245,15 +246,11 @@ export function AccountDialog({
                   disabled={isLoading}
                   required
                 />
-              </div>
+              </VStack>
             )}
 
-            {error && (
-              <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded p-2">
-                {error}
-              </p>
-            )}
-          </div>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </VStack>
           <DialogFooter>
             <Button
               type="button"

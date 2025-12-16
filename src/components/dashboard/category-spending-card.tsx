@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/lib";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PeriodType } from "@/gen/arian/v1/enums_pb";
 import { useCategorySpending } from "@/hooks/useCategorySpending";
@@ -65,49 +65,40 @@ export function CategorySpendingCard({ userId }: CategorySpendingCardProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Spending by Category</CardTitle>
-            <CardDescription>
-              {data?.currentPeriod?.label || "Compare spending across time periods"}
-            </CardDescription>
+    <Card
+      title="spending by category"
+      description={data?.currentPeriod?.label || "Compare spending across time periods"}
+      action={<PeriodSelector value={periodType} onChange={handlePeriodChange} />}
+    >
+      {loading && <Skeleton className="h-[300px]" />}
+      {error && (
+        <div className="flex justify-center items-center h-64 text-destructive">
+          <div className="text-center">
+            <p className="font-semibold">Failed to load data</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
           </div>
-          <PeriodSelector value={periodType} onChange={handlePeriodChange} />
         </div>
-      </CardHeader>
-      <CardContent>
-        {loading && <Skeleton className="h-[300px]" />}
-        {error && (
-          <div className="flex justify-center items-center h-64 text-destructive">
-            <div className="text-center">
-              <p className="font-semibold">Failed to load data</p>
-              <p className="text-sm text-muted-foreground">{error.message}</p>
+      )}
+      {!loading && !error && data && (
+        <>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="rounded-lg border bg-card p-3">
+              <p className="text-xs text-muted-foreground">Current Period</p>
+              <p className="text-xl font-bold">
+                ${formatAmount(data.totals?.currentPeriodTotal).toFixed(2)}
+              </p>
+            </div>
+            <div className="rounded-lg border bg-card p-3">
+              <p className="text-xs text-muted-foreground">Previous Period</p>
+              <p className="text-xl font-bold">
+                ${formatAmount(data.totals?.previousPeriodTotal).toFixed(2)}
+              </p>
             </div>
           </div>
-        )}
-        {!loading && !error && data && (
-          <>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="rounded-lg border bg-card p-3">
-                <p className="text-xs text-muted-foreground">Current Period</p>
-                <p className="text-xl font-bold">
-                  ${formatAmount(data.totals?.currentPeriodTotal).toFixed(2)}
-                </p>
-              </div>
-              <div className="rounded-lg border bg-card p-3">
-                <p className="text-xs text-muted-foreground">Previous Period</p>
-                <p className="text-xl font-bold">
-                  ${formatAmount(data.totals?.previousPeriodTotal).toFixed(2)}
-                </p>
-              </div>
-            </div>
 
-            <CategorySpendingChart data={data} onCategoryClick={handleCategoryClick} />
-          </>
-        )}
-      </CardContent>
+          <CategorySpendingChart data={data} onCategoryClick={handleCategoryClick} />
+        </>
+      )}
       <CategoryTransactionsSheet
         open={!!selectedCategory}
         onOpenChange={(open) => !open && setSelectedCategory(null)}

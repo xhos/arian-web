@@ -1,7 +1,7 @@
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { Badge } from "@/components/ui/badge";
 import { formatAmount, formatCurrency } from "@/lib/utils/transaction";
-import { Card, VStack, HStack, Muted, Caption } from "@/components/lib";
+import { Card, VStack, HStack, Muted, Caption, Text } from "@/components/lib";
 
 interface TransactionDetailsProps {
   transaction: Transaction;
@@ -39,38 +39,38 @@ export function TransactionDetails({ transaction }: TransactionDetailsProps) {
             {transaction.balanceAfter && (
               <VStack spacing="xs" align="start">
                 <Caption>BALANCE AFTER</Caption>
-                <div className="font-mono text-sm">
+                <Text size="sm" className="font-mono">
                   {formatCurrency(
                     formatAmount(transaction.balanceAfter),
                     transaction.balanceAfter?.currencyCode
                   )}
-                </div>
+                </Text>
               </VStack>
             )}
 
             {transaction.receiptId && (
               <VStack spacing="xs" align="start">
                 <Caption>RECEIPT ID</Caption>
-                <div className="font-mono text-sm">#{transaction.receiptId.toString()}</div>
+                <Text size="sm" className="font-mono">#{transaction.receiptId.toString()}</Text>
               </VStack>
             )}
 
             {transaction.foreignAmount && (
               <VStack spacing="xs" align="start">
                 <Caption>FOREIGN AMOUNT</Caption>
-                <div className="font-mono text-sm">
+                <Text size="sm" className="font-mono">
                   {formatCurrency(
                     formatAmount(transaction.foreignAmount),
                     transaction.foreignAmount?.currencyCode
                   )}
-                </div>
+                </Text>
               </VStack>
             )}
 
             {transaction.exchangeRate && (
               <VStack spacing="xs" align="start">
                 <Caption>EXCHANGE RATE</Caption>
-                <div className="font-mono text-sm">{transaction.exchangeRate}</div>
+                <Text size="sm" className="font-mono">{transaction.exchangeRate}</Text>
               </VStack>
             )}
 

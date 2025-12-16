@@ -45,14 +45,14 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
       : "Custom";
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <div className="inline-flex items-center gap-1.5">
       <div className="inline-flex items-center rounded-xs border border-input bg-input p-0.5 text-muted-foreground">
         {periods.map((period) => (
           <button
             key={period.value}
             onClick={() => onChange(period.value)}
             className={cn(
-              "px-2.5 py-1 text-xs font-normal rounded-xs transition-all",
+              "px-2 py-1 text-xs font-normal rounded-xs transition-all",
               value === period.value && "bg-background text-foreground",
               value !== period.value && "hover:text-foreground"
             )}
@@ -67,10 +67,9 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
           <Button
             variant={isCustom ? "default" : "outline"}
             size="sm"
-            className="gap-1.5"
+            className="h-8 w-8 p-0"
           >
-            <CalendarIcon className="h-4 w-4" />
-            <span className="text-xs">{customLabel}</span>
+            <CalendarIcon className="h-3.5 w-3.5" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="end">

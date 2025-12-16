@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2, Target, Search, Plus } from "lucide-react";
-import { VStack, HStack } from "@/components/lib";
+import { VStack, HStack, Muted, Caption } from "@/components/lib";
 import type { Rule } from "@/gen/arian/v1/rule_pb";
 import type { Category } from "@/gen/arian/v1/category_pb";
 import type { TransactionRule } from "@/lib/rules";
@@ -129,17 +129,15 @@ export function RulesTable({
       </HStack>
 
       {rules.length === 0 ? (
-        <div className="tui-border rounded-lg p-8 text-center">
-          <Target className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <div className="text-sm tui-muted mb-2">No rules yet</div>
-          <div className="text-xs tui-muted">
-            Create your first rule to automatically categorize transactions
-          </div>
-        </div>
+        <VStack spacing="md" align="center" justify="center" className="border border-border rounded-lg p-8">
+          <Target className="h-12 w-12 text-muted-foreground" />
+          <Muted size="sm">No rules yet</Muted>
+          <Caption>Create your first rule to automatically categorize transactions</Caption>
+        </VStack>
       ) : filteredRules.length === 0 ? (
-        <div className="tui-border rounded-lg p-8 text-center">
-          <div className="text-sm tui-muted">No rules found matching &quot;{searchValue}&quot;</div>
-        </div>
+        <VStack spacing="sm" align="center" justify="center" className="border border-border rounded-lg p-8">
+          <Muted size="sm">No rules found matching &quot;{searchValue}&quot;</Muted>
+        </VStack>
       ) : (
         <div className="tui-border rounded-lg overflow-hidden">
           <Table>

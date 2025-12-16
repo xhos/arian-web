@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import { Button } from "@/components/ui/button";
-import { Amount, Text, SectionTitle } from "@/components/lib";
+import { Amount, Text, VStack, HStack, Caption } from "@/components/lib";
 import { formatCurrency } from "@/lib/utils/transaction";
 import { Stat } from "@/components/ui/layout";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
@@ -34,31 +34,31 @@ function SelectionGuide() {
   return (
     <Panel>
       <PanelSection className="space-y-4">
-        <div className="space-y-3">
-          <div>
-            <div className="text-sm font-medium mb-1.5">Individual Selection</div>
+        <VStack spacing="sm">
+          <VStack spacing="xs">
+            <Text size="sm" weight="medium">Individual Selection</Text>
             <Text size="sm" color="muted" className="flex items-center gap-1.5">
               <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click transaction
             </Text>
-          </div>
-          <div>
-            <div className="text-sm font-medium mb-1.5">Range Selection</div>
+          </VStack>
+          <VStack spacing="xs">
+            <Text size="sm" weight="medium">Range Selection</Text>
             <Text size="sm" color="muted" className="flex items-center gap-1.5">
               <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click transaction
             </Text>
-          </div>
-          <div>
-            <div className="text-sm font-medium mb-1.5">Select Entire Day</div>
-            <div className="space-y-1">
+          </VStack>
+          <VStack spacing="xs">
+            <Text size="sm" weight="medium">Select Entire Day</Text>
+            <VStack spacing="xs">
               <Text size="sm" color="muted" className="flex items-center gap-1.5">
                 <KbdGroup><Kbd>Ctrl</Kbd></KbdGroup> + click day header
               </Text>
               <Text size="sm" color="muted" className="flex items-center gap-1.5">
                 <KbdGroup><Kbd>Shift</Kbd></KbdGroup> + click day header
               </Text>
-            </div>
-          </div>
-        </div>
+            </VStack>
+          </VStack>
+        </VStack>
         <PanelDivider />
         <Text size="sm" color="muted" className="block">
           Selected transactions will show analysis here including income, expenses, and net totals.
@@ -99,22 +99,22 @@ function TransactionAnalytics({
   return (
     <Panel>
       <PanelSection className="border-b">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold">Selection Analysis</h3>
+        <HStack spacing="md" justify="between" align="center" className="mb-2">
+          <Text size="sm" weight="semibold">Selection Analysis</Text>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             ✕
           </button>
-        </div>
+        </HStack>
         <Text size="sm" color="muted">
           {analytics.transactionCount} transaction{analytics.transactionCount !== 1 ? "s" : ""} selected
         </Text>
       </PanelSection>
 
       <PanelSection className="space-y-5">
-        <div className="space-y-2.5">
+        <VStack spacing="sm">
           <Stat
             label="Income"
             value={<Amount variant="positive" value={analytics.totalIncome} className="text-sm" />}
@@ -123,7 +123,7 @@ function TransactionAnalytics({
             label="Expenses"
             value={<Amount variant="negative" value={analytics.totalExpenses} className="text-sm" />}
           />
-        </div>
+        </VStack>
 
         <PanelDivider />
 
@@ -140,9 +140,9 @@ function TransactionAnalytics({
 
         <PanelDivider />
 
-        <div>
-          <SectionTitle className="mb-2 text-xs">Summary</SectionTitle>
-          <div className="space-y-2 text-xs">
+        <VStack spacing="sm">
+          <Caption>Summary</Caption>
+          <VStack spacing="xs">
             <Stat
               label="Average per transaction"
               value={
@@ -171,14 +171,14 @@ function TransactionAnalytics({
                 }
               />
             )}
-          </div>
-        </div>
+          </VStack>
+        </VStack>
 
         <PanelDivider />
 
-        <div>
-          <SectionTitle className="mb-3 text-xs">Actions</SectionTitle>
-          <div className="space-y-2">
+        <VStack spacing="sm">
+          <Caption>Actions</Caption>
+          <VStack spacing="xs">
             <Button onClick={onBulkModify} className="w-full" size="sm">
               Bulk Modify
             </Button>
@@ -195,8 +195,8 @@ function TransactionAnalytics({
                   ? `Confirm delete ${transactions.length}?`
                   : "Delete Selected"}
             </Button>
-          </div>
-        </div>
+          </VStack>
+        </VStack>
       </PanelSection>
     </Panel>
   );

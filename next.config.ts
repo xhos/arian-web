@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  turbopack: {
+    resolveAlias: {
+      "@/gen": "./src/gen",
+    },
+  },
 };
 
 export default nextConfig;

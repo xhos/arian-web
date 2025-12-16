@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, HelpCircle } from "lucide-react";
+import { VStack, HStack, Text, Muted, Card } from "@/components/lib";
 import { ConditionBuilder, type UICondition } from "./ConditionBuilder";
 import { FIELD_OPTIONS, TX_DIRECTION_OPTIONS } from "./rule-dialog-constants";
 import type { Category } from "@/gen/arian/v1/category_pb";
@@ -39,7 +39,7 @@ export function Step1({ ruleName, onRuleNameChange, onNext }: Step1Props) {
 
   return (
     <StepLayout>
-      <div>
+      <VStack spacing="sm" align="start">
         <Label htmlFor="ruleName" className="text-base font-medium">
           Name
         </Label>
@@ -49,9 +49,8 @@ export function Step1({ ruleName, onRuleNameChange, onNext }: Step1Props) {
           onChange={(e) => onRuleNameChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="e.g., Groceries"
-          className="mt-2"
         />
-      </div>
+      </VStack>
     </StepLayout>
   );
 }
@@ -95,30 +94,34 @@ export function Step2({
   };
 
   return (
-    <div onKeyDown={handleKeyDown} className="space-y-4">
-      <div className="bg-muted/50 p-4 rounded-lg">
-        <Label className="text-base font-medium mb-3 block">Apply this rule when:</Label>
-        <RadioGroup value={logic} onValueChange={onLogicChange} className="space-y-3">
-          <div className="flex items-start gap-3">
-            <RadioGroupItem value="AND" id="all-conditions" className="mt-1" />
-            <div>
-              <Label htmlFor="all-conditions" className="font-medium cursor-pointer">
-                ALL conditions are met
-              </Label>
-              <p className="text-xs text-muted-foreground">Transaction must match all conditions below</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <RadioGroupItem value="OR" id="any-conditions" className="mt-1" />
-            <div>
-              <Label htmlFor="any-conditions" className="font-medium cursor-pointer">
-                ANY condition is met
-              </Label>
-              <p className="text-xs text-muted-foreground">Transaction matches any single condition below</p>
-            </div>
-          </div>
-        </RadioGroup>
-      </div>
+    <VStack spacing="md" onKeyDown={handleKeyDown} className="w-full">
+      <Card variant="subtle" padding="md">
+        <VStack spacing="sm" align="start">
+          <Label className="text-base font-medium">Apply this rule when:</Label>
+          <RadioGroup value={logic} onValueChange={onLogicChange}>
+            <VStack spacing="sm" align="start">
+              <HStack spacing="sm" align="start">
+                <RadioGroupItem value="AND" id="all-conditions" className="mt-1" />
+                <VStack spacing="xs" align="start">
+                  <Label htmlFor="all-conditions" className="font-medium cursor-pointer">
+                    ALL conditions are met
+                  </Label>
+                  <Muted size="xs">Transaction must match all conditions below</Muted>
+                </VStack>
+              </HStack>
+              <HStack spacing="sm" align="start">
+                <RadioGroupItem value="OR" id="any-conditions" className="mt-1" />
+                <VStack spacing="xs" align="start">
+                  <Label htmlFor="any-conditions" className="font-medium cursor-pointer">
+                    ANY condition is met
+                  </Label>
+                  <Muted size="xs">Transaction matches any single condition below</Muted>
+                </VStack>
+              </HStack>
+            </VStack>
+          </RadioGroup>
+        </VStack>
+      </Card>
 
       {conditions.map((condition, index) => (
         <ConditionBuilder
@@ -136,7 +139,7 @@ export function Step2({
         <Plus className="h-4 w-4 mr-2" />
         Add Another Condition
       </Button>
-    </div>
+    </VStack>
   );
 }
 
@@ -156,9 +159,9 @@ export function Step3({
   onMerchantChange,
 }: Step3Props) {
   return (
-    <div className="bg-muted/50 p-4 rounded-lg">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm">Apply category</span>
+    <Card variant="subtle" padding="md">
+      <HStack spacing="sm" align="center" className="flex-wrap">
+        <Text size="sm">Apply category</Text>
         <Select value={selectedCategoryId} onValueChange={onCategoryChange}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="select" />
@@ -172,9 +175,9 @@ export function Step3({
           </SelectContent>
         </Select>
 
-        <span className="text-sm text-muted-foreground">and/or</span>
+        <Muted size="sm">and/or</Muted>
 
-        <span className="text-sm">merchant</span>
+        <Text size="sm">merchant</Text>
         <Input
           id="merchant"
           value={merchantValue}
@@ -182,8 +185,8 @@ export function Step3({
           placeholder="enter value"
           className="w-48"
         />
-      </div>
-    </div>
+      </HStack>
+    </Card>
   );
 }
 
@@ -226,19 +229,19 @@ export function Step4({
   });
 
   return (
-    <div className="space-y-4">
-      <Card className="p-4">
-        <div className="space-y-3">
-          <div>
+    <VStack spacing="md">
+      <Card padding="md">
+        <VStack spacing="md" align="start">
+          <VStack spacing="xs" align="start">
             <Label className="text-xs text-muted-foreground">Name</Label>
-            <p className="text-sm font-medium">{ruleName}</p>
-          </div>
+            <Text size="sm" weight="medium">{ruleName}</Text>
+          </VStack>
 
-          <div>
+          <VStack spacing="xs" align="start">
             <Label className="text-xs text-muted-foreground">When</Label>
-            <div className="text-sm space-y-1 mt-1">
+            <VStack spacing="sm" align="start">
               {validConditions.map((condition, index) => (
-                <div key={index}>
+                <Text key={index} size="sm">
                   {index > 0 && <span className="text-muted-foreground">{logic} </span>}
                   <span>
                     {FIELD_OPTIONS.find((f) => f.value === condition.field)?.label} {condition.operator}{" "}
@@ -253,37 +256,43 @@ export function Step4({
                             : `"${condition.value}"`}
                     {condition.case_sensitive && " (case sensitive)"}
                   </span>
-                </div>
+                </Text>
               ))}
-            </div>
-          </div>
+            </VStack>
+          </VStack>
 
-          <div>
+          <VStack spacing="xs" align="start">
             <Label className="text-xs text-muted-foreground">Apply</Label>
-            <div className="flex gap-2 mt-1 text-sm">
+            <HStack spacing="sm" className="flex-wrap">
               {selectedCategory && (
-                <span>category <Badge variant="outline" className="ml-1">{selectedCategory.slug}</Badge></span>
+                <HStack spacing="xs" align="center">
+                  <Text size="sm">category</Text>
+                  <Badge variant="outline">{selectedCategory.slug}</Badge>
+                </HStack>
               )}
-              {selectedCategory && merchantValue && <span className="text-muted-foreground">and</span>}
+              {selectedCategory && merchantValue && <Muted size="sm">and</Muted>}
               {merchantValue && (
-                <span>merchant <Badge variant="outline" className="ml-1">{merchantValue}</Badge></span>
+                <HStack spacing="xs" align="center">
+                  <Text size="sm">merchant</Text>
+                  <Badge variant="outline">{merchantValue}</Badge>
+                </HStack>
               )}
-            </div>
-          </div>
-        </div>
+            </HStack>
+          </VStack>
+        </VStack>
       </Card>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <HStack spacing="lg" justify="between" align="center" className="w-full flex-wrap">
+        <HStack spacing="sm" align="center">
           <Label htmlFor="applyToExisting">Apply to existing</Label>
           <Switch
             id="applyToExisting"
             checked={applyToExisting}
             onCheckedChange={onApplyToExistingChange}
           />
-        </div>
+        </HStack>
 
-        <div className="flex items-center gap-3">
+        <HStack spacing="sm" align="center">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -307,8 +316,8 @@ export function Step4({
             min={1}
             className="w-16 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
-        </div>
-      </div>
-    </div>
+        </HStack>
+      </HStack>
+    </VStack>
   );
 }

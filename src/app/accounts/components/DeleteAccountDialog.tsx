@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
+import { VStack, HStack, Text, Muted } from "@/components/lib";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -70,35 +71,35 @@ export function DeleteAccountDialog({
             Delete Account
           </DialogTitle>
         </DialogHeader>
-        <div className="py-4 space-y-3">
-          <p className="text-sm text-muted-foreground">
+        <VStack spacing="md" className="py-4">
+          <Text size="sm" color="muted">
             Are you sure you want to delete this account? This action cannot be undone.
-          </p>
-          <div className="tui-border rounded-lg p-3 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">Account Name:</span>
-              <span className="text-sm font-mono">{account.name}</span>
-            </div>
+          </Text>
+          <VStack spacing="xs" className="tui-border rounded-lg p-3">
+            <HStack spacing="md" justify="between">
+              <Text size="sm" weight="medium">Account Name:</Text>
+              <Text size="sm" className="font-mono">{account.name}</Text>
+            </HStack>
             {account.alias && (
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">Alias:</span>
-                <span className="text-sm font-mono">{account.alias}</span>
-              </div>
+              <HStack spacing="md" justify="between">
+                <Text size="sm" weight="medium">Alias:</Text>
+                <Text size="sm" className="font-mono">{account.alias}</Text>
+              </HStack>
             )}
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">Bank:</span>
-              <span className="text-sm">{account.bank}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">Type:</span>
-              <span className="text-sm">{getAccountTypeName(account.type)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">Current Balance:</span>
-              <span className="text-sm font-mono">{formatBalance(account.balance)}</span>
-            </div>
-          </div>
-        </div>
+            <HStack spacing="md" justify="between">
+              <Text size="sm" weight="medium">Bank:</Text>
+              <Text size="sm">{account.bank}</Text>
+            </HStack>
+            <HStack spacing="md" justify="between">
+              <Text size="sm" weight="medium">Type:</Text>
+              <Text size="sm">{getAccountTypeName(account.type)}</Text>
+            </HStack>
+            <HStack spacing="md" justify="between">
+              <Text size="sm" weight="medium">Current Balance:</Text>
+              <Text size="sm" className="font-mono">{formatBalance(account.balance)}</Text>
+            </HStack>
+          </VStack>
+        </VStack>
         <DialogFooter>
           <Button
             type="button"

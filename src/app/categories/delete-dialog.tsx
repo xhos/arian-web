@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
-import { VStack } from "@/components/lib";
+import { VStack, HStack, Text } from "@/components/lib";
 import type { Category } from "@/gen/arian/v1/category_pb";
 
 interface DeleteDialogProps {
@@ -59,29 +59,31 @@ export function DeleteDialog({
           </div>
           {childCount > 0 && (
             <div className="bg-destructive/10 border border-destructive/20 rounded p-3">
-              <p className="text-sm text-destructive font-medium">
+              <Text size="sm" weight="medium" color="destructive">
                 This will also delete {childCount} child categor{childCount === 1 ? "y" : "ies"}.
-              </p>
+              </Text>
             </div>
           )}
         </VStack>
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? "Deleting..." : "Delete Category"}
-          </Button>
+          <HStack spacing="sm" justify="end" className="w-full">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "Delete Category"}
+            </Button>
+          </HStack>
         </DialogFooter>
       </DialogContent>
     </Dialog>

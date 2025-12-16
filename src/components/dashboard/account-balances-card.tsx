@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { dashboardApi } from "@/lib/api/dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { VStack, HStack, Caption } from "@/components/lib";
+import { Card, VStack, HStack, Caption } from "@/components/lib";
 import { formatAmount } from "@/lib/utils/transaction";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 import type { AccountBalance } from "@/gen/arian/v1/account_pb";
@@ -53,8 +53,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
   });
 
   return (
-    <div className="rounded-lg bg-card p-5 shadow-sm">
-      <h3 className="mb-4 text-sm font-medium text-muted-foreground">ACCOUNT BALANCES</h3>
+    <Card variant="elevated" title="account balances">
       <VStack spacing="sm">
         {isLoading ? (
           <>
@@ -97,6 +96,6 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
           </div>
         )}
       </VStack>
-    </div>
+    </Card>
   );
 }

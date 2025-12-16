@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
-import { VStack, HStack, Caption, Muted, ErrorMessage } from "@/components/lib";
+import { VStack, HStack, Caption, ErrorMessage, Text } from "@/components/lib";
 import type { Category } from "@/gen/arian/v1/category_pb";
 
 interface CategoryDialogProps {
@@ -116,9 +116,9 @@ export function CategoryDialog({
                 disabled={isLoading}
                 className="font-mono"
               />
-              <Muted size="xs">
-                Use dots to create hierarchy: <code className="text-xs">parent.child</code>
-              </Muted>
+              <Text size="xs" color="muted">
+                Use dots to create hierarchy: <code className="font-mono text-xs">parent.child</code>
+              </Text>
             </VStack>
             <VStack spacing="xs">
               <Caption>Color</Caption>

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { subMonths } from "date-fns";
 import { create } from "@bufbuild/protobuf";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/lib";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardApi } from "@/lib/api/dashboard";
@@ -48,30 +48,18 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Net Worth Over Time</CardTitle>
-          <CardDescription>Loading...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-[300px] w-full" />
-        </CardContent>
+      <Card title="net worth over time" description="Loading...">
+        <Skeleton className="h-[300px] w-full" />
       </Card>
     );
   }
 
   if (error || !data || data.dataPoints.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Net Worth Over Time</CardTitle>
-          <CardDescription>No data available</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-[300px] items-center justify-center text-muted-foreground">
-            {error ? "Failed to load net worth data" : "No net worth history found"}
-          </div>
-        </CardContent>
+      <Card title="net worth over time" description="No data available">
+        <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+          {error ? "Failed to load net worth data" : "No net worth history found"}
+        </div>
       </Card>
     );
   }
@@ -87,19 +75,19 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
   const changePercent = previousValue !== 0 ? ((change / previousValue) * 100).toFixed(1) : "0.0";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Net Worth Over Time</CardTitle>
-        <CardDescription>
+    <Card
+      title="net worth over time"
+      description={
+        <>
           <span className="tabular-nums">
             ${currentValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
           <span className={`ml-2 text-xs ${change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
             {change >= 0 ? "↑" : "↓"} {change >= 0 ? "+" : ""}{changePercent}% from last month
           </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </>
+      }
+    >
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <AreaChart
             accessibilityLayer
@@ -154,7 +142,6 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
             />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
     </Card>
   );
 }

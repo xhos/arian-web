@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VStack, Caption, Muted } from "@/components/lib";
+import { VStack, Caption, Muted, Text, HStack } from "@/components/lib";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
 interface CreateAccountSidebarProps {
@@ -93,8 +93,8 @@ export default function CreateAccountSidebar({
       <div className="fixed right-0 top-0 h-full w-96 bg-background border-l border-border z-50 overflow-y-auto">
         <VStack spacing="md" className="p-6">
           {/* Header */}
-          <div className="flex items-center justify-between w-full">
-            <h2 className="text-lg font-semibold">Add Account</h2>
+          <HStack spacing="md" justify="between" align="center" className="w-full">
+            <Text size="lg" weight="semibold">Add Account</Text>
             <Button
               variant="ghost"
               size="sm"
@@ -102,7 +102,7 @@ export default function CreateAccountSidebar({
             >
               ✕
             </Button>
-          </div>
+          </HStack>
 
           {/* Form */}
           <VStack spacing="sm">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VStack, HStack, Caption, Muted } from "@/components/lib";
+import { VStack, HStack, Caption, Muted, Card, ErrorMessage, Text } from "@/components/lib";
 
 interface AnchorBalanceFormProps {
   accountId: bigint;
@@ -43,16 +43,20 @@ export default function AnchorBalanceForm({
     e.preventDefault();
     setError("");
 
-    if (!formData.amount || parseFloat(formData.amount) < 0) {
+    if (!formData.amount) {
       setError("Please enter a valid amount");
       return;
     }
 
     try {
+      const amount = parseFloat(formData.amount);
+      const units = Math.trunc(amount);
+      const nanos = Math.round((amount - units) * 1e9);
+
       await onSubmit({
         currencyCode: formData.currency,
-        units: Math.floor(parseFloat(formData.amount)).toString(),
-        nanos: Math.round((parseFloat(formData.amount) % 1) * 1e9),
+        units: units.toString(),
+        nanos,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to set anchor balance");
@@ -60,15 +64,15 @@ export default function AnchorBalanceForm({
   };
 
   return (
-    <div className="border border-border rounded-lg p-4">
-      <h2 className="text-sm text-muted-foreground mb-4 uppercase tracking-wider">
-        set anchor balance for {accountName}
-      </h2>
-
-      {error && <div className="mb-4 p-3 text-sm font-mono text-destructive border border-border">{error}</div>}
-
+    <Card padding="md">
       <form onSubmit={handleSubmit}>
         <VStack spacing="lg">
+          <Muted size="xs" weight="medium" className="uppercase tracking-wider">
+            set anchor balance for {accountName}
+          </Muted>
+
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <VStack spacing="xs">
               <Caption>amount *</Caption>
@@ -81,6 +85,7 @@ export default function AnchorBalanceForm({
                 placeholder="0.00"
                 disabled={isLoading}
                 required
+                min={undefined}
               />
             </VStack>
 
@@ -102,12 +107,12 @@ export default function AnchorBalanceForm({
             </VStack>
           </div>
 
-          <Muted>
+          <Text size="sm" color="muted">
             This sets the reference balance for this account at a specific point in time. It&apos;s
             used to calculate running balances for transactions.
-          </Muted>
+          </Text>
 
-          <HStack spacing="sm" className="pt-4">
+          <HStack spacing="sm">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "setting..." : "set anchor balance"}
             </Button>
@@ -117,6 +122,6 @@ export default function AnchorBalanceForm({
           </HStack>
         </VStack>
       </form>
-    </div>
+    </Card>
   );
 }

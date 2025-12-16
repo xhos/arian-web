@@ -17,7 +17,7 @@ export default async function HomePage() {
   const userId = session.user.id;
 
   return (
-    <div className="min-h-screen w-full bg-background p-4 lg:p-6">
+    <div className="w-full p-4 lg:p-6">
       <div className="mx-auto max-w-[1400px] space-y-4">
         <DashboardStats userId={userId} />
 

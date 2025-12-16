@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { VStack, HStack, Text, Muted, Card } from "@/components/lib";
 import type { Account } from "@/gen/arian/v1/account_pb";
 import { AccountType } from "@/gen/arian/v1/enums_pb";
 
@@ -105,161 +106,163 @@ export default function AccountList({
   };
 
   return (
-    <div className="space-y-4">
+    <VStack spacing="md">
       {accounts.map((account) => (
-        <div key={account.id.toString()} className="tui-border rounded-lg p-4">
-          {/* Main account info */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              {editingAccount === account.id ? (
-                <div className="space-y-2">
-                  <Input
-                    defaultValue={account.alias || account.name}
-                    placeholder="Account display name"
-                    className="font-medium"
-                  />
-                  <div className="flex gap-2">
+        <Card key={account.id.toString()} padding="md">
+          <VStack spacing="md">
+            {/* Main account info */}
+            <HStack spacing="lg" justify="between" align="start" className="w-full">
+              <VStack spacing="xs" align="start" className="flex-1">
+                {editingAccount === account.id ? (
+                  <VStack spacing="sm" className="w-full">
                     <Input
-                      defaultValue={account.name}
-                      placeholder="Internal name"
-                      className="text-sm"
+                      defaultValue={account.alias || account.name}
+                      placeholder="Account display name"
+                      className="font-medium"
                     />
-                    <Input defaultValue={account.bank} placeholder="Bank" className="text-sm" />
-                    <select defaultValue={account.type.toString()} className="rounded-md border border-input bg-transparent px-3 py-2 text-sm">
-                      <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
-                      <option value={AccountType.ACCOUNT_SAVINGS}>Savings</option>
-                      <option value={AccountType.ACCOUNT_CREDIT_CARD}>Credit Card</option>
-                      <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
-                      <option value={AccountType.ACCOUNT_OTHER}>Other</option>
-                    </select>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-lg">{account.alias || account.name}</h3>
-                    {account.alias && <span className="text-sm tui-muted">({account.name})</span>}
-                  </div>
-                  <div className="text-sm tui-muted">
-                    {account.bank} • {getAccountTypeName(account.type)}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="text-right">
-              <div className="text-xl font-mono mb-1">{getCurrentBalance(account.id)}</div>
-              <div className="text-xs tui-muted">current balance</div>
-            </div>
-          </div>
-
-          {/* Anchor balance info */}
-          {account.anchorBalance && (
-            <div className="mb-4 p-3 bg-muted/30 rounded border-l-2 border-primary/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs tui-muted mb-1">anchor balance</div>
-                  {editingAnchor === account.id ? (
-                    <div className="flex gap-2 items-center">
+                    <HStack spacing="sm" className="w-full">
                       <Input
-                        type="number"
-                        step="0.01"
-                        defaultValue={
-                          parseFloat(account.anchorBalance.units?.toString() || "0") +
-                          (account.anchorBalance.nanos || 0) / 1e9
-                        }
-                        className="w-24 h-7 text-sm"
+                        defaultValue={account.name}
+                        placeholder="Internal name"
+                        className="text-sm"
                       />
-                      <select
-                        defaultValue={account.anchorBalance.currencyCode || "USD"}
-                        className="h-7 text-sm rounded-md border border-input bg-transparent px-2"
-                      >
-                        <option value="USD">USD</option>
-                        <option value="CAD">CAD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="GBP">GBP</option>
-                        <option value="JPY">JPY</option>
+                      <Input defaultValue={account.bank} placeholder="Bank" className="text-sm" />
+                      <select defaultValue={account.type.toString()} className="rounded-md border border-input bg-transparent px-3 py-2 text-sm">
+                        <option value={AccountType.ACCOUNT_CHEQUING}>Chequing</option>
+                        <option value={AccountType.ACCOUNT_SAVINGS}>Savings</option>
+                        <option value={AccountType.ACCOUNT_CREDIT_CARD}>Credit Card</option>
+                        <option value={AccountType.ACCOUNT_INVESTMENT}>Investment</option>
+                        <option value={AccountType.ACCOUNT_OTHER}>Other</option>
                       </select>
-                      <Button size="sm" className="h-7 text-xs">
-                        save
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 text-xs"
-                        onClick={() => setEditingAnchor(null)}
-                      >
-                        cancel
-                      </Button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingAnchor(account.id)}
-                      className="text-sm hover:underline text-primary"
-                    >
-                      {formatBalance(account.anchorBalance)}
-                    </button>
-                  )}
-                </div>
-                <div className="text-xs tui-muted">
-                  {account.anchorDate && formatDate(account.anchorDate)}
-                </div>
-              </div>
-            </div>
-          )}
+                    </HStack>
+                  </VStack>
+                ) : (
+                  <VStack spacing="xs" align="start">
+                    <HStack spacing="sm" align="center">
+                      <Text weight="medium" size="lg">{account.alias || account.name}</Text>
+                      {account.alias && <Muted size="sm">({account.name})</Muted>}
+                    </HStack>
+                    <Text size="sm" color="muted">
+                      {account.bank} • {getAccountTypeName(account.type)}
+                    </Text>
+                  </VStack>
+                )}
+              </VStack>
 
-          {/* Action buttons */}
-          <div className="flex gap-2 flex-wrap">
-            {editingAccount === account.id ? (
-              <>
-                <Button size="sm" onClick={() => setEditingAccount(null)}>
-                  save changes
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setEditingAccount(null)}>
-                  cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setEditingAccount(account.id)}
-                  disabled={isLoading}
-                >
-                  edit
-                </Button>
-                {!account.anchorBalance && (
+              <VStack spacing="xs" align="end">
+                <Text size="lg" weight="bold" className="font-mono">{getCurrentBalance(account.id)}</Text>
+                <Muted size="xs">current balance</Muted>
+              </VStack>
+            </HStack>
+
+            {/* Anchor balance info */}
+            {account.anchorBalance && (
+              <Card variant="subtle" padding="sm" className="border-l-2 border-primary/20 w-full">
+                <HStack spacing="lg" justify="between" align="center" className="w-full">
+                  <VStack spacing="xs" align="start">
+                    <Muted size="xs">anchor balance</Muted>
+                    {editingAnchor === account.id ? (
+                      <HStack spacing="sm" align="center">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          defaultValue={
+                            parseFloat(account.anchorBalance.units?.toString() || "0") +
+                            (account.anchorBalance.nanos || 0) / 1e9
+                          }
+                          className="w-24 h-7 text-sm"
+                        />
+                        <select
+                          defaultValue={account.anchorBalance.currencyCode || "USD"}
+                          className="h-7 text-sm rounded-md border border-input bg-transparent px-2"
+                        >
+                          <option value="USD">USD</option>
+                          <option value="CAD">CAD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="GBP">GBP</option>
+                          <option value="JPY">JPY</option>
+                        </select>
+                        <Button size="sm" className="h-7 text-xs">
+                          save
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs"
+                          onClick={() => setEditingAnchor(null)}
+                        >
+                          cancel
+                        </Button>
+                      </HStack>
+                    ) : (
+                      <button
+                        onClick={() => setEditingAnchor(account.id)}
+                        className="text-sm hover:underline text-primary"
+                      >
+                        {formatBalance(account.anchorBalance)}
+                      </button>
+                    )}
+                  </VStack>
+                  <Muted size="xs">
+                    {account.anchorDate && formatDate(account.anchorDate)}
+                  </Muted>
+                </HStack>
+              </Card>
+            )}
+
+            {/* Action buttons */}
+            <HStack spacing="sm" className="flex-wrap">
+              {editingAccount === account.id ? (
+                <>
+                  <Button size="sm" onClick={() => setEditingAccount(null)}>
+                    save changes
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingAccount(null)}>
+                    cancel
+                  </Button>
+                </>
+              ) : (
+                <>
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      onSetAnchorBalance(account.id, { currencyCode: "USD", units: "0", nanos: 0 })
+                    variant="ghost"
+                    onClick={() => setEditingAccount(account.id)}
+                    disabled={isLoading}
+                  >
+                    edit
+                  </Button>
+                  {!account.anchorBalance && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        onSetAnchorBalance(account.id, { currencyCode: "USD", units: "0", nanos: 0 })
+                      }
+                      disabled={isLoading}
+                      className="text-primary hover:bg-primary/10 border-primary/20"
+                    >
+                      set anchor balance
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant={deleteConfirmation === account.id ? "destructive" : "ghost"}
+                    onClick={() => handleDeleteClick(account.id)}
+                    className={
+                      deleteConfirmation === account.id
+                        ? "min-h-8"
+                        : "text-destructive hover:bg-destructive/10 border-destructive/50"
                     }
                     disabled={isLoading}
-                    className="text-primary hover:bg-primary/10 border-primary/20"
                   >
-                    set anchor balance
+                    {deleteConfirmation === account.id ? "confirm delete" : "delete"}
                   </Button>
-                )}
-                <Button
-                  size="sm"
-                  variant={deleteConfirmation === account.id ? "destructive" : "ghost"}
-                  onClick={() => handleDeleteClick(account.id)}
-                  className={
-                    deleteConfirmation === account.id
-                      ? "min-h-8"
-                      : "text-destructive hover:bg-destructive/10 border-destructive/50"
-                  }
-                  disabled={isLoading}
-                >
-                  {deleteConfirmation === account.id ? "confirm delete" : "delete"}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+                </>
+              )}
+            </HStack>
+          </VStack>
+        </Card>
       ))}
-    </div>
+    </VStack>
   );
 }
