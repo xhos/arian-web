@@ -191,7 +191,7 @@ export default function AccountsPage() {
 
         {accounts.length === 0 ? (
           <EmptyState
-            title="No accounts yet"
+            title=""
             action={
               <Button onClick={() => setIsCreateDialogOpen(true)} disabled={isOperationLoading}>
                 <Plus className="h-4 w-4" />

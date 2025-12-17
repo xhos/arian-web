@@ -62,21 +62,48 @@ export const transactionsApi = {
   async create(data: CreateTransactionInput) {
     const request = create(CreateTransactionRequestSchema, {
       userId: data.userId,
-      accountId: data.accountId,
-      txDate: { seconds: BigInt(Math.floor(data.txDate.getTime() / 1000)) },
-      txAmount: {
-        currencyCode: data.txAmount.currencyCode,
-        units: BigInt(data.txAmount.units),
-        nanos: data.txAmount.nanos,
-      },
-      direction: data.direction,
-      description: data.description,
-      merchant: data.merchant,
-      userNotes: data.userNotes,
-      categoryId: data.categoryId,
+      transactions: [{
+        accountId: data.accountId,
+        txDate: { seconds: BigInt(Math.floor(data.txDate.getTime() / 1000)) },
+        txAmount: {
+          currencyCode: data.txAmount.currencyCode,
+          units: BigInt(data.txAmount.units),
+          nanos: data.txAmount.nanos,
+        },
+        direction: data.direction,
+        description: data.description,
+        merchant: data.merchant,
+        userNotes: data.userNotes,
+        categoryId: data.categoryId,
+      }],
     });
     const response = await transactionClient.createTransaction(request);
-    return response.transaction;
+    return response.transactions[0];
+  },
+
+  async bulkCreate(userId: string, transactions: Omit<CreateTransactionInput, "userId">[]) {
+    const request = create(CreateTransactionRequestSchema, {
+      userId,
+      transactions: transactions.map(tx => ({
+        accountId: tx.accountId,
+        txDate: { seconds: BigInt(Math.floor(tx.txDate.getTime() / 1000)) },
+        txAmount: {
+          currencyCode: tx.txAmount.currencyCode,
+          units: BigInt(tx.txAmount.units),
+          nanos: tx.txAmount.nanos,
+        },
+        direction: tx.direction,
+        description: tx.description,
+        merchant: tx.merchant,
+        userNotes: tx.userNotes,
+        categoryId: tx.categoryId,
+      })),
+    });
+    const response = await transactionClient.createTransaction(request);
+    return {
+      transactions: response.transactions,
+      createdCount: response.createdCount,
+    };
   },
 
   async bulkDelete(userId: string, transactionIds: bigint[]) {
