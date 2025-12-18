@@ -30,6 +30,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const cookie = document.cookie
+                    .split("; ")
+                    .find((row) => row.startsWith("sidebar_state="));
+                  if (cookie) {
+                    const isExpanded = cookie.substring("sidebar_state=".length) === "true";
+                    if (!isExpanded) {
+                      document.documentElement.setAttribute("data-sidebar-collapsed", "true");
+                    }
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`${satoshi.variable} ${geistMono.variable} ${lora.variable} antialiased`}>
         <QueryProvider>
           <ThemeProvider

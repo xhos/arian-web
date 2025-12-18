@@ -221,6 +221,15 @@
 }
 
 @layer utilities {
+  /* Sidebar persistence: Apply collapsed state immediately if saved */
+  html[data-sidebar-collapsed="true"] [data-slot="sidebar-container"] {
+    width: 3rem !important;
+  }
+
+  html[data-sidebar-collapsed="true"] [data-slot="sidebar-gap"] {
+    width: 3rem !important;
+  }
+
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }

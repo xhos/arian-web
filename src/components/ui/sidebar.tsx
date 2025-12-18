@@ -72,6 +72,22 @@ function SidebarProvider({
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
+
+  // Read the saved sidebar state from cookie on mount and clean up the data attribute
+  React.useEffect(() => {
+    const cookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+
+    if (cookie) {
+      const cookieValue = cookie.substring(SIDEBAR_COOKIE_NAME.length + 1)
+      _setOpen(cookieValue === "true")
+    }
+
+    // Remove the temporary data attribute after React takes over
+    document.documentElement.removeAttribute("data-sidebar-collapsed")
+  }, [])
+
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
