@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { subMonths } from "date-fns";
+import { subDays, subMonths } from "date-fns";
 import { create } from "@bufbuild/protobuf";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card } from "@/components/lib";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardApi } from "@/lib/api/dashboard";
-import { Granularity } from "@/gen/arian/v1/enums_pb";
+import { Granularity, PeriodType } from "@/gen/arian/v1/enums_pb";
 import { DateSchema } from "@/gen/google/type/date_pb";
 import { formatAmount } from "@/lib/utils/transaction";
+import { PeriodSelector } from "./period-selector";
 
 interface NetWorthChartProps {
   userId: string;
@@ -19,16 +21,66 @@ interface NetWorthChartProps {
 const chartConfig = {
   netWorth: {
     label: "Net Worth",
-    color: "hsl(var(--chart-1))",
+    color: "var(--color-accent-primary)",
   },
 } satisfies ChartConfig;
 
 export function NetWorthChart({ userId }: NetWorthChartProps) {
-  const endDate = new Date();
-  const startDate = subMonths(endDate, 12);
+  const [periodType, setPeriodType] = useState<PeriodType>(PeriodType.PERIOD_TYPE_90_DAYS);
+  const [customDates, setCustomDates] = useState<{ start: Date; end: Date } | undefined>();
+
+  const handlePeriodChange = (period: PeriodType, dates?: { start: Date; end: Date }) => {
+    setPeriodType(period);
+    if (period === PeriodType.PERIOD_TYPE_CUSTOM && dates) {
+      setCustomDates(dates);
+    }
+  };
+
+  // Calculate date range based on period type
+  const getDateRange = () => {
+    const endDate = new Date();
+    let startDate: Date;
+
+    if (periodType === PeriodType.PERIOD_TYPE_CUSTOM && customDates) {
+      return { startDate: customDates.start, endDate: customDates.end };
+    }
+
+    switch (periodType) {
+      case PeriodType.PERIOD_TYPE_7_DAYS:
+        startDate = subDays(endDate, 7);
+        break;
+      case PeriodType.PERIOD_TYPE_30_DAYS:
+        startDate = subDays(endDate, 30);
+        break;
+      case PeriodType.PERIOD_TYPE_90_DAYS:
+        startDate = subDays(endDate, 90);
+        break;
+      default:
+        startDate = subMonths(endDate, 12);
+    }
+
+    return { startDate, endDate };
+  };
+
+  const { startDate, endDate } = getDateRange();
+
+  // Determine appropriate granularity based on date range
+  const getGranularity = () => {
+    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff <= 90) {
+      return Granularity.DAY;
+    } else if (daysDiff <= 180) {
+      return Granularity.WEEK;
+    } else {
+      return Granularity.MONTH;
+    }
+  };
+
+  const granularity = getGranularity();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["net-worth-history", userId],
+    queryKey: ["net-worth-history", userId, periodType, customDates],
     queryFn: () =>
       dashboardApi.getNetWorthHistory({
         userId,
@@ -42,7 +94,7 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
           month: endDate.getMonth() + 1,
           day: endDate.getDate(),
         }),
-        granularity: Granularity.MONTH,
+        granularity,
       }),
   });
 
@@ -65,7 +117,7 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
   }
 
   const chartData = data.dataPoints.map((point) => ({
-    date: `${point.date?.year}-${String(point.date?.month).padStart(2, "0")}`,
+    date: `${point.date?.year}-${String(point.date?.month).padStart(2, "0")}-${String(point.date?.day).padStart(2, "0")}`,
     netWorth: formatAmount(point.netWorth),
   }));
 
@@ -73,6 +125,15 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
   const previousValue = chartData[chartData.length - 2]?.netWorth ?? 0;
   const change = currentValue - previousValue;
   const changePercent = previousValue !== 0 ? ((change / previousValue) * 100).toFixed(1) : "0.0";
+
+  const getChangeLabel = () => {
+    if (granularity === Granularity.DAY) {
+      return "from previous day";
+    } else if (granularity === Granularity.WEEK) {
+      return "from previous week";
+    }
+    return "from previous month";
+  };
 
   return (
     <Card
@@ -83,10 +144,11 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
             ${currentValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
           <span className={`ml-2 text-xs ${change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-            {change >= 0 ? "↑" : "↓"} {change >= 0 ? "+" : ""}{changePercent}% from last month
+            {change >= 0 ? "↑" : "↓"} {change >= 0 ? "+" : ""}{changePercent}% {getChangeLabel()}
           </span>
         </>
       }
+      action={<PeriodSelector value={periodType} onChange={handlePeriodChange} />}
     >
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <AreaChart
@@ -106,6 +168,11 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
               tickMargin={8}
               tickFormatter={(value) => {
                 const date = new Date(value);
+                if (granularity === Granularity.DAY) {
+                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                } else if (granularity === Granularity.WEEK) {
+                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                }
                 return date.toLocaleDateString("en-US", { month: "short" });
               }}
             />
@@ -116,6 +183,11 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
                   indicator="dot"
                   labelFormatter={(value) => {
                     const date = new Date(value);
+                    if (granularity === Granularity.DAY) {
+                      return date.toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric", year: "numeric" });
+                    } else if (granularity === Granularity.WEEK) {
+                      return `Week of ${date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
+                    }
                     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
                   }}
                   formatter={(value) => (
