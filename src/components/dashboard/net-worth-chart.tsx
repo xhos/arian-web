@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { subDays, subMonths } from "date-fns";
+import { subDays, subMonths, subWeeks } from "date-fns";
 import { create } from "@bufbuild/protobuf";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card } from "@/components/lib";
@@ -36,48 +36,76 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
     }
   };
 
-  // Calculate date range based on period type
-  const getDateRange = () => {
-    const endDate = new Date();
-    let startDate: Date;
-
-    if (periodType === PeriodType.PERIOD_TYPE_CUSTOM && customDates) {
-      return { startDate: customDates.start, endDate: customDates.end };
-    }
-
-    switch (periodType) {
-      case PeriodType.PERIOD_TYPE_7_DAYS:
-        startDate = subDays(endDate, 7);
-        break;
-      case PeriodType.PERIOD_TYPE_30_DAYS:
-        startDate = subDays(endDate, 30);
-        break;
-      case PeriodType.PERIOD_TYPE_90_DAYS:
-        startDate = subDays(endDate, 90);
-        break;
-      default:
-        startDate = subMonths(endDate, 12);
-    }
-
-    return { startDate, endDate };
-  };
-
-  const { startDate, endDate } = getDateRange();
-
-  // Determine appropriate granularity based on date range
-  const getGranularity = () => {
-    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysDiff <= 90) {
+  // Determine appropriate granularity based on date range in days
+  const getGranularity = (daysBack: number) => {
+    if (daysBack < 60) {
       return Granularity.DAY;
-    } else if (daysDiff <= 180) {
+    } else if (daysBack < 365) {
       return Granularity.WEEK;
     } else {
       return Granularity.MONTH;
     }
   };
 
-  const granularity = getGranularity();
+  // Calculate date range based on period type, aligned with granularity
+  const getDateRange = () => {
+    const endDate = new Date();
+    let startDate: Date;
+    let daysBack: number;
+
+    if (periodType === PeriodType.PERIOD_TYPE_CUSTOM && customDates) {
+      return {
+        startDate: customDates.start,
+        endDate: customDates.end,
+        granularity: getGranularity(
+          Math.ceil((customDates.end.getTime() - customDates.start.getTime()) / (1000 * 60 * 60 * 24))
+        )
+      };
+    }
+
+    switch (periodType) {
+      case PeriodType.PERIOD_TYPE_7_DAYS:
+        daysBack = 7;
+        break;
+      case PeriodType.PERIOD_TYPE_30_DAYS:
+        daysBack = 30;
+        break;
+      case PeriodType.PERIOD_TYPE_90_DAYS:
+        daysBack = 90;
+        break;
+      case PeriodType.PERIOD_TYPE_3_MONTHS:
+        daysBack = 90;
+        break;
+      case PeriodType.PERIOD_TYPE_6_MONTHS:
+        daysBack = 180;
+        break;
+      case PeriodType.PERIOD_TYPE_1_YEAR:
+        daysBack = 365;
+        break;
+      case PeriodType.PERIOD_TYPE_ALL_TIME:
+        daysBack = 730; // 2 years back as a reasonable maximum
+        break;
+      default:
+        daysBack = 365;
+    }
+
+    const granularity = getGranularity(daysBack);
+
+    // Adjust start date to align with granularity, ensuring endDate is always a data point
+    if (granularity === Granularity.WEEK) {
+      const weeksBack = Math.ceil(daysBack / 7);
+      startDate = subWeeks(endDate, weeksBack);
+    } else if (granularity === Granularity.MONTH) {
+      const monthsBack = Math.ceil(daysBack / 30);
+      startDate = subMonths(endDate, monthsBack);
+    } else {
+      startDate = subDays(endDate, daysBack);
+    }
+
+    return { startDate, endDate, granularity };
+  };
+
+  const { startDate, endDate, granularity } = getDateRange();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["net-worth-history", userId, periodType, customDates],
@@ -100,7 +128,7 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
 
   if (isLoading) {
     return (
-      <Card title="net worth over time" description="Loading...">
+      <Card padding="md" title="net worth over time" description="Loading...">
         <Skeleton className="h-[300px] w-full" />
       </Card>
     );
@@ -108,7 +136,7 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
 
   if (error || !data || data.dataPoints.length === 0) {
     return (
-      <Card title="net worth over time" description="No data available">
+      <Card padding="md" title="net worth over time" description="No data available">
         <div className="flex h-[300px] items-center justify-center text-muted-foreground">
           {error ? "Failed to load net worth data" : "No net worth history found"}
         </div>
@@ -137,18 +165,20 @@ export function NetWorthChart({ userId }: NetWorthChartProps) {
 
   return (
     <Card
+      padding="md"
       title="net worth over time"
       description={
         <>
           <span className="tabular-nums">
             ${currentValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
-          <span className={`ml-2 text-xs ${change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-            {change >= 0 ? "↑" : "↓"} {change >= 0 ? "+" : ""}{changePercent}% {getChangeLabel()}
+          <span className={`ml-2 text-xs ${change > 0 ? "text-green-600 dark:text-green-400" : change < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"}`}>
+            {change > 0 ? "↑" : change < 0 ? "↓" : ""} {change !== 0 ? `${change > 0 ? "+" : ""}${changePercent}%` : "no change"} {getChangeLabel()}
           </span>
         </>
       }
       action={<PeriodSelector value={periodType} onChange={handlePeriodChange} />}
+      hideActionUntilHover
     >
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
           <AreaChart

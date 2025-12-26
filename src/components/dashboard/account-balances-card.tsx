@@ -53,7 +53,7 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
   });
 
   return (
-    <Card variant="elevated" title="account balances">
+    <Card padding="md" title="account balances">
       <VStack spacing="sm">
         {isLoading ? (
           <>
@@ -65,22 +65,19 @@ export function AccountBalancesCard({ userId }: AccountBalancesCardProps) {
           sortAccountsByType(data).map((account, index) => {
             const balance = account.balance ? formatAmount(account.balance) : 0;
             const isDebt = account.type === AccountType.ACCOUNT_CREDIT_CARD;
-            const isBorderTop = account.type === AccountType.ACCOUNT_CREDIT_CARD;
 
             return (
               <HStack
                 key={account.id}
                 spacing="md"
                 justify="between"
-                className={isBorderTop && index > 0 ? "border-t pt-3" : ""}
+                className={index > 0 ? "border-t pt-3" : ""}
               >
                 <VStack spacing="xs" align="start">
-                  <div className="text-sm font-medium">{account.name}</div>
-                  <Caption>{getAccountTypeLabel(account.type)}</Caption>
+                  <div className="text-sm font-medium">{account.alias || account.name}</div>
+                  <Caption className="text-muted-foreground">{getAccountTypeLabel(account.type)}</Caption>
                 </VStack>
-                <div
-                  className={`text-sm font-semibold tabular-nums ${isDebt ? "text-red-600" : ""}`}
-                >
+                <div className="text-sm font-semibold tabular-nums">
                   {isDebt && balance !== 0 ? "-" : ""}$
                   {Math.abs(balance).toLocaleString("en-US", {
                     minimumFractionDigits: 2,

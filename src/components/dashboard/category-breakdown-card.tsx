@@ -69,6 +69,7 @@ export function CategoryBreakdownCard({ userId }: CategoryBreakdownCardProps) {
       padding="md"
       title="spending breakdown"
       action={<PeriodSelector value={periodType} onChange={handlePeriodChange} />}
+      hideActionUntilHover
     >
       {loading && <Skeleton className="h-[280px]" />}
       {error && (

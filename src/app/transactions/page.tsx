@@ -30,8 +30,11 @@ export default function TransactionsPage() {
   const {
     deleteTransactions,
     createTransaction,
+    updateTransaction,
     isCreating,
+    isUpdating,
     createError,
+    updateError,
     deleteError,
     refetch,
     isLoading,
@@ -51,8 +54,16 @@ export default function TransactionsPage() {
     userNotes?: string;
     categoryId?: bigint;
   }) => {
-    await createTransaction(formData);
+    if (editingTransaction) {
+      await updateTransaction({
+        id: editingTransaction.id,
+        ...formData,
+      });
+    } else {
+      await createTransaction(formData);
+    }
     setIsDialogOpen(false);
+    setEditingTransaction(null);
   };
 
   const handleClearSelection = () => {
@@ -74,6 +85,13 @@ export default function TransactionsPage() {
     setIsDialogOpen(true);
   };
 
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setEditingTransaction(null);
+    }
+  };
+
   const handleDeleteTransaction = async (transaction: Transaction) => {
     await deleteTransactions([transaction.id]);
   };
@@ -88,9 +106,9 @@ export default function TransactionsPage() {
       <PageContent>
         <PageHeaderWithTitle title="transactions" />
 
-        {(createError || deleteError) && (
+        {(createError || updateError || deleteError) && (
           <ErrorMessage className="mb-6">
-            {createError?.message || deleteError?.message}
+            {createError?.message || updateError?.message || deleteError?.message}
           </ErrorMessage>
         )}
 
@@ -110,7 +128,7 @@ export default function TransactionsPage() {
                   <Button onClick={() => refetch()} size="icon" variant="ghost" disabled={isLoading}>
                     <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                   </Button>
-                  <Button onClick={() => setIsDialogOpen(true)} size="icon" disabled={isCreating}>
+                  <Button onClick={() => setIsDialogOpen(true)} size="icon" disabled={isCreating || isUpdating}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </HStack>
@@ -137,7 +155,7 @@ export default function TransactionsPage() {
                 <Button onClick={() => refetch()} size="icon" variant="ghost" disabled={isLoading}>
                   <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                 </Button>
-                <Button onClick={() => setIsDialogOpen(true)} size="default" disabled={isCreating}>
+                <Button onClick={() => setIsDialogOpen(true)} size="default" disabled={isCreating || isUpdating}>
                   <Plus className="h-4 w-4" />
                   New
                 </Button>
@@ -168,7 +186,7 @@ export default function TransactionsPage() {
 
         <TransactionDialog
           open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
+          onOpenChange={handleDialogOpenChange}
           transaction={editingTransaction}
           onSave={handleSaveTransaction}
           title={editingTransaction ? "Edit Transaction" : "Create Transaction"}

@@ -8,19 +8,19 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  variant?: 'default' | 'subtle' | 'outline' | 'elevated';
+  variant?: 'default' | 'subtle' | 'outline';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   interactive?: boolean;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;
+  hideActionUntilHover?: boolean;
 }
 
 const variantClasses = {
-  default: 'bg-card border border-border rounded-lg',
-  subtle: 'bg-muted/30 border-0 rounded-lg',
-  outline: 'bg-background border border-border rounded-lg',
-  elevated: 'bg-card border border-border rounded-lg shadow-sm',
+  default: 'bg-card border border-border rounded-lg shadow-sm',
+  subtle: 'bg-muted/30 border-0 rounded-lg shadow-sm',
+  outline: 'bg-background border border-border rounded-lg shadow-sm',
 };
 
 const paddingClasses = {
@@ -37,10 +37,12 @@ export function Card({
   title,
   description,
   action,
+  hideActionUntilHover = false,
   className,
   children,
   ...props
 }: CardProps) {
+  const [isHovered, setIsHovered] = React.useState(false);
   const hasHeader = title || description || action;
   const contentPadding = hasHeader ? 'none' : padding;
 
@@ -50,21 +52,30 @@ export function Card({
         variantClasses[variant],
         paddingClasses[contentPadding],
         interactive && 'transition-colors hover:bg-accent/5 cursor-pointer',
-        'flex flex-col gap-6',
+        'flex flex-col',
         className
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       {...props}
     >
       {hasHeader && (
-        <div className={cn('flex items-start justify-between gap-4', paddingClasses[padding], 'pb-0')}>
+        <div className={cn('flex items-start justify-between gap-4', paddingClasses[padding], 'pb-4')}>
           <div className="flex-1 min-w-0">
-            {title && <h2 className="font-semibold text-base leading-none">{title}</h2>}
+            {title && <div className="font-mono text-xs text-muted-foreground">{title}</div>}
             {description && <p className="text-muted-foreground text-sm mt-2">{description}</p>}
           </div>
-          {action && <div className="shrink-0">{action}</div>}
+          {action && (
+            <div className={cn(
+              'shrink-0 transition-opacity duration-200',
+              hideActionUntilHover && !isHovered && 'opacity-0 pointer-events-none'
+            )}>
+              {action}
+            </div>
+          )}
         </div>
       )}
-      {children && <div className={cn(hasHeader && paddingClasses[padding], hasHeader && 'pt-0')}>{children}</div>}
+      {children && <div className={cn(hasHeader && paddingClasses[padding], hasHeader && 'pt-0', 'flex-1')}>{children}</div>}
     </div>
   );
 }

@@ -18,11 +18,11 @@ export default async function HomePage() {
 
   return (
     <div className="w-full p-4 lg:p-6">
-      <div className="mx-auto max-w-[1400px] space-y-4">
+      <div className="mx-auto max-w-[1600px] space-y-4">
         <DashboardStats userId={userId} />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
           {/* Left Column */}
           <div className="space-y-4 lg:col-span-3">
             <AccountBalancesCard userId={userId} />

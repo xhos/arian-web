@@ -35,13 +35,14 @@ export function Amount({
 
   const variantClasses = {
     neutral: 'text-foreground',
-    positive: 'text-success',
-    negative: 'text-destructive',
+    positive: 'text-green-700 dark:text-green-400',
+    negative: 'text-foreground',
   };
 
   return (
     <span className={cn('font-mono font-semibold', variantClasses[variant], className)}>
       {variant === 'positive' && value > 0 && '+'}
+      {variant === 'negative' && value > 0 && '-'}
       {formatted}
     </span>
   );
