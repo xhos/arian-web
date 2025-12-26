@@ -3,6 +3,7 @@ import { transactionClient } from "@/lib/grpc-client";
 import {
   ListTransactionsRequestSchema,
   CreateTransactionRequestSchema,
+  UpdateTransactionRequestSchema,
   DeleteTransactionRequestSchema,
 } from "@/gen/arian/v1/transaction_services_pb";
 import type { Cursor } from "@/gen/arian/v1/common_pb";
@@ -32,6 +33,23 @@ export interface CreateTransactionInput {
     nanos: number;
   };
   direction: TransactionDirection;
+  description?: string;
+  merchant?: string;
+  userNotes?: string;
+  categoryId?: bigint;
+}
+
+export interface UpdateTransactionInput {
+  userId: string;
+  id: bigint;
+  accountId?: bigint;
+  txDate?: Date;
+  txAmount?: {
+    currencyCode: string;
+    units: string;
+    nanos: number;
+  };
+  direction?: TransactionDirection;
   description?: string;
   merchant?: string;
   userNotes?: string;
@@ -79,6 +97,26 @@ export const transactionsApi = {
     });
     const response = await transactionClient.createTransaction(request);
     return response.transactions[0];
+  },
+
+  async update(data: UpdateTransactionInput) {
+    const request = create(UpdateTransactionRequestSchema, {
+      userId: data.userId,
+      id: data.id,
+      accountId: data.accountId,
+      txDate: data.txDate ? { seconds: BigInt(Math.floor(data.txDate.getTime() / 1000)) } : undefined,
+      txAmount: data.txAmount ? {
+        currencyCode: data.txAmount.currencyCode,
+        units: BigInt(data.txAmount.units),
+        nanos: data.txAmount.nanos,
+      } : undefined,
+      direction: data.direction,
+      description: data.description,
+      merchant: data.merchant,
+      userNotes: data.userNotes,
+      categoryId: data.categoryId,
+    });
+    await transactionClient.updateTransaction(request);
   },
 
   async bulkCreate(userId: string, transactions: Omit<CreateTransactionInput, "userId">[]) {

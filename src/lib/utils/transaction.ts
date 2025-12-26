@@ -59,32 +59,42 @@ export function formatDate(timestamp?: TimestampType | string) {
   }
 
   const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffInMs = today.getTime() - dateOnly.getTime();
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
   const isCurrentYear = date.getFullYear() === now.getFullYear();
 
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  let displayDate: string;
 
-  const isCurrentWeek = date >= startOfWeek && date <= endOfWeek;
-
-  let displayOptions: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  };
-
-  if (!isCurrentYear) {
-    displayOptions.year = "numeric";
+  // Today
+  if (diffInDays === 0) {
+    displayDate = "today";
   }
-
-  if (isCurrentWeek) {
-    displayOptions = { weekday: "long" };
+  // Yesterday
+  else if (diffInDays === 1) {
+    displayDate = "yesterday";
+  }
+  // Within the last 7 days - show day name
+  else if (diffInDays > 1 && diffInDays < 7) {
+    displayDate = date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+  }
+  // Older - show full date
+  else {
+    const displayOptions: Intl.DateTimeFormatOptions = {
+      month: "long",
+      day: "numeric",
+    };
+    if (!isCurrentYear) {
+      displayOptions.year = "numeric";
+    }
+    displayDate = date.toLocaleDateString("en-US", displayOptions).toLowerCase();
   }
 
   return {
     date: date.toISOString().split("T")[0],
-    displayDate: date.toLocaleDateString("en-US", displayOptions),
+    displayDate,
   };
 }
 

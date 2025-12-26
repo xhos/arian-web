@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { transactionsApi, type CreateTransactionInput } from "@/lib/api/transactions";
+import { transactionsApi, type CreateTransactionInput, type UpdateTransactionInput } from "@/lib/api/transactions";
 import type { Transaction } from "@/gen/arian/v1/transaction_pb";
 import type { Cursor } from "@/gen/arian/v1/common_pb";
 import { useMemo } from "react";
@@ -107,6 +107,20 @@ export function useTransactionsQuery({
     },
   });
 
+  // Update transaction mutation
+  const updateTransactionMutation = useMutation({
+    mutationFn: async (formData: Omit<UpdateTransactionInput, "userId">) => {
+      if (!userId) throw new Error("User not authenticated");
+      return transactionsApi.update({ ...formData, userId });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch transactions
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["transaction-summary"] });
+    },
+  });
+
   return {
     // Query state
     transactions: allTransactions,
@@ -126,6 +140,10 @@ export function useTransactionsQuery({
     createTransaction: createTransactionMutation.mutateAsync,
     isCreating: createTransactionMutation.isPending,
     createError: createTransactionMutation.error,
+
+    updateTransaction: updateTransactionMutation.mutateAsync,
+    isUpdating: updateTransactionMutation.isPending,
+    updateError: updateTransactionMutation.error,
 
     // Manual controls
     refetch: transactionsQuery.refetch,
