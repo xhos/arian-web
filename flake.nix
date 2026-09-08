@@ -30,12 +30,15 @@
       pre-commit = git-hooks.lib.${system}.run {
         src = ./.;
         hooks = {
-          alejandra.enable = true;
+          # bun2nix rewrites bun.nix on every install; keep alejandra off it
+          alejandra = {
+            enable = true;
+            excludes = ["bun\\.nix"];
+          };
           biome.enable = true;
 
           typecheck = {
             enable = true;
-            name = "typecheck";
             entry = pkgs.lib.getExe (pkgs.writeShellApplication {
               name = "tsc-check";
               runtimeInputs = [pkgs.typescript];
@@ -48,7 +51,6 @@
 
           nix-build = {
             enable = true;
-            name = "nix-build";
             entry = pkgs.lib.getExe (pkgs.writeShellApplication {
               name = "nix-build-check";
               runtimeInputs = [pkgs.nix];
@@ -77,28 +79,26 @@
     devShells = forAllSystems (system: pkgs: {
       default = pkgs.mkShell {
         packages = with pkgs; [
-          buf
-          nodejs
-          typescript
           bun
           bun2nix.packages.${system}.default
-
-          (writeShellScriptBin "regen" ''
-            rm -rf src/gen/
-            bun buf generate
-          '')
+          nodejs
+          biome
 
           (writeShellScriptBin "run" ''
             ${bun}/bin/bun install
             exec ${bun}/bin/bun run dev
           '')
 
+          (writeShellScriptBin "regen" ''
+            rm -rf src/gen
+            exec ${bun}/bin/bun x buf generate
+          '')
+
           (writeShellScriptBin "bump-protos" ''
-            git -C proto fetch origin
-            git -C proto checkout main
-            git -C proto pull --ff-only
+            set -e
+            git submodule update --remote --checkout proto
             git add proto
-            git commit -m "chore: bump proto files"
+            git commit -m "chore: bump protos"
             git push
           '')
         ];
@@ -106,5 +106,7 @@
         shellHook = self.checks.${system}.pre-commit.shellHook;
       };
     });
+
+    formatter = forAllSystems (system: pkgs: pkgs.alejandra);
   };
 }
